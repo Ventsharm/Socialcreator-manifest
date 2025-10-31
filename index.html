@@ -138,7 +138,7 @@
   });
 </script>
 
-<!-- Firebase (Compat, Blogger/GitHub friendly) -->
+<!-- Firebase (Compat) -->
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
@@ -169,227 +169,104 @@ const els={
 function fmt(n){return Number(n||0).toLocaleString(undefined,{style:"currency",currency:"GBP",minimumFractionDigits:2});}
 function cleanName(n){return (n||"").replace(/^\s*✅\s*/,"").trim();}
 
-/* --------- Local cache per user (no reads on refresh) --------- */
+/* ---- Cache ---- */
 function cacheKey(uid){ return "vb_budget_"+uid; }
-function saveCache(uid, data){
-  try{ localStorage.setItem(cacheKey(uid), JSON.stringify(data)); }catch(e){}
-}
-function loadCache(uid){
-  try{ return JSON.parse(localStorage.getItem(cacheKey(uid))||"null") }catch(e){ return null; }
-}
+function saveCache(uid,data){ localStorage.setItem(cacheKey(uid),JSON.stringify(data)); }
+function loadCache(uid){ try{return JSON.parse(localStorage.getItem(cacheKey(uid))||"null")}catch(e){return null;} }
 
-/* --------- Edit dialog (single popup) --------- */
+/* ---- Popup ---- */
 function openEditor({title,name,amount,include}) {
   return new Promise(res=>{
-    els.dlgTitle.textContent = title || "Edit";
+    els.dlgTitle.textContent = title;
     els.dlgBody.innerHTML = "";
-
-    const l1=document.createElement("label"); l1.textContent="Name";
     const n=document.createElement("input"); n.className="field"; n.value=name||"";
-    const l2=document.createElement("label"); l2.textContent="Amount";
-    const a=document.createElement("input"); a.type="number"; a.step="0.01"; a.className="field"; a.value=(amount!=null?amount:0);
-    els.dlgBody.append(l1,n,l2,a);
-
+    const a=document.createElement("input"); a.type="number"; a.step="0.01"; a.className="field"; a.value=amount||0;
+    els.dlgBody.append("Name",n,"Amount",a);
     let c=null;
     if(typeof include==="boolean"){
       const wrap=document.createElement("label"); wrap.style.cssText="display:flex;gap:8px;align-items:center;";
-      c=document.createElement("input"); c.type="checkbox"; c.checked=!!include;
+      c=document.createElement("input"); c.type="checkbox"; c.checked=include;
       const sp=document.createElement("span"); sp.textContent="Include in available income";
       wrap.append(c,sp); els.dlgBody.append(wrap);
     }
-
     els.dlgBack.style.display="flex";
-    const onCancel=()=>{ finish(null); };
-    const onSave=()=>{ const out={ name:n.value.trim(), amount:Number(a.value)||0 }; if(c) out.include=!!c.checked; finish(out); };
-    function finish(v){
-      els.dlgBack.style.display="none";
-      els.dlgCancel.removeEventListener("click", onCancel);
-      els.dlgSave.removeEventListener("click", onSave);
-      res(v);
-    }
-    els.dlgCancel.addEventListener("click", onCancel);
-    els.dlgSave.addEventListener("click", onSave);
+    const onCancel=()=>finish(null),onSave=()=>finish({name:n.value,amount:Number(a.value)||0,include:c?c.checked:null});
+    function finish(v){ els.dlgBack.style.display="none"; els.dlgCancel.onclick=null; els.dlgSave.onclick=null; res(v);}
+    els.dlgCancel.onclick=onCancel; els.dlgSave.onclick=onSave;
   });
 }
 
-/* --------- Render from state (no reads here) --------- */
-function renderFromState(state){
-  const incomes = state.incomes||[];
-  const expenses = state.expenses||[];
-
-  els.incomeList.innerHTML="";
-  els.expenseList.innerHTML="";
-
+/* ---- Render ---- */
+function render(state){
+  const incomes=state.incomes||[],expenses=state.expenses||[];
+  els.incomeList.innerHTML=""; els.expenseList.innerHTML="";
   let totalAll=0,totalIncl=0,totalExp=0;
-
-  // Incomes
   incomes.forEach(inc=>{
-    totalAll += Number(inc.amount)||0;
-    if(inc.include) totalIncl += Number(inc.amount)||0;
-
-    const row=document.createElement("div"); row.className="row";
-    const line=document.createElement("div");
-    line.textContent=(inc.include?"✅ ":"")+cleanName(inc.name)+" - "+fmt(inc.amount);
-    row.appendChild(line);
-
+    totalAll+=Number(inc.amount)||0; if(inc.include) totalIncl+=Number(inc.amount)||0;
+    const row=document.createElement("div"); row.className="row"; 
+    row.innerHTML=`${inc.include?"✅ ":""}${cleanName(inc.name)} - ${fmt(inc.amount)}`
     const actions=document.createElement("div"); actions.className="actions";
-    const btnE=document.createElement("button"); btnE.className="btn btn-primary"; btnE.textContent="Edit";
-    const btnD=document.createElement("button"); btnD.className="btn btn-danger"; btnD.textContent="Delete";
-    actions.append(btnE,btnD); row.appendChild(actions);
-
-    // attach later in onAuthStateChanged where we have uid
-    row.dataset.itemId = inc.id || "";
-    row.dataset.kind   = "income";
-
-    els.incomeList.appendChild(row);
+    const e=document.createElement("button"); e.textContent="Edit"; e.className="btn btn-primary";
+    const d=document.createElement("button"); d.textContent="Delete"; d.className="btn btn-danger";
+    actions.append(e,d); row.append(actions); els.incomeList.append(row);
   });
-
-  // Expenses
   expenses.forEach(ex=>{
-    totalExp += Number(ex.amount)||0;
-
-    const row=document.createElement("div"); row.className="row";
-    const line=document.createElement("div");
-    line.textContent=ex.name+" - "+fmt(ex.amount);
-    row.appendChild(line);
-
+    totalExp+=Number(ex.amount)||0;
+    const row=document.createElement("div"); row.className="row"; 
+    row.innerHTML=`${ex.name} - ${fmt(ex.amount)}`
     const actions=document.createElement("div"); actions.className="actions";
-    const btnE=document.createElement("button"); btnE.className="btn btn-primary"; btnE.textContent="Edit";
-    const btnD=document.createElement("button"); btnD.className="btn btn-danger"; btnD.textContent="Delete";
-    actions.append(btnE,btnD); row.appendChild(actions);
-
-    row.dataset.itemId = ex.id || "";
-    row.dataset.kind   = "expense";
-
-    els.expenseList.appendChild(row);
+    const e=document.createElement("button"); e.textContent="Edit"; e.className="btn btn-primary";
+    const d=document.createElement("button"); d.textContent="Delete"; d.className="btn btn-danger";
+    actions.append(e,d); row.append(actions); els.expenseList.append(row);
   });
-
   els.sumTotalIncome.textContent=fmt(totalAll);
   els.sumAvailIncome.textContent=fmt(totalIncl-totalExp);
   els.sumExpenses.textContent=fmt(totalExp);
   els.sumPercent.textContent="Spent: "+(totalIncl>0?Math.round(totalExp/totalIncl*100):0)+"%";
 }
 
-/* --------- Fetch from server (1 read per collection), then cache + render --------- */
+/* ---- Server Sync ---- */
 async function reloadFromServer(uid){
-  const incSnap = await db.collection("users").doc(uid).collection("incomes").get();
-  const expSnap = await db.collection("users").doc(uid).collection("expenses").get();
-  const state = {
-    incomes: incSnap.docs.map(d=>({ id:d.id, ...d.data() })),
-    expenses: expSnap.docs.map(d=>({ id:d.id, ...d.data() }))
-  };
-  saveCache(uid, state);
-  renderFromState(state);
-  // Reattach button handlers with live IDs
-  attachRowHandlers(uid, state);
+  const incSnap=await db.collection("users").doc(uid).collection("incomes").get();
+  const expSnap=await db.collection("users").doc(uid).collection("expenses").get();
+  const state={ incomes:incSnap.docs.map(d=>({id:d.id,...d.data()})), expenses:expSnap.docs.map(d=>({id:d.id,...d.data()})) };
+  saveCache(uid,state); render(state);
 }
 
-/* --------- Attach Edit/Delete handlers to rendered rows --------- */
-function attachRowHandlers(uid, state){
-  // Map by id for quick lookup
-  const incomeById = Object.fromEntries((state.incomes||[]).map(i=>[i.id,i]));
-  const expenseById= Object.fromEntries((state.expenses||[]).map(e=>[e.id,e]));
+/* ---- Auth ---- */
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
+function showAuthError(e){ els.authMsg.textContent=e?.message||"Check Firebase Auth setup."; }
 
-  // For each row, wire up edit/delete to use IDs
-  document.querySelectorAll('.row').forEach(row=>{
-    const id = row.dataset.itemId;
-    const kind = row.dataset.kind;
-    if(!id || !kind) return;
-    const [editBtn, delBtn] = row.querySelectorAll('.actions .btn');
-
-    if(kind==="income"){
-      const inc = incomeById[id]; if(!inc) return;
-      editBtn.onclick = async ()=>{
-        const ed = await openEditor({title:"Edit Income",name:cleanName(inc.name),amount:inc.amount,include:!!inc.include});
-        if(!ed) return;
-        await db.collection("users").doc(uid).collection("incomes").doc(id).set({
-          name: cleanName(ed.name)||inc.name,
-          amount: Number(ed.amount)||0,
-          include: typeof ed.include==="boolean" ? ed.include : !!inc.include
-        }, { merge:true });
-        await reloadFromServer(uid);  // 1 read per collection after write
-      };
-      delBtn.onclick = async ()=>{
-        if(confirm(`Delete "${cleanName(inc.name)}" (${fmt(inc.amount)})?`)){
-          await db.collection("users").doc(uid).collection("incomes").doc(id).delete();
-          await reloadFromServer(uid); // refresh lists
-        }
-      };
-    } else {
-      const ex = expenseById[id]; if(!ex) return;
-      editBtn.onclick = async ()=>{
-        const ed = await openEditor({title:"Edit Expense",name:ex.name,amount:ex.amount});
-        if(!ed) return;
-        await db.collection("users").doc(uid).collection("expenses").doc(id).set({
-          name: (ed.name||"").trim()||ex.name,
-          amount: Number(ed.amount)||0
-        }, { merge:true });
-        await reloadFromServer(uid);
-      };
-      delBtn.onclick = async ()=>{
-        if(confirm(`Delete "${ex.name}" (${fmt(ex.amount)})?`)){
-          await db.collection("users").doc(uid).collection("expenses").doc(id).delete();
-          await reloadFromServer(uid);
-        }
-      };
-    }
-  });
-}
-
-/* --------- Auth (no reads on refresh) --------- */
-els.btnLogin.onclick=()=>auth.signInWithEmailAndPassword(els.authEmail.value,els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
-els.btnRegister.onclick=()=>auth.createUserWithEmailAndPassword(els.authEmail.value,els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
+els.btnLogin.onclick=async()=>{try{await auth.signInWithEmailAndPassword(els.authEmail.value,els.authPass.value);}catch(e){showAuthError(e);}};
+els.btnRegister.onclick=async()=>{try{await auth.createUserWithEmailAndPassword(els.authEmail.value,els.authPass.value);}catch(e){showAuthError(e);}};
 els.btnLogout.onclick=()=>auth.signOut();
 
-auth.onAuthStateChanged(async (user)=>{
+auth.onAuthStateChanged(async user=>{
   if(user){
-    els.userEmail.textContent="Logged in as: "+(user.email||"");
-    els.authWrap.style.display="none"; 
-    els.appWrap.style.display="block";
+    els.userEmail.textContent="Logged in as: "+user.email;
+    els.authWrap.style.display="none"; els.appWrap.style.display="block";
+    const cached=loadCache(user.uid)||{incomes:[],expenses:[]}; render(cached);
 
-    // 🔒 NO READS ON REFRESH:
-    // Show cached data if present, otherwise show empty lists.
-    const cached = loadCache(user.uid) || { incomes:[], expenses:[] };
-    renderFromState(cached);
-    // Attach handlers using cached IDs (if any)
-    attachRowHandlers(user.uid, cached);
-
-    // Buttons (writes trigger a one-time reload to fetch latest)
-    els.addIncome.onclick = async ()=>{
-      const n = cleanName(els.incName.value);
-      const a = Number(els.incAmt.value||0);
-      const i = !!els.incInclude.checked;
-      if(!n) return;
-      await db.collection("users").doc(user.uid).collection("incomes").add({ name:n, amount:a, include:i });
-      els.incName.value=""; els.incAmt.value=""; els.incInclude.checked=true;
-      await reloadFromServer(user.uid); // 2 reads (incomes+expenses) after write
+    els.addIncome.onclick=async()=>{
+      const n=cleanName(els.incName.value); const a=Number(els.incAmt.value||0); const i=!!els.incInclude.checked;
+      if(!n)return; await db.collection("users").doc(user.uid).collection("incomes").add({name:n,amount:a,include:i});
+      els.incName.value=""; els.incAmt.value=""; els.incInclude.checked=true; await reloadFromServer(user.uid);
     };
-
-    els.addExpense.onclick = async ()=>{
-      const n = (els.expName.value||"").trim();
-      const a = Number(els.expAmt.value||0);
-      if(!n) return;
-      await db.collection("users").doc(user.uid).collection("expenses").add({ name:n, amount:a });
-      els.expName.value=""; els.expAmt.value="";
+    els.addExpense.onclick=async()=>{
+      const n=(els.expName.value||"").trim(); const a=Number(els.expAmt.value||0);
+      if(!n)return; await db.collection("users").doc(user.uid).collection("expenses").add({name:n,amount:a});
+      els.expName.value=""; els.expAmt.value=""; await reloadFromServer(user.uid);
+    };
+    els.resetAll.onclick=async()=>{
+      if(!confirm("Reset all incomes and expenses?"))return;
+      const incSnap=await db.collection("users").doc(user.uid).collection("incomes").get();
+      const expSnap=await db.collection("users").doc(user.uid).collection("expenses").get();
+      for(const d of incSnap.docs) await d.ref.delete();
+      for(const d of expSnap.docs) await d.ref.delete();
       await reloadFromServer(user.uid);
     };
-
-    // Reset all — performs reads to collect latest IDs, same as before
-    els.resetAll.onclick = async ()=>{
-      if(!confirm("Reset all incomes and expenses for this account?")) return;
-      // Read current docs (counts as reads — same behaviour as before)
-      const incSnap = await db.collection("users").doc(user.uid).collection("incomes").get();
-      const expSnap = await db.collection("users").doc(user.uid).collection("expenses").get();
-      const ops = [];
-      incSnap.forEach(d=>ops.push(d.ref.delete()));
-      expSnap.forEach(d=>ops.push(d.ref.delete()));
-      await Promise.all(ops);
-      await reloadFromServer(user.uid); // refresh + cache
-    };
-
   }else{
-    els.appWrap.style.display="none";
-    els.authWrap.style.display="block";
+    els.appWrap.style.display="none"; els.authWrap.style.display="block";
   }
 });
 </script>
