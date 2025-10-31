@@ -121,7 +121,7 @@
   });
 </script>
 
-<!-- Firebase (Compat version that worked for you) -->
+<!-- Firebase (Compat, working) -->
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
@@ -146,7 +146,7 @@ const els={};
 function fmt(n){return Number(n||0).toLocaleString(undefined,{style:"currency",currency:"GBP"});}
 function cleanName(n){return (n||"").replace(/^\s*✅\s*/,"").trim();}
 
-// ---- RENDER (only added Edit/Delete & include toggle; nothing else changed) ----
+// ---- RENDER ----
 function render(uid){
   Promise.all([
     db.collection("users").doc(uid).collection("incomes").get(),
@@ -159,7 +159,6 @@ function render(uid){
     els.expenseList.innerHTML="";
     let totalAll=0,totalIncl=0,totalExp=0;
 
-    // Incomes with Edit/Delete + include toggle in Edit
     incomes.forEach(inc=>{
       totalAll+=Number(inc.amount)||0;
       if(inc.include) totalIncl+=Number(inc.amount)||0;
@@ -179,9 +178,15 @@ function render(uid){
         if(newName===null) return;
         const newAmt=prompt("Edit amount:",inc.amount);
         if(newAmt===null) return;
-        const incInc=confirm("Include this income in available balance?");
+        const includeNow=confirm(
+          inc.include
+          ? "Currently included. Press OK to keep it included, or Cancel to exclude."
+          : "Currently excluded. Press OK to include it in available balance."
+        );
+        const newInclude=includeNow?true:false;
+
         await db.collection("users").doc(uid).collection("incomes").doc(inc.id).set({
-          name:cleanName(newName), amount:Number(newAmt)||0, include:!!incInc
+          name:cleanName(newName),amount:Number(newAmt)||0,include:newInclude
         },{merge:true});
         render(uid);
       };
@@ -191,31 +196,26 @@ function render(uid){
           render(uid);
         }
       };
-
       els.incomeList.appendChild(row);
     });
 
-    // Expenses with Edit/Delete
     expenses.forEach(ex=>{
       totalExp+=Number(ex.amount)||0;
-
       const row=document.createElement("div"); row.className="row";
       const line=document.createElement("div");
       line.textContent=ex.name+" - "+fmt(ex.amount);
       row.appendChild(line);
-
       const actions=document.createElement("div"); actions.className="actions";
       const btnE=document.createElement("button"); btnE.className="btn btn-primary"; btnE.textContent="Edit";
       const btnD=document.createElement("button"); btnD.className="btn btn-danger"; btnD.textContent="Delete";
       actions.append(btnE,btnD); row.appendChild(actions);
-
       btnE.onclick=async()=>{
         const newName=prompt("Edit name:",ex.name);
-        if(newName===null) return;
+        if(newName===null)return;
         const newAmt=prompt("Edit amount:",ex.amount);
-        if(newAmt===null) return;
+        if(newAmt===null)return;
         await db.collection("users").doc(uid).collection("expenses").doc(ex.id).set({
-          name:(newName||"").trim(), amount:Number(newAmt)||0
+          name:(newName||"").trim(),amount:Number(newAmt)||0
         },{merge:true});
         render(uid);
       };
@@ -225,11 +225,9 @@ function render(uid){
           render(uid);
         }
       };
-
       els.expenseList.appendChild(row);
     });
 
-    // Summary
     els.sumTotalIncome.textContent=fmt(totalAll);
     els.sumAvailIncome.textContent=fmt(totalIncl-totalExp);
     els.sumExpenses.textContent=fmt(totalExp);
@@ -237,7 +235,7 @@ function render(uid){
   });
 }
 
-// ---- Auth handlers (unchanged from the version that worked) ----
+// ---- Auth ----
 els.btnLogin.onclick=()=>auth.signInWithEmailAndPassword(els.authEmail.value,els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
 els.btnRegister.onclick=()=>auth.createUserWithEmailAndPassword(els.authEmail.value,els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
 els.btnLogout.onclick=()=>auth.signOut();
@@ -247,7 +245,6 @@ auth.onAuthStateChanged(user=>{
     els.userEmail.textContent="Logged in as: "+user.email;
     els.authWrap.style.display="none"; els.appWrap.style.display="block";
     render(user.uid);
-
     els.addIncome.onclick=()=>{
       const n=cleanName(els.incName.value), a=Number(els.incAmt.value||0), i=!!els.incInclude.checked;
       if(!n)return;
