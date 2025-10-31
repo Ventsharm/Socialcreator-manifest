@@ -1,0 +1,1 @@
+# Socialcreator-manifest
