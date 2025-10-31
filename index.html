@@ -51,7 +51,7 @@
   </div>
 </div>
 
-<!-- ===== Verify Email Notice (shown when not verified) ===== -->
+<!-- ===== Verify Email Notice ===== -->
 <div id="verifyWrap" style="display:none;max-width:560px;margin:26px auto;padding:0 14px;">
   <div class="box" style="border-color:#eae8ff;background:#f8f7ff;">
     <h3 style="margin:0 0 10px;color:#7c3aed;">Verify your email</h3>
@@ -62,7 +62,7 @@
       <button id="btnResendVerify" class="btn btn-primary" style="flex:1;min-width:160px;">Resend email</button>
       <button id="btnLogoutFromVerify" class="btn btn-ghost" style="flex:1;min-width:160px;">Log out</button>
     </div>
-    <p class="small" style="margin-top:12px;">After you verify, return here and log in.</p>
+    <p class="small" style="margin-top:12px;">After verifying, return here and log in. If you can’t find the email, check your spam/junk folder.</p>
   </div>
 </div>
 
@@ -148,7 +148,6 @@
   </div>
 </div>
 
-<!-- Tabs JS -->
 <script>
 const tabs=document.querySelectorAll('.tab-bar button');
 const contents=document.querySelectorAll('.tab-content');
@@ -162,7 +161,6 @@ tabs.forEach(btn=>{
 });
 </script>
 
-<!-- Firebase libs -->
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script><script>
@@ -179,7 +177,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db   = firebase.firestore();
 
-/* ---------- Cache Helpers (0 reads/writes on refresh) ---------- */
+/* ---------- Cache Helpers ---------- */
 function cacheKey(uid){ return "vb_budget_"+uid; }
 function saveCache(uid,data){ localStorage.setItem(cacheKey(uid), JSON.stringify(data)); }
 function loadCache(uid){ try{return JSON.parse(localStorage.getItem(cacheKey(uid))||"null");}catch(e){return null;} }
@@ -231,7 +229,7 @@ function openDialog(title,item,hasInclude){
   });
 }
 
-/* ---------- Rendering (reads only on actions, not refresh) ---------- */
+/* ---------- Rendering ---------- */
 function render(uid,data){
   const incomes=data.incomes||[],expenses=data.expenses||[];
   els.incomeList.innerHTML=""; els.expenseList.innerHTML="";
@@ -290,7 +288,7 @@ function render(uid,data){
   els.sumPercent.textContent="Spent: "+(totalIncl>0?Math.round(totalExp/totalIncl*100):0)+"%";
 }
 
-/* ---------- Reload + Cache (single read per collection on action) ---------- */
+/* ---------- Reload + Cache ---------- */
 async function reload(uid){
   const incSnap=await db.collection("users").doc(uid).collection("incomes").get();
   const expSnap=await db.collection("users").doc(uid).collection("expenses").get();
@@ -309,9 +307,8 @@ els.btnLogin.onclick = () =>
 els.btnRegister.onclick = () =>
   auth.createUserWithEmailAndPassword(els.authEmail.value.trim(), els.authPass.value)
   .then(cred=>{
-    // Send verification once on signup
     return cred.user.sendEmailVerification().then(()=>{
-      els.authMsg.textContent = "Verification email sent. Please check your inbox.";
+      els.authMsg.textContent = "Verification email sent. Please check your inbox (and spam/junk folder).";
     });
   })
   .catch(e=>els.authMsg.textContent=e.message);
@@ -320,7 +317,7 @@ els.forgotLink.onclick = () => {
   const email = els.authEmail.value.trim();
   if(!email){ els.authMsg.textContent="Enter your email above, then tap Forgot password."; return; }
   auth.sendPasswordResetEmail(email)
-    .then(()=> els.authMsg.textContent="Password reset email sent.")
+    .then(()=> els.authMsg.textContent="Password reset email sent. Check your inbox (and spam/junk folder).")
     .catch(e => els.authMsg.textContent=e.message);
 };
 
@@ -331,26 +328,23 @@ els.btnResendVerify.onclick = () => {
   const u = auth.currentUser;
   if(!u){ return; }
   u.sendEmailVerification()
-   .then(()=> els.verifyMsg.textContent = "Verification email re-sent. Please check your inbox.")
+   .then(()=> els.verifyMsg.textContent = "Verification email re-sent. Please check your inbox (and spam/junk folder).")
    .catch(e => els.verifyMsg.textContent = e.message || "Could not resend email.");
 };
 
-/* ---------- Auth State (block unverified, keep 0 reads on refresh) ---------- */
+/* ---------- Auth State ---------- */
 auth.onAuthStateChanged(async user=>{
-  // Hide everything first
   els.authWrap.style.display="none";
   els.verifyWrap.style.display="none";
   els.appWrap.style.display="none";
 
   if(user){
     if(!user.emailVerified){
-      // Show verify panel; do NOT read/write
       els.verifyEmail.textContent = user.email || "";
       els.verifyWrap.style.display = "block";
       return;
     }
 
-    // Verified: show app & load cached first (0 reads on refresh)
     els.userEmail.textContent="Logged in as: "+(user.email||"");
     els.appWrap.style.display="block";
 
@@ -358,7 +352,6 @@ auth.onAuthStateChanged(async user=>{
     if(cached){ render(user.uid,cached); }
     else { const fresh=await reload(user.uid); render(user.uid,fresh); }
 
-    // Actions (writes/reads only on action)
     els.addIncome.onclick=async()=>{
       const n=els.incName.value.trim(),a=Number(els.incAmt.value||0),i=!!els.incInclude.checked;
       if(!n)return;
@@ -385,7 +378,6 @@ auth.onAuthStateChanged(async user=>{
     };
 
   }else{
-    // Signed out
     els.authWrap.style.display="block";
   }
 });
