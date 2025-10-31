@@ -1,4 +1,4 @@
-<!-- rebuild --><!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -24,7 +24,10 @@
   .dialog h3{margin:0 0 10px}
   .dialog .grid{display:grid;gap:10px}
   .dialog .rowbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
-</style><link rel="manifest" href="manifest.json">
+  .small { font-size:.92rem; color:#6b7280; }
+  .link { color:#2563eb; text-decoration:none; cursor:pointer; }
+</style>
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#000000">
 </head>
 <body>
@@ -33,13 +36,33 @@
 <div id="authWrap" style="max-width:480px;margin:30px auto;padding:0 14px;">
   <div class="box">
     <h2 style="margin:0 0 6px;font-size:1.4rem;text-align:center;">Sign in to Ventsharm Budget</h2>
-    <p id="authMsg" style="margin:6px 0 16px;color:#6b7280;text-align:center;">Use the same account on any device.</p>
+    <p id="authMsg" class="small" style="margin:6px 0 16px;text-align:center;">
+      Use the same account on any device.
+    </p>
     <div style="display:grid;gap:10px;">
-      <input id="authEmail" type="email" placeholder="Email" class="field">
-      <input id="authPass" type="password" placeholder="Password" class="field">
+      <input id="authEmail" type="email" placeholder="Email" class="field" autocomplete="username">
+      <input id="authPass" type="password" placeholder="Password" class="field" autocomplete="current-password">
+      <div class="small" style="text-align:right;margin-top:-6px;">
+        <a id="forgotLink" class="link">Forgot password?</a>
+      </div>
       <button id="btnLogin" class="btn" style="background:#111;color:#fff;font-weight:700;">Login</button>
       <button id="btnRegister" class="btn btn-ghost">Create account</button>
     </div>
+  </div>
+</div>
+
+<!-- ===== Verify Email Notice (shown when not verified) ===== -->
+<div id="verifyWrap" style="display:none;max-width:560px;margin:26px auto;padding:0 14px;">
+  <div class="box" style="border-color:#eae8ff;background:#f8f7ff;">
+    <h3 style="margin:0 0 10px;color:#7c3aed;">Verify your email</h3>
+    <p id="verifyMsg" class="small" style="margin:0 0 12px;">
+      We’ve sent a verification email to <b id="verifyEmail"></b>. Please open it and click the link to continue.
+    </p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button id="btnResendVerify" class="btn btn-primary" style="flex:1;min-width:160px;">Resend email</button>
+      <button id="btnLogoutFromVerify" class="btn btn-ghost" style="flex:1;min-width:160px;">Log out</button>
+    </div>
+    <p class="small" style="margin-top:12px;">After you verify, return here and log in.</p>
   </div>
 </div>
 
@@ -125,6 +148,7 @@
   </div>
 </div>
 
+<!-- Tabs JS -->
 <script>
 const tabs=document.querySelectorAll('.tab-bar button');
 const contents=document.querySelectorAll('.tab-content');
@@ -136,11 +160,12 @@ tabs.forEach(btn=>{
     document.getElementById(btn.dataset.tab).classList.add('active');
   });
 });
-</script><!-- Firebase -->
+</script>
+
+<!-- Firebase libs -->
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
-<script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script><script>
 /* ---------- Firebase Config ---------- */
 const firebaseConfig = {
   apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
@@ -154,7 +179,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db   = firebase.firestore();
 
-/* ---------- Cache Helpers ---------- */
+/* ---------- Cache Helpers (0 reads/writes on refresh) ---------- */
 function cacheKey(uid){ return "vb_budget_"+uid; }
 function saveCache(uid,data){ localStorage.setItem(cacheKey(uid), JSON.stringify(data)); }
 function loadCache(uid){ try{return JSON.parse(localStorage.getItem(cacheKey(uid))||"null");}catch(e){return null;} }
@@ -164,6 +189,9 @@ const $ = id => document.getElementById(id);
 const els = {
   authWrap:$("authWrap"), authEmail:$("authEmail"), authPass:$("authPass"),
   btnLogin:$("btnLogin"), btnRegister:$("btnRegister"), authMsg:$("authMsg"),
+  forgotLink:$("forgotLink"),
+  verifyWrap:$("verifyWrap"), verifyEmail:$("verifyEmail"), verifyMsg:$("verifyMsg"),
+  btnResendVerify:$("btnResendVerify"), btnLogoutFromVerify:$("btnLogoutFromVerify"),
   appWrap:$("appWrap"), userEmail:$("userEmail"), btnLogout:$("btnLogout"),
   incName:$("incName"), incAmt:$("incAmt"), incInclude:$("incInclude"),
   addIncome:$("addIncome"), incomeList:$("incomeList"),
@@ -203,7 +231,7 @@ function openDialog(title,item,hasInclude){
   });
 }
 
-/* ---------- Rendering ---------- */
+/* ---------- Rendering (reads only on actions, not refresh) ---------- */
 function render(uid,data){
   const incomes=data.incomes||[],expenses=data.expenses||[];
   els.incomeList.innerHTML=""; els.expenseList.innerHTML="";
@@ -262,12 +290,7 @@ function render(uid,data){
   els.sumPercent.textContent="Spent: "+(totalIncl>0?Math.round(totalExp/totalIncl*100):0)+"%";
 }
 
-/* ---------- Auth ---------- */
-els.btnLogin.onclick=()=>auth.signInWithEmailAndPassword(els.authEmail.value,els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
-els.btnRegister.onclick=()=>auth.createUserWithEmailAndPassword(els.authEmail.value,els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
-els.btnLogout.onclick=()=>auth.signOut();
-
-/* ---------- Reload + Cache ---------- */
+/* ---------- Reload + Cache (single read per collection on action) ---------- */
 async function reload(uid){
   const incSnap=await db.collection("users").doc(uid).collection("incomes").get();
   const expSnap=await db.collection("users").doc(uid).collection("expenses").get();
@@ -278,15 +301,64 @@ async function reload(uid){
   saveCache(uid,data); return data;
 }
 
-/* ---------- Auth State ---------- */
+/* ---------- Auth Actions ---------- */
+els.btnLogin.onclick = () =>
+  auth.signInWithEmailAndPassword(els.authEmail.value.trim(), els.authPass.value)
+  .catch(e=>els.authMsg.textContent=e.message);
+
+els.btnRegister.onclick = () =>
+  auth.createUserWithEmailAndPassword(els.authEmail.value.trim(), els.authPass.value)
+  .then(cred=>{
+    // Send verification once on signup
+    return cred.user.sendEmailVerification().then(()=>{
+      els.authMsg.textContent = "Verification email sent. Please check your inbox.";
+    });
+  })
+  .catch(e=>els.authMsg.textContent=e.message);
+
+els.forgotLink.onclick = () => {
+  const email = els.authEmail.value.trim();
+  if(!email){ els.authMsg.textContent="Enter your email above, then tap Forgot password."; return; }
+  auth.sendPasswordResetEmail(email)
+    .then(()=> els.authMsg.textContent="Password reset email sent.")
+    .catch(e => els.authMsg.textContent=e.message);
+};
+
+els.btnLogout.onclick = () => auth.signOut();
+els.btnLogoutFromVerify.onclick = () => auth.signOut();
+
+els.btnResendVerify.onclick = () => {
+  const u = auth.currentUser;
+  if(!u){ return; }
+  u.sendEmailVerification()
+   .then(()=> els.verifyMsg.textContent = "Verification email re-sent. Please check your inbox.")
+   .catch(e => els.verifyMsg.textContent = e.message || "Could not resend email.");
+};
+
+/* ---------- Auth State (block unverified, keep 0 reads on refresh) ---------- */
 auth.onAuthStateChanged(async user=>{
+  // Hide everything first
+  els.authWrap.style.display="none";
+  els.verifyWrap.style.display="none";
+  els.appWrap.style.display="none";
+
   if(user){
-    els.userEmail.textContent="Logged in as: "+user.email;
-    els.authWrap.style.display="none"; els.appWrap.style.display="block";
+    if(!user.emailVerified){
+      // Show verify panel; do NOT read/write
+      els.verifyEmail.textContent = user.email || "";
+      els.verifyWrap.style.display = "block";
+      return;
+    }
+
+    // Verified: show app & load cached first (0 reads on refresh)
+    els.userEmail.textContent="Logged in as: "+(user.email||"");
+    els.appWrap.style.display="block";
 
     let cached=loadCache(user.uid);
-    if(cached) render(user.uid,cached); else {cached=await reload(user.uid); render(user.uid,cached);}
+    if(cached){ render(user.uid,cached); }
+    else { const fresh=await reload(user.uid); render(user.uid,fresh); }
 
+    // Actions (writes/reads only on action)
     els.addIncome.onclick=async()=>{
       const n=els.incName.value.trim(),a=Number(els.incAmt.value||0),i=!!els.incInclude.checked;
       if(!n)return;
@@ -311,8 +383,10 @@ auth.onAuthStateChanged(async user=>{
       await Promise.all(ops);
       const data=await reload(user.uid); render(user.uid,data);
     };
+
   }else{
-    els.appWrap.style.display="none"; els.authWrap.style.display="block";
+    // Signed out
+    els.authWrap.style.display="block";
   }
 });
 </script>
