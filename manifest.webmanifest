@@ -1,20 +1,20 @@
 {
-  "name": "My Social Creator App",
-  "short_name": "MyApp",
-  "description": "A fast, modern web app built with Social Creator that delivers interactive content and a smooth experience on any device.",
-  "start_url": "/index.html",
-  "scope": "/",
+  "name": "Budget Calculator",
+  "short_name": "BudgetCalc",
+  "description": "A simple budget calculator app that helps track spending and savings.",
+  "start_url": "/Socialcreator-manifest/",
+  "scope": "/Socialcreator-manifest/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
   "icons": [
     {
-      "src": "https://ventsharm.github.io/Socialcreator-manifest/icons/icon-192.png",
+      "src": "Icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://ventsharm.github.io/Socialcreator-manifest/icons/icon-512.png",
+      "src": "Icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
