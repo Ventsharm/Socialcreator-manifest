@@ -1,9 +1,9 @@
 {
   "name": "Budget Calculator",
   "short_name": "BudgetCalc",
-  "description": "A simple budget calculator app that helps track spending and savings.",
-  "start_url": "/Socialcreator-manifest/",
-  "scope": "/Socialcreator-manifest/",
+  "description": "A simple budget calculator app that helps track income, expenses, and savings efficiently.",
+  "start_url": "https://ventsharm.github.io/Socialcreator-manifest/",
+  "scope": "https://ventsharm.github.io/Socialcreator-manifest/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
