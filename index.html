@@ -5,40 +5,54 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ventsharm Budget (Firebase)</title>
 <style>
-  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial; background:#f7f8fa; color:#111; }
-  .tab-bar { display:flex; justify-content:space-around; background:#fff; border-bottom:1px solid #e9edf3; position:sticky; top:0; z-index:99; }
-  .tab-bar button { flex:1; padding:14px; border:none; background:none; font-weight:600; cursor:pointer; color:#555; }
-  .tab-bar button.active { color:#111; border-bottom:3px solid #111; }
-  .tab-content { display:none; padding:0 14px; }
-  .tab-content.active { display:block; }
-  .box {background:#fff;border:1px solid #e9edf3;border-radius:16px;box-shadow:0 6px 18px rgba(0,0,0,.06);padding:18px;margin-top:14px;}
-  input,button{font-family:inherit;}
+  :root{
+    --box-bg:#fff; --box-b:#e9edf3; --shadow:0 6px 18px rgba(0,0,0,.06);
+    --btn:#111; --btntxt:#fff; --muted:#6b7280;
+    --blue:#2563eb; --red:#ef4444; --bor:#d1d5db;
+  }
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:#f7f8fa;color:#111}
+  .box{background:var(--box-bg);border:1px solid var(--box-b);border-radius:16px;box-shadow:var(--shadow);padding:18px}
+  input,button{font-family:inherit}
+  .tab-bar{display:flex;justify-content:space-around;background:#fff;border-bottom:1px solid #e9edf3;position:sticky;top:0;z-index:99}
+  .tab-bar button{flex:1;padding:14px;border:none;background:none;font-weight:600;cursor:pointer;color:#555}
+  .tab-bar button.active{color:#111;border-bottom:3px solid #111}
+  .tab-content{display:none;padding:0 14px}
+  .tab-content.active{display:block}
+  .row{background:#fff;border:1px solid #e9edf3;border-radius:12px;padding:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+  .btn{flex:1;min-width:130px;padding:10px 12px;border:none;border-radius:10px;color:#fff;cursor:pointer}
+  .btn-primary{background:var(--blue)}
+  .btn-danger{background:var(--red)}
+  .btn-ghost{background:#f9fafb;border:1px solid #e5e7eb;color:#111}
+  .field{padding:12px;border-radius:12px;border:1px solid var(--bor)}
+  .inline-edit{background:#fafafa;border:1px dashed #d9dce2;border-radius:12px;padding:10px;margin-top:8px}
+  .inline-edit label{display:block;font-size:0.9rem;margin:6px 0 4px;color:#333}
 </style>
 </head>
 <body>
 
-<!-- ===== Auth (shown until signed in) ===== -->
+<!-- ===== Auth ===== -->
 <div id="authWrap" style="max-width:480px;margin:30px auto;padding:0 14px;">
   <div class="box">
     <h2 style="margin:0 0 6px;font-size:1.4rem;text-align:center;">Sign in to Ventsharm Budget</h2>
     <p id="authMsg" style="margin:6px 0 16px;color:#6b7280;text-align:center;">Use the same account on any device.</p>
     <div style="display:grid;gap:10px;">
-      <input id="authEmail" type="email" placeholder="Email" style="padding:12px;border-radius:12px;border:1px solid #d1d5db;">
-      <input id="authPass" type="password" placeholder="Password" style="padding:12px;border-radius:12px;border:1px solid #d1d5db;">
-      <button id="btnLogin" style="padding:12px;border:none;border-radius:12px;background:#111;color:#fff;font-weight:700;cursor:pointer;">Login</button>
-      <button id="btnRegister" style="padding:12px;border:1px solid #e5e7eb;background:#f9fafb;border-radius:12px;cursor:pointer;">Create account</button>
+      <input id="authEmail" type="email" placeholder="Email" class="field">
+      <input id="authPass" type="password" placeholder="Password" class="field">
+      <button id="btnLogin" class="btn" style="background:var(--btn);color:var(--btntxt);font-weight:700;">Login</button>
+      <button id="btnRegister" class="btn btn-ghost">Create account</button>
     </div>
   </div>
 </div>
 
-<!-- ===== App (hidden until signed in) ===== -->
+<!-- ===== App ===== -->
 <div id="appWrap" style="display:none;max-width:880px;margin:20px auto;color:#111;">
-  <div class="box" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+  <div class="box" style="display:flex;justify-content:space-between;align-items:center;margin:0 14px 8px">
     <div>
       <h2 style="margin:0;font-size:1.4rem;">Budget Planner</h2>
       <p id="userEmail" style="margin:0;color:#6b7280;font-size:.95rem;"></p>
     </div>
-    <button id="btnLogout" style="padding:10px 14px;border:1px solid #e5e7eb;background:#f9fafb;border-radius:10px;cursor:pointer;">Log out</button>
+    <button id="btnLogout" class="btn btn-ghost">Log out</button>
   </div>
 
   <!-- Tabs -->
@@ -50,16 +64,16 @@
 
   <!-- ===== Income Tab ===== -->
   <div id="incomeTab" class="tab-content active">
-    <div class="box">
+    <div class="box" style="margin-top:14px">
       <h3 style="margin:0 0 12px;">Income Sources</h3>
       <div style="display:grid;gap:10px;margin-bottom:12px;">
-        <input id="incName" placeholder="Income name e.g. Cashier or Benefit" style="padding:12px;border-radius:12px;border:1px solid #d1d5db;">
-        <input id="incAmt" type="number" min="0" step="0.01" placeholder="Amount e.g. 1200" style="padding:12px;border-radius:12px;border:1px solid #d1d5db;">
+        <input id="incName" placeholder="Income name e.g. Cashier or Benefit" class="field">
+        <input id="incAmt" type="number" min="0" step="0.01" placeholder="Amount e.g. 1200" class="field">
         <label style="display:flex;gap:8px;align-items:center;">
           <input id="incInclude" type="checkbox" checked>
           <span>Include in available income</span>
         </label>
-        <button id="addIncome" style="padding:12px;border:none;border-radius:12px;background:#111;color:#fff;font-weight:700;cursor:pointer;">Add Income</button>
+        <button id="addIncome" class="btn" style="background:var(--btn);color:var(--btntxt);font-weight:700;">Add Income</button>
       </div>
       <div id="incomeList" style="display:grid;gap:10px;"></div>
     </div>
@@ -67,14 +81,14 @@
 
   <!-- ===== Expense Tab ===== -->
   <div id="expenseTab" class="tab-content">
-    <div class="box">
+    <div class="box" style="margin-top:14px">
       <h3 style="margin:0 0 12px;">Expenses</h3>
       <div style="display:grid;gap:10px;margin-bottom:12px;">
-        <input id="expName" placeholder="Bill / Subscription e.g. Rent or Spotify" style="padding:12px;border-radius:12px;border:1px solid #d1d5db;">
-        <input id="expAmt" type="number" min="0" step="0.01" placeholder="Amount e.g. 500" style="padding:12px;border-radius:12px;border:1px solid #d1d5db;">
+        <input id="expName" placeholder="Bill / Subscription e.g. Rent or Spotify" class="field">
+        <input id="expAmt" type="number" min="0" step="0.01" placeholder="Amount e.g. 500" class="field">
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <button id="addExpense" style="flex:1;min-width:160px;padding:12px;border:none;border-radius:12px;background:#111;color:#fff;font-weight:700;cursor:pointer;">Add Bill</button>
-          <button id="resetAll" style="flex:1;min-width:160px;padding:12px;border:1px solid #e5e7eb;background:#f9fafb;border-radius:12px;cursor:pointer;">Reset All</button>
+          <button id="addExpense" class="btn" style="flex:1;min-width:160px;background:var(--btn);color:#fff;font-weight:700;">Add Bill</button>
+          <button id="resetAll" class="btn btn-ghost" style="flex:1;min-width:160px;">Reset All</button>
         </div>
       </div>
       <div id="expenseList" style="display:grid;gap:10px;"></div>
@@ -83,17 +97,17 @@
 
   <!-- ===== Overview Tab ===== -->
   <div id="overviewTab" class="tab-content">
-    <div style="display:grid;gap:12px;margin-top:14px;">
-      <div style="background:#f8fbff;border:1px solid #e4efff;border-radius:16px;padding:14px;">
+    <div style="display:grid;gap:12px;margin:14px;">
+      <div class="box" style="background:#f8fbff;border-color:#e4efff">
         <div style="color:#3b82f6;font-weight:600;">Total Income (All)</div>
         <div id="sumTotalIncome" style="font-weight:800;font-size:1.15rem;margin-top:4px;">£0.00</div>
       </div>
-      <div style="background:#f8f7ff;border:1px solid #eae8ff;border-radius:16px;padding:14px;">
+      <div class="box" style="background:#f8f7ff;border-color:#eae8ff">
         <div style="color:#7c3aed;font-weight:600;">Available Income (Included - Expenses)</div>
         <div id="sumAvailIncome" style="font-weight:800;font-size:1.15rem;margin-top:4px;">£0.00</div>
         <div id="sumPercent" style="color:#6b7280;font-size:.92rem;margin-top:2px;">Spent: 0%</div>
       </div>
-      <div style="background:#fff9f6;border:1px solid #ffe8df;border-radius:16px;padding:14px;">
+      <div class="box" style="background:#fff9f6;border-color:#ffe8df">
         <div style="color:#f97316;font-weight:600;">Expenses</div>
         <div id="sumExpenses" style="font-weight:800;font-size:1.15rem;margin-top:4px;">£0.00</div>
       </div>
@@ -115,7 +129,7 @@ tabs.forEach(btn=>{
 });
 </script>
 
-<!-- Firebase (Compat version works anywhere) -->
+<!-- Firebase (Compat) -->
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
@@ -132,12 +146,19 @@ firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth();
 const db=firebase.firestore();
 
-const els={};
-["authWrap","authEmail","authPass","btnLogin","btnRegister","authMsg","appWrap","userEmail","btnLogout",
- "incName","incAmt","incInclude","addIncome","incomeList","expName","expAmt","addExpense","resetAll",
- "expenseList","sumTotalIncome","sumAvailIncome","sumExpenses","sumPercent"].forEach(k=>els[k]=document.getElementById(k));
+const $=id=>document.getElementById(id);
+const els={
+  authWrap:$("#authWrap"), authEmail:$("#authEmail"), authPass:$("#authPass"),
+  btnLogin:$("#btnLogin"), btnRegister:$("#btnRegister"), authMsg:$("#authMsg"),
+  appWrap:$("#appWrap"), userEmail:$("#userEmail"), btnLogout:$("#btnLogout"),
+  incName:$("#incName"), incAmt:$("#incAmt"), incInclude:$("#incInclude"), addIncome:$("#addIncome"), incomeList:$("#incomeList"),
+  expName:$("#expName"), expAmt:$("#expAmt"), addExpense:$("#addExpense"), resetAll:$("#resetAll"), expenseList:$("#expenseList"),
+  sumTotalIncome:$("#sumTotalIncome"), sumAvailIncome:$("#sumAvailIncome"), sumExpenses:$("#sumExpenses"), sumPercent:$("#sumPercent")
+};
 
-function fmt(n){return Number(n||0).toLocaleString(undefined,{style:"currency",currency:"GBP"});}
+function fmt(n){return Number(n||0).toLocaleString(undefined,{style:"currency",currency:"GBP",minimumFractionDigits:2});}
+function cleanName(n){return (n||"").replace(/^\s*✅\s*/,"").trim();}
+
 function render(uid){
   Promise.all([
     db.collection("users").doc(uid).collection("incomes").get(),
@@ -145,24 +166,119 @@ function render(uid){
   ]).then(([incSnap,expSnap])=>{
     const incomes=incSnap.docs.map(d=>({id:d.id,...d.data()}));
     const expenses=expSnap.docs.map(d=>({id:d.id,...d.data()}));
+
+    // Build income list
     els.incomeList.innerHTML="";
-    els.expenseList.innerHTML="";
     let totalAll=0,totalIncl=0,totalExp=0;
+
     incomes.forEach(inc=>{
       totalAll+=Number(inc.amount)||0;
       if(inc.include) totalIncl+=Number(inc.amount)||0;
-      const div=document.createElement("div");
-      div.style.cssText="padding:10px;border:1px solid #e9edf3;border-radius:10px;";
-      div.textContent=(inc.include?"✅ ":"")+inc.name+" - "+fmt(inc.amount);
-      els.incomeList.appendChild(div);
+
+      const row=document.createElement("div"); row.className="row";
+      const line=document.createElement("div");
+      line.textContent=(inc.include?"✅ ":"")+cleanName(inc.name)+" - "+fmt(inc.amount);
+      row.appendChild(line);
+
+      // Inline editor (hidden by default)
+      const editor=document.createElement("div"); editor.className="inline-edit"; editor.style.display="none";
+      editor.innerHTML=`
+        <label>Name</label>
+        <input type="text" class="field" value="${cleanName(inc.name)}">
+        <label>Amount</label>
+        <input type="number" step="0.01" class="field" value="${Number(inc.amount)||0}">
+        <label style="display:flex;gap:8px;align-items:center;margin-top:6px">
+          <input type="checkbox" ${inc.include?"checked":""}> <span>Include in available income</span>
+        </label>
+        <div class="actions">
+          <button class="btn btn-primary">Save</button>
+          <button class="btn btn-ghost">Cancel</button>
+        </div>`;
+      row.appendChild(editor);
+
+      const actions=document.createElement("div"); actions.className="actions";
+      const btnE=document.createElement("button"); btnE.className="btn btn-primary"; btnE.textContent="Edit";
+      const btnD=document.createElement("button"); btnD.className="btn btn-danger"; btnD.textContent="Delete";
+      actions.append(btnE,btnD); row.appendChild(actions);
+
+      btnE.onclick=()=>{
+        editor.style.display = editor.style.display==="none" ? "block" : "none";
+      };
+      btnD.onclick=async()=>{
+        if(confirm(`Delete "${cleanName(inc.name)}" (${fmt(inc.amount)})?`)){
+          await db.collection("users").doc(uid).collection("incomes").doc(inc.id).delete();
+          render(uid);
+        }
+      };
+
+      // editor buttons
+      const [nameInput, amtInput, includeChk] = editor.querySelectorAll("input");
+      const [btnSave, btnCancel] = editor.querySelectorAll("button");
+      btnCancel.onclick=()=>{ editor.style.display="none"; };
+      btnSave.onclick=async()=>{
+        const newName=cleanName(nameInput.value);
+        const newAmt=Number(amtInput.value)||0;
+        const newInc=includeChk.checked;
+        await db.collection("users").doc(uid).collection("incomes").doc(inc.id).set({
+          name:newName, amount:newAmt, include:newInc
+        },{merge:true});
+        editor.style.display="none";
+        render(uid);
+      };
+
+      els.incomeList.appendChild(row);
     });
+
+    // Build expense list
+    els.expenseList.innerHTML="";
     expenses.forEach(ex=>{
       totalExp+=Number(ex.amount)||0;
-      const div=document.createElement("div");
-      div.style.cssText="padding:10px;border:1px solid #e9edf3;border-radius:10px;";
-      div.textContent=ex.name+" - "+fmt(ex.amount);
-      els.expenseList.appendChild(div);
+
+      const row=document.createElement("div"); row.className="row";
+      const line=document.createElement("div");
+      line.textContent=ex.name+" - "+fmt(ex.amount);
+      row.appendChild(line);
+
+      const editor=document.createElement("div"); editor.className="inline-edit"; editor.style.display="none";
+      editor.innerHTML=`
+        <label>Name</label>
+        <input type="text" class="field" value="${ex.name}">
+        <label>Amount</label>
+        <input type="number" step="0.01" class="field" value="${Number(ex.amount)||0}">
+        <div class="actions">
+          <button class="btn btn-primary">Save</button>
+          <button class="btn btn-ghost">Cancel</button>
+        </div>`;
+      row.appendChild(editor);
+
+      const actions=document.createElement("div"); actions.className="actions";
+      const btnE=document.createElement("button"); btnE.className="btn btn-primary"; btnE.textContent="Edit";
+      const btnD=document.createElement("button"); btnD.className="btn btn-danger"; btnD.textContent="Delete";
+      actions.append(btnE,btnD); row.appendChild(actions);
+
+      btnE.onclick=()=>{ editor.style.display = editor.style.display==="none" ? "block" : "none"; };
+      btnD.onclick=async()=>{
+        if(confirm(`Delete "${ex.name}" (${fmt(ex.amount)})?`)){
+          await db.collection("users").doc(uid).collection("expenses").doc(ex.id).delete();
+          render(uid);
+        }
+      };
+
+      const [nIn,aIn]=editor.querySelectorAll("input");
+      const [bS,bC]=editor.querySelectorAll("button");
+      bC.onclick=()=>{ editor.style.display="none"; };
+      bS.onclick=async()=>{
+        const newName=(nIn.value||"").trim()||ex.name;
+        const newAmt=Number(aIn.value)||0;
+        await db.collection("users").doc(uid).collection("expenses").doc(ex.id).set({name:newName,amount:newAmt},{merge:true});
+        editor.style.display="none";
+        render(uid);
+      };
+
+      els.expenseList.appendChild(row);
     });
+
+    // Summary
     els.sumTotalIncome.textContent=fmt(totalAll);
     els.sumAvailIncome.textContent=fmt(totalIncl-totalExp);
     els.sumExpenses.textContent=fmt(totalExp);
@@ -170,36 +286,46 @@ function render(uid){
   });
 }
 
-els.btnLogin.onclick=()=>auth.signInWithEmailAndPassword(els.authEmail.value,els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
-els.btnRegister.onclick=()=>auth.createUserWithEmailAndPassword(els.authEmail.value,els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
+// Auth buttons
+els.btnLogin.onclick=()=>auth.signInWithEmailAndPassword(els.authEmail.value.trim().toLowerCase(),els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
+els.btnRegister.onclick=()=>auth.createUserWithEmailAndPassword(els.authEmail.value.trim().toLowerCase(),els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
 els.btnLogout.onclick=()=>auth.signOut();
 
+// Auth state
 auth.onAuthStateChanged(user=>{
   if(user){
-    els.userEmail.textContent="Logged in as: "+user.email;
-    els.authWrap.style.display="none"; els.appWrap.style.display="block";
+    els.userEmail.textContent="Logged in as: "+(user.email||"");
+    els.authWrap.style.display="none";
+    els.appWrap.style.display="block";
     render(user.uid);
+
     els.addIncome.onclick=()=>{
-      const n=els.incName.value.trim(),a=Number(els.incAmt.value||0),i=els.incInclude.checked;
-      if(!n)return;
-      db.collection("users").doc(user.uid).collection("incomes").add({name:n,amount:a,include:i});
-      els.incName.value=""; els.incAmt.value=""; render(user.uid);
+      const n=cleanName(els.incName.value), a=Number(els.incAmt.value||0), i=!!els.incInclude.checked;
+      if(!n) return;
+      db.collection("users").doc(user.uid).collection("incomes").add({name:n,amount:a,include:i}).then(()=>{
+        els.incName.value=""; els.incAmt.value=""; els.incInclude.checked=true; render(user.uid);
+      });
     };
     els.addExpense.onclick=()=>{
-      const n=els.expName.value.trim(),a=Number(els.expAmt.value||0);
-      if(!n)return;
-      db.collection("users").doc(user.uid).collection("expenses").add({name:n,amount:a});
-      els.expName.value=""; els.expAmt.value=""; render(user.uid);
+      const n=(els.expName.value||"").trim(), a=Number(els.expAmt.value||0);
+      if(!n) return;
+      db.collection("users").doc(user.uid).collection("expenses").add({name:n,amount:a}).then(()=>{
+        els.expName.value=""; els.expAmt.value=""; render(user.uid);
+      });
     };
     els.resetAll.onclick=async()=>{
-      if(!confirm("Reset all incomes and expenses?"))return;
+      if(!confirm("Reset all incomes and expenses?")) return;
       const incs=await db.collection("users").doc(user.uid).collection("incomes").get();
       const exps=await db.collection("users").doc(user.uid).collection("expenses").get();
-      incs.forEach(d=>d.ref.delete()); exps.forEach(d=>d.ref.delete());
+      const ops=[];
+      incs.forEach(d=>ops.push(d.ref.delete()));
+      exps.forEach(d=>ops.push(d.ref.delete()));
+      await Promise.all(ops);
       render(user.uid);
     };
   }else{
-    els.appWrap.style.display="none"; els.authWrap.style.display="block";
+    els.appWrap.style.display="none";
+    els.authWrap.style.display="block";
   }
 });
 </script>
