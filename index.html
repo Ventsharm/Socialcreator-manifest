@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head>
+>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ventsharm Budget (Firebase)</title>
@@ -115,7 +115,7 @@
   </div>
 </div>
 
-<!-- Tab switching -->
+<!-- Tabs -->
 <script>
 const tabs=document.querySelectorAll('.tab-bar button');
 const contents=document.querySelectorAll('.tab-content');
@@ -129,204 +129,151 @@ tabs.forEach(btn=>{
 });
 </script>
 
-<!-- Firebase (Compat) -->
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
-  authDomain: "budget-app-283de.firebaseapp.com",
-  projectId: "budget-app-283de",
-  storageBucket: "budget-app-283de.firebasestorage.app",
-  messagingSenderId: "162369707369",
-  appId: "1:162369707369:web:3faa7f002f8ba22dc0f1f8"
-};
-firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth();
-const db=firebase.firestore();
+<!-- Firebase -->
+<script type="text/javascript" src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 
-const $=id=>document.getElementById(id);
-const els={
-  authWrap:$("#authWrap"), authEmail:$("#authEmail"), authPass:$("#authPass"),
-  btnLogin:$("#btnLogin"), btnRegister:$("#btnRegister"), authMsg:$("#authMsg"),
-  appWrap:$("#appWrap"), userEmail:$("#userEmail"), btnLogout:$("#btnLogout"),
-  incName:$("#incName"), incAmt:$("#incAmt"), incInclude:$("#incInclude"), addIncome:$("#addIncome"), incomeList:$("#incomeList"),
-  expName:$("#expName"), expAmt:$("#expAmt"), addExpense:$("#addExpense"), resetAll:$("#resetAll"), expenseList:$("#expenseList"),
-  sumTotalIncome:$("#sumTotalIncome"), sumAvailIncome:$("#sumAvailIncome"), sumExpenses:$("#sumExpenses"), sumPercent:$("#sumPercent")
-};
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", () => {
+  const firebaseConfig = {
+    apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
+    authDomain: "budget-app-283de.firebaseapp.com",
+    projectId: "budget-app-283de",
+    storageBucket: "budget-app-283de.firebasestorage.app",
+    messagingSenderId: "162369707369",
+    appId: "1:162369707369:web:3faa7f002f8ba22dc0f1f8"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
-function fmt(n){return Number(n||0).toLocaleString(undefined,{style:"currency",currency:"GBP",minimumFractionDigits:2});}
-function cleanName(n){return (n||"").replace(/^\s*✅\s*/,"").trim();}
+  const $ = id => document.getElementById(id);
+  const els = {
+    authWrap: $("#authWrap"), authEmail: $("#authEmail"), authPass: $("#authPass"),
+    btnLogin: $("#btnLogin"), btnRegister: $("#btnRegister"), authMsg: $("#authMsg"),
+    appWrap: $("#appWrap"), userEmail: $("#userEmail"), btnLogout: $("#btnLogout"),
+    incName: $("#incName"), incAmt: $("#incAmt"), incInclude: $("#incInclude"), addIncome: $("#addIncome"), incomeList: $("#incomeList"),
+    expName: $("#expName"), expAmt: $("#expAmt"), addExpense: $("#addExpense"), resetAll: $("#resetAll"), expenseList: $("#expenseList"),
+    sumTotalIncome: $("#sumTotalIncome"), sumAvailIncome: $("#sumAvailIncome"), sumExpenses: $("#sumExpenses"), sumPercent: $("#sumPercent")
+  };
 
-function render(uid){
-  Promise.all([
-    db.collection("users").doc(uid).collection("incomes").get(),
-    db.collection("users").doc(uid).collection("expenses").get()
-  ]).then(([incSnap,expSnap])=>{
-    const incomes=incSnap.docs.map(d=>({id:d.id,...d.data()}));
-    const expenses=expSnap.docs.map(d=>({id:d.id,...d.data()}));
+  function fmt(n){return Number(n||0).toLocaleString(undefined,{style:"currency",currency:"GBP",minimumFractionDigits:2});}
+  function cleanName(n){return (n||"").replace(/^\s*✅\s*/,"").trim();}
 
-    // Build income list
-    els.incomeList.innerHTML="";
-    let totalAll=0,totalIncl=0,totalExp=0;
+  function render(uid){
+    Promise.all([
+      db.collection("users").doc(uid).collection("incomes").get(),
+      db.collection("users").doc(uid).collection("expenses").get()
+    ]).then(([incSnap,expSnap])=>{
+      const incomes=incSnap.docs.map(d=>({id:d.id,...d.data()}));
+      const expenses=expSnap.docs.map(d=>({id:d.id,...d.data()}));
 
-    incomes.forEach(inc=>{
-      totalAll+=Number(inc.amount)||0;
-      if(inc.include) totalIncl+=Number(inc.amount)||0;
+      els.incomeList.innerHTML="";
+      els.expenseList.innerHTML="";
+      let totalAll=0,totalIncl=0,totalExp=0;
 
-      const row=document.createElement("div"); row.className="row";
-      const line=document.createElement("div");
-      line.textContent=(inc.include?"✅ ":"")+cleanName(inc.name)+" - "+fmt(inc.amount);
-      row.appendChild(line);
-
-      // Inline editor (hidden by default)
-      const editor=document.createElement("div"); editor.className="inline-edit"; editor.style.display="none";
-      editor.innerHTML=`
-        <label>Name</label>
-        <input type="text" class="field" value="${cleanName(inc.name)}">
-        <label>Amount</label>
-        <input type="number" step="0.01" class="field" value="${Number(inc.amount)||0}">
-        <label style="display:flex;gap:8px;align-items:center;margin-top:6px">
-          <input type="checkbox" ${inc.include?"checked":""}> <span>Include in available income</span>
-        </label>
-        <div class="actions">
-          <button class="btn btn-primary">Save</button>
-          <button class="btn btn-ghost">Cancel</button>
-        </div>`;
-      row.appendChild(editor);
-
-      const actions=document.createElement("div"); actions.className="actions";
-      const btnE=document.createElement("button"); btnE.className="btn btn-primary"; btnE.textContent="Edit";
-      const btnD=document.createElement("button"); btnD.className="btn btn-danger"; btnD.textContent="Delete";
-      actions.append(btnE,btnD); row.appendChild(actions);
-
-      btnE.onclick=()=>{
-        editor.style.display = editor.style.display==="none" ? "block" : "none";
-      };
-      btnD.onclick=async()=>{
-        if(confirm(`Delete "${cleanName(inc.name)}" (${fmt(inc.amount)})?`)){
-          await db.collection("users").doc(uid).collection("incomes").doc(inc.id).delete();
+      incomes.forEach(inc=>{
+        totalAll+=Number(inc.amount)||0;
+        if(inc.include) totalIncl+=Number(inc.amount)||0;
+        const row=document.createElement("div"); row.className="row";
+        const line=document.createElement("div");
+        line.textContent=(inc.include?"✅ ":"")+cleanName(inc.name)+" - "+fmt(inc.amount);
+        row.appendChild(line);
+        const edit=document.createElement("button"); edit.textContent="Edit"; edit.className="btn btn-primary";
+        const del=document.createElement("button"); del.textContent="Delete"; del.className="btn btn-danger";
+        const actions=document.createElement("div"); actions.className="actions"; actions.append(edit,del);
+        row.appendChild(actions);
+        edit.onclick=async()=>{
+          const newName=prompt("Edit name:",cleanName(inc.name));
+          if(newName===null)return;
+          const newAmt=prompt("Edit amount:",inc.amount);
+          if(newAmt===null)return;
+          const incInc=confirm("Include this income in available balance?");
+          await db.collection("users").doc(uid).collection("incomes").doc(inc.id).set({
+            name:cleanName(newName),amount:Number(newAmt)||0,include:incInc
+          },{merge:true});
           render(uid);
-        }
-      };
+        };
+        del.onclick=async()=>{
+          if(confirm(`Delete "${cleanName(inc.name)}" (${fmt(inc.amount)})?`)){
+            await db.collection("users").doc(uid).collection("incomes").doc(inc.id).delete();
+            render(uid);
+          }
+        };
+        els.incomeList.appendChild(row);
+      });
 
-      // editor buttons
-      const [nameInput, amtInput, includeChk] = editor.querySelectorAll("input");
-      const [btnSave, btnCancel] = editor.querySelectorAll("button");
-      btnCancel.onclick=()=>{ editor.style.display="none"; };
-      btnSave.onclick=async()=>{
-        const newName=cleanName(nameInput.value);
-        const newAmt=Number(amtInput.value)||0;
-        const newInc=includeChk.checked;
-        await db.collection("users").doc(uid).collection("incomes").doc(inc.id).set({
-          name:newName, amount:newAmt, include:newInc
-        },{merge:true});
-        editor.style.display="none";
-        render(uid);
-      };
-
-      els.incomeList.appendChild(row);
-    });
-
-    // Build expense list
-    els.expenseList.innerHTML="";
-    expenses.forEach(ex=>{
-      totalExp+=Number(ex.amount)||0;
-
-      const row=document.createElement("div"); row.className="row";
-      const line=document.createElement("div");
-      line.textContent=ex.name+" - "+fmt(ex.amount);
-      row.appendChild(line);
-
-      const editor=document.createElement("div"); editor.className="inline-edit"; editor.style.display="none";
-      editor.innerHTML=`
-        <label>Name</label>
-        <input type="text" class="field" value="${ex.name}">
-        <label>Amount</label>
-        <input type="number" step="0.01" class="field" value="${Number(ex.amount)||0}">
-        <div class="actions">
-          <button class="btn btn-primary">Save</button>
-          <button class="btn btn-ghost">Cancel</button>
-        </div>`;
-      row.appendChild(editor);
-
-      const actions=document.createElement("div"); actions.className="actions";
-      const btnE=document.createElement("button"); btnE.className="btn btn-primary"; btnE.textContent="Edit";
-      const btnD=document.createElement("button"); btnD.className="btn btn-danger"; btnD.textContent="Delete";
-      actions.append(btnE,btnD); row.appendChild(actions);
-
-      btnE.onclick=()=>{ editor.style.display = editor.style.display==="none" ? "block" : "none"; };
-      btnD.onclick=async()=>{
-        if(confirm(`Delete "${ex.name}" (${fmt(ex.amount)})?`)){
-          await db.collection("users").doc(uid).collection("expenses").doc(ex.id).delete();
+      expenses.forEach(ex=>{
+        totalExp+=Number(ex.amount)||0;
+        const row=document.createElement("div"); row.className="row";
+        const line=document.createElement("div");
+        line.textContent=ex.name+" - "+fmt(ex.amount);
+        row.appendChild(line);
+        const edit=document.createElement("button"); edit.textContent="Edit"; edit.className="btn btn-primary";
+        const del=document.createElement("button"); del.textContent="Delete"; del.className="btn btn-danger";
+        const actions=document.createElement("div"); actions.className="actions"; actions.append(edit,del);
+        row.appendChild(actions);
+        edit.onclick=async()=>{
+          const newName=prompt("Edit name:",ex.name);
+          if(newName===null)return;
+          const newAmt=prompt("Edit amount:",ex.amount);
+          if(newAmt===null)return;
+          await db.collection("users").doc(uid).collection("expenses").doc(ex.id).set({
+            name:(newName||"").trim(),amount:Number(newAmt)||0
+          },{merge:true});
           render(uid);
-        }
-      };
+        };
+        del.onclick=async()=>{
+          if(confirm(`Delete "${ex.name}" (${fmt(ex.amount)})?`)){
+            await db.collection("users").doc(uid).collection("expenses").doc(ex.id).delete();
+            render(uid);
+          }
+        };
+        els.expenseList.appendChild(row);
+      });
 
-      const [nIn,aIn]=editor.querySelectorAll("input");
-      const [bS,bC]=editor.querySelectorAll("button");
-      bC.onclick=()=>{ editor.style.display="none"; };
-      bS.onclick=async()=>{
-        const newName=(nIn.value||"").trim()||ex.name;
-        const newAmt=Number(aIn.value)||0;
-        await db.collection("users").doc(uid).collection("expenses").doc(ex.id).set({name:newName,amount:newAmt},{merge:true});
-        editor.style.display="none";
-        render(uid);
-      };
-
-      els.expenseList.appendChild(row);
+      els.sumTotalIncome.textContent=fmt(totalAll);
+      els.sumAvailIncome.textContent=fmt(totalIncl-totalExp);
+      els.sumExpenses.textContent=fmt(totalExp);
+      els.sumPercent.textContent="Spent: "+(totalIncl>0?Math.round(totalExp/totalIncl*100):0)+"%";
     });
-
-    // Summary
-    els.sumTotalIncome.textContent=fmt(totalAll);
-    els.sumAvailIncome.textContent=fmt(totalIncl-totalExp);
-    els.sumExpenses.textContent=fmt(totalExp);
-    els.sumPercent.textContent="Spent: "+(totalIncl>0?Math.round(totalExp/totalIncl*100):0)+"%";
-  });
-}
-
-// Auth buttons
-els.btnLogin.onclick=()=>auth.signInWithEmailAndPassword(els.authEmail.value.trim().toLowerCase(),els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
-els.btnRegister.onclick=()=>auth.createUserWithEmailAndPassword(els.authEmail.value.trim().toLowerCase(),els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
-els.btnLogout.onclick=()=>auth.signOut();
-
-// Auth state
-auth.onAuthStateChanged(user=>{
-  if(user){
-    els.userEmail.textContent="Logged in as: "+(user.email||"");
-    els.authWrap.style.display="none";
-    els.appWrap.style.display="block";
-    render(user.uid);
-
-    els.addIncome.onclick=()=>{
-      const n=cleanName(els.incName.value), a=Number(els.incAmt.value||0), i=!!els.incInclude.checked;
-      if(!n) return;
-      db.collection("users").doc(user.uid).collection("incomes").add({name:n,amount:a,include:i}).then(()=>{
-        els.incName.value=""; els.incAmt.value=""; els.incInclude.checked=true; render(user.uid);
-      });
-    };
-    els.addExpense.onclick=()=>{
-      const n=(els.expName.value||"").trim(), a=Number(els.expAmt.value||0);
-      if(!n) return;
-      db.collection("users").doc(user.uid).collection("expenses").add({name:n,amount:a}).then(()=>{
-        els.expName.value=""; els.expAmt.value=""; render(user.uid);
-      });
-    };
-    els.resetAll.onclick=async()=>{
-      if(!confirm("Reset all incomes and expenses?")) return;
-      const incs=await db.collection("users").doc(user.uid).collection("incomes").get();
-      const exps=await db.collection("users").doc(user.uid).collection("expenses").get();
-      const ops=[];
-      incs.forEach(d=>ops.push(d.ref.delete()));
-      exps.forEach(d=>ops.push(d.ref.delete()));
-      await Promise.all(ops);
-      render(user.uid);
-    };
-  }else{
-    els.appWrap.style.display="none";
-    els.authWrap.style.display="block";
   }
+
+  els.btnLogin.onclick=()=>auth.signInWithEmailAndPassword(els.authEmail.value,els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
+  els.btnRegister.onclick=()=>auth.createUserWithEmailAndPassword(els.authEmail.value,els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
+  els.btnLogout.onclick=()=>auth.signOut();
+
+  auth.onAuthStateChanged(user=>{
+    if(user){
+      els.userEmail.textContent="Logged in as: "+user.email;
+      els.authWrap.style.display="none";
+      els.appWrap.style.display="block";
+      render(user.uid);
+      els.addIncome.onclick=()=>{
+        const n=cleanName(els.incName.value),a=Number(els.incAmt.value||0),i=els.incInclude.checked;
+        if(!n)return;
+        db.collection("users").doc(user.uid).collection("incomes").add({name:n,amount:a,include:i});
+        els.incName.value="";els.incAmt.value="";els.incInclude.checked=true;render(user.uid);
+      };
+      els.addExpense.onclick=()=>{
+        const n=(els.expName.value||"").trim(),a=Number(els.expAmt.value||0);
+        if(!n)return;
+        db.collection("users").doc(user.uid).collection("expenses").add({name:n,amount:a});
+        els.expName.value="";els.expAmt.value="";render(user.uid);
+      };
+      els.resetAll.onclick=async()=>{
+        if(!confirm("Reset all incomes and expenses?"))return;
+        const incs=await db.collection("users").doc(user.uid).collection("incomes").get();
+        const exps=await db.collection("users").doc(user.uid).collection("expenses").get();
+        const ops=[];incs.forEach(d=>ops.push(d.ref.delete()));exps.forEach(d=>ops.push(d.ref.delete()));
+        await Promise.all(ops);render(user.uid);
+      };
+    }else{
+      els.appWrap.style.display="none";
+      els.authWrap.style.display="block";
+    }
+  });
 });
 </script>
 </body>
