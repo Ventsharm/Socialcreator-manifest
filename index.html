@@ -19,6 +19,13 @@
   .btn-danger{background:#ef4444}
   .btn-ghost{background:#f9fafb;border:1px solid #e5e7eb;color:#111}
   .field{padding:12px;border-radius:12px;border:1px solid #d1d5db}
+
+  /* Simple popup dialog */
+  .backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center}
+  .dialog{width:90%;max-width:380px;background:#fff;border:1px solid #e9edf3;border-radius:16px;box-shadow:0 10px 24px rgba(0,0,0,.2);padding:16px}
+  .dialog h3{margin:0 0 10px}
+  .dialog .grid{display:grid;gap:10px}
+  .dialog .rowbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
 </style>
 </head>
 <body>
@@ -107,6 +114,18 @@
   </div>
 </div>
 
+<!-- Simple popup dialog -->
+<div id="dlgBack" class="backdrop">
+  <div class="dialog">
+    <h3 id="dlgTitle">Edit</h3>
+    <div id="dlgBody" class="grid"></div>
+    <div class="rowbtns">
+      <button id="dlgCancel" class="btn btn-ghost">Cancel</button>
+      <button id="dlgSave" class="btn btn-primary">Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- Tab switching -->
 <script>
   const tabs=document.querySelectorAll('.tab-bar button');
@@ -121,7 +140,7 @@
   });
 </script>
 
-<!-- Firebase (Compat, working) -->
+<!-- Firebase (Compat, Blogger/GitHub friendly) -->
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
@@ -138,15 +157,66 @@ firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth();
 const db=firebase.firestore();
 
-const els={};
-["authWrap","authEmail","authPass","btnLogin","btnRegister","authMsg","appWrap","userEmail","btnLogout",
- "incName","incAmt","incInclude","addIncome","incomeList","expName","expAmt","addExpense","resetAll",
- "expenseList","sumTotalIncome","sumAvailIncome","sumExpenses","sumPercent"].forEach(k=>els[k]=document.getElementById(k));
+const $=id=>document.getElementById(id);
+const els={
+  authWrap:$("#authWrap"), authEmail:$("#authEmail"), authPass:$("#authPass"),
+  btnLogin:$("#btnLogin"), btnRegister:$("#btnRegister"), authMsg:$("#authMsg"),
+  appWrap:$("#appWrap"), userEmail:$("#userEmail"), btnLogout:$("#btnLogout"),
+  incName:$("#incName"), incAmt:$("#incAmt"), incInclude:$("#incInclude"), addIncome:$("#addIncome"), incomeList:$("#incomeList"),
+  expName:$("#expName"), expAmt:$("#expAmt"), addExpense:$("#addExpense"), resetAll:$("#resetAll"), expenseList:$("#expenseList"),
+  sumTotalIncome:$("#sumTotalIncome"), sumAvailIncome:$("#sumAvailIncome"), sumExpenses:$("#sumExpenses"), sumPercent:$("#sumPercent"),
+  dlgBack:$("#dlgBack"), dlgTitle:$("#dlgTitle"), dlgBody:$("#dlgBody"), dlgCancel:$("#dlgCancel"), dlgSave:$("#dlgSave")
+};
 
-function fmt(n){return Number(n||0).toLocaleString(undefined,{style:"currency",currency:"GBP"});}
+function fmt(n){return Number(n||0).toLocaleString(undefined,{style:"currency",currency:"GBP",minimumFractionDigits:2});}
 function cleanName(n){return (n||"").replace(/^\s*✅\s*/,"").trim();}
 
-// ---- RENDER ----
+/* One-popup editor */
+function openEditor({title,name,amount,include}) {
+  return new Promise(res=>{
+    els.dlgTitle.textContent = title||"Edit";
+    els.dlgBody.innerHTML = "";
+    // Name
+    const l1=document.createElement("label");
+    l1.textContent="Name";
+    const n=document.createElement("input");
+    n.className="field";
+    n.value=name||"";
+    // Amount
+    const l2=document.createElement("label");
+    l2.textContent="Amount";
+    const a=document.createElement("input");
+    a.type="number"; a.step="0.01"; a.className="field";
+    a.value = (amount!=null ? amount : 0);
+    els.dlgBody.append(l1,n,l2,a);
+    // Include (only if include is boolean provided)
+    let c=null;
+    if (typeof include === "boolean") {
+      const wrap=document.createElement("label");
+      wrap.style.cssText="display:flex;gap:8px;align-items:center;";
+      c=document.createElement("input"); c.type="checkbox"; c.checked=!!include;
+      const sp=document.createElement("span"); sp.textContent="Include in available income";
+      wrap.append(c,sp);
+      els.dlgBody.append(wrap);
+    }
+    els.dlgBack.style.display="flex";
+    const onCancel=()=>{ cleanup(); res(null); };
+    const onSave=()=>{ 
+      const out={ name: n.value.trim(), amount: Number(a.value)||0 };
+      if(c) out.include = !!c.checked;
+      cleanup(); res(out);
+    };
+    function cleanup(){
+      els.dlgBack.style.display="none";
+      els.dlgCancel.removeEventListener("click", onCancel);
+      els.dlgSave.removeEventListener("click", onSave);
+    }
+    els.dlgCancel.addEventListener("click", onCancel);
+    els.dlgSave.addEventListener("click", onSave);
+  });
+}
+
+/* Render */
 function render(uid){
   Promise.all([
     db.collection("users").doc(uid).collection("incomes").get(),
@@ -159,6 +229,7 @@ function render(uid){
     els.expenseList.innerHTML="";
     let totalAll=0,totalIncl=0,totalExp=0;
 
+    // Incomes
     incomes.forEach(inc=>{
       totalAll+=Number(inc.amount)||0;
       if(inc.include) totalIncl+=Number(inc.amount)||0;
@@ -174,19 +245,17 @@ function render(uid){
       actions.append(btnE,btnD); row.appendChild(actions);
 
       btnE.onclick=async()=>{
-        const newName=prompt("Edit name:",cleanName(inc.name));
-        if(newName===null) return;
-        const newAmt=prompt("Edit amount:",inc.amount);
-        if(newAmt===null) return;
-        const includeNow=confirm(
-          inc.include
-          ? "Currently included. Press OK to keep it included, or Cancel to exclude."
-          : "Currently excluded. Press OK to include it in available balance."
-        );
-        const newInclude=includeNow?true:false;
-
+        const edited = await openEditor({
+          title:"Edit Income",
+          name: cleanName(inc.name),
+          amount: inc.amount,
+          include: !!inc.include
+        });
+        if(!edited) return;
         await db.collection("users").doc(uid).collection("incomes").doc(inc.id).set({
-          name:cleanName(newName),amount:Number(newAmt)||0,include:newInclude
+          name: cleanName(edited.name)||inc.name,
+          amount: Number(edited.amount)||0,
+          include: (typeof edited.include==="boolean" ? edited.include : !!inc.include)
         },{merge:true});
         render(uid);
       };
@@ -199,23 +268,30 @@ function render(uid){
       els.incomeList.appendChild(row);
     });
 
+    // Expenses
     expenses.forEach(ex=>{
       totalExp+=Number(ex.amount)||0;
+
       const row=document.createElement("div"); row.className="row";
       const line=document.createElement("div");
       line.textContent=ex.name+" - "+fmt(ex.amount);
       row.appendChild(line);
+
       const actions=document.createElement("div"); actions.className="actions";
       const btnE=document.createElement("button"); btnE.className="btn btn-primary"; btnE.textContent="Edit";
       const btnD=document.createElement("button"); btnD.className="btn btn-danger"; btnD.textContent="Delete";
       actions.append(btnE,btnD); row.appendChild(actions);
+
       btnE.onclick=async()=>{
-        const newName=prompt("Edit name:",ex.name);
-        if(newName===null)return;
-        const newAmt=prompt("Edit amount:",ex.amount);
-        if(newAmt===null)return;
+        const edited = await openEditor({
+          title:"Edit Expense",
+          name: ex.name,
+          amount: ex.amount
+        });
+        if(!edited) return;
         await db.collection("users").doc(uid).collection("expenses").doc(ex.id).set({
-          name:(newName||"").trim(),amount:Number(newAmt)||0
+          name: (edited.name||"").trim()||ex.name,
+          amount: Number(edited.amount)||0
         },{merge:true});
         render(uid);
       };
@@ -228,6 +304,7 @@ function render(uid){
       els.expenseList.appendChild(row);
     });
 
+    // Summary
     els.sumTotalIncome.textContent=fmt(totalAll);
     els.sumAvailIncome.textContent=fmt(totalIncl-totalExp);
     els.sumExpenses.textContent=fmt(totalExp);
@@ -235,7 +312,7 @@ function render(uid){
   });
 }
 
-// ---- Auth ----
+/* Auth handlers (same as your working version) */
 els.btnLogin.onclick=()=>auth.signInWithEmailAndPassword(els.authEmail.value,els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
 els.btnRegister.onclick=()=>auth.createUserWithEmailAndPassword(els.authEmail.value,els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
 els.btnLogout.onclick=()=>auth.signOut();
@@ -245,6 +322,7 @@ auth.onAuthStateChanged(user=>{
     els.userEmail.textContent="Logged in as: "+user.email;
     els.authWrap.style.display="none"; els.appWrap.style.display="block";
     render(user.uid);
+
     els.addIncome.onclick=()=>{
       const n=cleanName(els.incName.value), a=Number(els.incAmt.value||0), i=!!els.incInclude.checked;
       if(!n)return;
