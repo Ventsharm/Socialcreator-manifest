@@ -1,7 +1,7 @@
 {
-  "name": "Budget Calculator",
-  "short_name": "BudgetCalc",
-  "description": "A simple budget calculator app that helps track income, expenses, and savings efficiently.",
+  "name": "Ventsharm Budget",
+  "short_name": "Budget",
+  "description": "Track income, expenses, and available balance with Firebase sync across devices.",
   "start_url": "https://ventsharm.github.io/Socialcreator-manifest/",
   "scope": "https://ventsharm.github.io/Socialcreator-manifest/",
   "display": "standalone",
@@ -9,12 +9,12 @@
   "theme_color": "#000000",
   "icons": [
     {
-      "src": "Icon-192.png",
+      "src": "https://ventsharm.github.io/Socialcreator-manifest/Icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "Icon-512.png",
+      "src": "https://ventsharm.github.io/Socialcreator-manifest/Icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
