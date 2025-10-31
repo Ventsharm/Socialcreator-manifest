@@ -19,8 +19,6 @@
   .btn-danger{background:#ef4444}
   .btn-ghost{background:#f9fafb;border:1px solid #e5e7eb;color:#111}
   .field{padding:12px;border-radius:12px;border:1px solid #d1d5db}
-
-  /* Simple popup dialog */
   .backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center}
   .dialog{width:90%;max-width:380px;background:#fff;border:1px solid #e9edf3;border-radius:16px;box-shadow:0 10px 24px rgba(0,0,0,.2);padding:16px}
   .dialog h3{margin:0 0 10px}
@@ -30,7 +28,7 @@
 </head>
 <body>
 
-<!-- ===== Auth (shown until signed in) ===== -->
+<!-- ===== Auth ===== -->
 <div id="authWrap" style="max-width:480px;margin:30px auto;padding:0 14px;">
   <div class="box">
     <h2 style="margin:0 0 6px;font-size:1.4rem;text-align:center;">Sign in to Ventsharm Budget</h2>
@@ -44,7 +42,7 @@
   </div>
 </div>
 
-<!-- ===== App (hidden until signed in) ===== -->
+<!-- ===== App ===== -->
 <div id="appWrap" style="display:none;max-width:880px;margin:20px auto;color:#111;">
   <div class="box" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
     <div>
@@ -61,10 +59,10 @@
     <button data-tab="overviewTab">Overview</button>
   </div>
 
-  <!-- ===== Income Tab ===== -->
+  <!-- Income Tab -->
   <div id="incomeTab" class="tab-content active">
     <div class="box">
-      <h3 style="margin:0 0 12px;">Income Sources</h3>
+      <h3>Income Sources</h3>
       <div style="display:grid;gap:10px;margin-bottom:12px;">
         <input id="incName" placeholder="Income name e.g. Cashier or Benefit" class="field">
         <input id="incAmt" type="number" min="0" step="0.01" placeholder="Amount e.g. 1200" class="field">
@@ -78,10 +76,10 @@
     </div>
   </div>
 
-  <!-- ===== Expense Tab ===== -->
+  <!-- Expense Tab -->
   <div id="expenseTab" class="tab-content">
     <div class="box">
-      <h3 style="margin:0 0 12px;">Expenses</h3>
+      <h3>Expenses</h3>
       <div style="display:grid;gap:10px;margin-bottom:12px;">
         <input id="expName" placeholder="Bill / Subscription e.g. Rent or Spotify" class="field">
         <input id="expAmt" type="number" min="0" step="0.01" placeholder="Amount e.g. 500" class="field">
@@ -94,27 +92,27 @@
     </div>
   </div>
 
-  <!-- ===== Overview Tab ===== -->
+  <!-- Overview Tab -->
   <div id="overviewTab" class="tab-content">
     <div style="display:grid;gap:12px;margin-top:14px;">
-      <div class="box" style="background:#f8fbff;border-color:#e4efff">
+      <div class="box" style="background:#f8fbff;">
         <div style="color:#3b82f6;font-weight:600;">Total Income (All)</div>
-        <div id="sumTotalIncome" style="font-weight:800;font-size:1.15rem;margin-top:4px;">£0.00</div>
+        <div id="sumTotalIncome" style="font-weight:800;font-size:1.15rem;">£0.00</div>
       </div>
-      <div class="box" style="background:#f8f7ff;border-color:#eae8ff">
+      <div class="box" style="background:#f8f7ff;">
         <div style="color:#7c3aed;font-weight:600;">Available Income (Included - Expenses)</div>
-        <div id="sumAvailIncome" style="font-weight:800;font-size:1.15rem;margin-top:4px;">£0.00</div>
-        <div id="sumPercent" style="color:#6b7280;font-size:.92rem;margin-top:2px;">Spent: 0%</div>
+        <div id="sumAvailIncome" style="font-weight:800;font-size:1.15rem;">£0.00</div>
+        <div id="sumPercent" style="color:#6b7280;font-size:.92rem;">Spent: 0%</div>
       </div>
-      <div class="box" style="background:#fff9f6;border-color:#ffe8df">
+      <div class="box" style="background:#fff9f6;">
         <div style="color:#f97316;font-weight:600;">Expenses</div>
-        <div id="sumExpenses" style="font-weight:800;font-size:1.15rem;margin-top:4px;">£0.00</div>
+        <div id="sumExpenses" style="font-weight:800;font-size:1.15rem;">£0.00</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Simple popup dialog -->
+<!-- Popup -->
 <div id="dlgBack" class="backdrop">
   <div class="dialog">
     <h3 id="dlgTitle">Edit</h3>
@@ -126,25 +124,22 @@
   </div>
 </div>
 
-<!-- Tab switching -->
 <script>
-  const tabs=document.querySelectorAll('.tab-bar button');
-  const contents=document.querySelectorAll('.tab-content');
-  tabs.forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      tabs.forEach(b=>b.classList.remove('active'));
-      contents.forEach(c=>c.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(btn.dataset.tab).classList.add('active');
-    });
+const tabs=document.querySelectorAll('.tab-bar button');
+const contents=document.querySelectorAll('.tab-content');
+tabs.forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    tabs.forEach(b=>b.classList.remove('active'));
+    contents.forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
   });
-</script>
-
-<!-- Firebase (Compat, Blogger/GitHub friendly) -->
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+});
+</script><script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 <script>
+/* ---------- Firebase Config ---------- */
 const firebaseConfig = {
   apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
   authDomain: "budget-app-283de.firebaseapp.com",
@@ -154,112 +149,106 @@ const firebaseConfig = {
   appId: "1:162369707369:web:3faa7f002f8ba22dc0f1f8"
 };
 firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth();
-const db=firebase.firestore();
+const auth = firebase.auth();
+const db   = firebase.firestore();
 
-const $=id=>document.getElementById(id);
-const els={
-  authWrap:$("#authWrap"), authEmail:$("#authEmail"), authPass:$("#authPass"),
-  btnLogin:$("#btnLogin"), btnRegister:$("#btnRegister"), authMsg:$("#authMsg"),
-  appWrap:$("#appWrap"), userEmail:$("#userEmail"), btnLogout:$("#btnLogout"),
-  incName:$("#incName"), incAmt:$("#incAmt"), incInclude:$("#incInclude"), addIncome:$("#addIncome"), incomeList:$("#incomeList"),
-  expName:$("#expName"), expAmt:$("#expAmt"), addExpense:$("#addExpense"), resetAll:$("#resetAll"), expenseList:$("#expenseList"),
-  sumTotalIncome:$("#sumTotalIncome"), sumAvailIncome:$("#sumAvailIncome"), sumExpenses:$("#sumExpenses"), sumPercent:$("#sumPercent"),
-  dlgBack:$("#dlgBack"), dlgTitle:$("#dlgTitle"), dlgBody:$("#dlgBody"), dlgCancel:$("#dlgCancel"), dlgSave:$("#dlgSave")
+/* ---------- Shortcuts ---------- */
+const $ = id => document.getElementById(id);
+const els = {
+  authWrap:$("authWrap"), authEmail:$("authEmail"), authPass:$("authPass"),
+  btnLogin:$("btnLogin"), btnRegister:$("btnRegister"), authMsg:$("authMsg"),
+  appWrap:$("appWrap"), userEmail:$("userEmail"), btnLogout:$("btnLogout"),
+  incName:$("incName"), incAmt:$("incAmt"), incInclude:$("incInclude"),
+  addIncome:$("addIncome"), incomeList:$("incomeList"),
+  expName:$("expName"), expAmt:$("expAmt"), addExpense:$("addExpense"),
+  resetAll:$("resetAll"), expenseList:$("expenseList"),
+  sumTotalIncome:$("sumTotalIncome"), sumAvailIncome:$("sumAvailIncome"),
+  sumExpenses:$("sumExpenses"), sumPercent:$("sumPercent"),
+  dlgBack:$("dlgBack"), dlgTitle:$("dlgTitle"), dlgBody:$("dlgBody"),
+  dlgCancel:$("dlgCancel"), dlgSave:$("dlgSave")
 };
 
-function fmt(n){return Number(n||0).toLocaleString(undefined,{style:"currency",currency:"GBP",minimumFractionDigits:2});}
+/* ---------- Helpers ---------- */
+function fmt(n){return Number(n||0).toLocaleString(undefined,{style:"currency",currency:"GBP"});}
 function cleanName(n){return (n||"").replace(/^\s*✅\s*/,"").trim();}
 
-/* One-popup editor */
+/* ---------- Edit Dialog ---------- */
 function openEditor({title,name,amount,include}) {
   return new Promise(res=>{
-    els.dlgTitle.textContent = title||"Edit";
+    els.dlgTitle.textContent = title || "Edit";
     els.dlgBody.innerHTML = "";
-    // Name
-    const l1=document.createElement("label");
-    l1.textContent="Name";
-    const n=document.createElement("input");
-    n.className="field";
-    n.value=name||"";
-    // Amount
-    const l2=document.createElement("label");
-    l2.textContent="Amount";
-    const a=document.createElement("input");
-    a.type="number"; a.step="0.01"; a.className="field";
-    a.value = (amount!=null ? amount : 0);
-    els.dlgBody.append(l1,n,l2,a);
-    // Include (only if include is boolean provided)
-    let c=null;
+    const n = document.createElement("input");
+    n.className = "field"; n.value = name || "";
+    const a = document.createElement("input");
+    a.type = "number"; a.step = "0.01"; a.className = "field"; a.value = amount || 0;
+    els.dlgBody.append("Name", n, "Amount", a);
+    let c = null;
     if (typeof include === "boolean") {
-      const wrap=document.createElement("label");
-      wrap.style.cssText="display:flex;gap:8px;align-items:center;";
-      c=document.createElement("input"); c.type="checkbox"; c.checked=!!include;
-      const sp=document.createElement("span"); sp.textContent="Include in available income";
-      wrap.append(c,sp);
-      els.dlgBody.append(wrap);
+      const wrap = document.createElement("label");
+      wrap.style.cssText = "display:flex;gap:8px;align-items:center;";
+      c = document.createElement("input"); c.type = "checkbox"; c.checked = include;
+      const sp = document.createElement("span"); sp.textContent = "Include in available income";
+      wrap.append(c, sp); els.dlgBody.append(wrap);
     }
-    els.dlgBack.style.display="flex";
-    const onCancel=()=>{ cleanup(); res(null); };
-    const onSave=()=>{ 
-      const out={ name: n.value.trim(), amount: Number(a.value)||0 };
-      if(c) out.include = !!c.checked;
-      cleanup(); res(out);
+    els.dlgBack.style.display = "flex";
+    const cancel = () => finish(null);
+    const save   = () => {
+      const out = { name:n.value.trim(), amount:Number(a.value)||0 };
+      if (c) out.include = c.checked;
+      finish(out);
     };
-    function cleanup(){
-      els.dlgBack.style.display="none";
-      els.dlgCancel.removeEventListener("click", onCancel);
-      els.dlgSave.removeEventListener("click", onSave);
+    function finish(v){
+      els.dlgBack.style.display = "none";
+      els.dlgCancel.removeEventListener("click", cancel);
+      els.dlgSave.removeEventListener("click", save);
+      res(v);
     }
-    els.dlgCancel.addEventListener("click", onCancel);
-    els.dlgSave.addEventListener("click", onSave);
+    els.dlgCancel.addEventListener("click", cancel);
+    els.dlgSave.addEventListener("click", save);
   });
 }
 
-/* Render */
+/* ---------- Render ---------- */
 function render(uid){
   Promise.all([
     db.collection("users").doc(uid).collection("incomes").get(),
     db.collection("users").doc(uid).collection("expenses").get()
-  ]).then(([incSnap,expSnap])=>{
-    const incomes=incSnap.docs.map(d=>({id:d.id,...d.data()}));
-    const expenses=expSnap.docs.map(d=>({id:d.id,...d.data()}));
+  ]).then(([incSnap, expSnap])=>{
+    const incomes = incSnap.docs.map(d=>({id:d.id, ...d.data()}));
+    const expenses= expSnap.docs.map(d=>({id:d.id, ...d.data()}));
 
-    els.incomeList.innerHTML="";
-    els.expenseList.innerHTML="";
-    let totalAll=0,totalIncl=0,totalExp=0;
+    els.incomeList.innerHTML = "";
+    els.expenseList.innerHTML = "";
+
+    let totalAll=0, totalIncl=0, totalExp=0;
 
     // Incomes
     incomes.forEach(inc=>{
-      totalAll+=Number(inc.amount)||0;
-      if(inc.include) totalIncl+=Number(inc.amount)||0;
-
-      const row=document.createElement("div"); row.className="row";
-      const line=document.createElement("div");
-      line.textContent=(inc.include?"✅ ":"")+cleanName(inc.name)+" - "+fmt(inc.amount);
+      totalAll += Number(inc.amount)||0;
+      if(inc.include) totalIncl += Number(inc.amount)||0;
+      const row = document.createElement("div");
+      row.className = "row";
+      const line = document.createElement("div");
+      line.textContent = (inc.include?"✅ ":"") + cleanName(inc.name) + " - " + fmt(inc.amount);
       row.appendChild(line);
 
-      const actions=document.createElement("div"); actions.className="actions";
-      const btnE=document.createElement("button"); btnE.className="btn btn-primary"; btnE.textContent="Edit";
-      const btnD=document.createElement("button"); btnD.className="btn btn-danger"; btnD.textContent="Delete";
-      actions.append(btnE,btnD); row.appendChild(actions);
+      const act = document.createElement("div");
+      act.className = "actions";
+      const e = document.createElement("button"); e.className = "btn btn-primary"; e.textContent="Edit";
+      const d = document.createElement("button"); d.className = "btn btn-danger";  d.textContent="Delete";
+      act.append(e,d); row.appendChild(act);
 
-      btnE.onclick=async()=>{
-        const edited = await openEditor({
-          title:"Edit Income",
-          name: cleanName(inc.name),
-          amount: inc.amount,
-          include: !!inc.include
-        });
-        if(!edited) return;
+      e.onclick = async ()=>{
+        const ed = await openEditor({title:"Edit Income",name:cleanName(inc.name),amount:inc.amount,include:!!inc.include});
+        if(!ed) return;
         await db.collection("users").doc(uid).collection("incomes").doc(inc.id).set({
-          name: cleanName(edited.name)||inc.name,
-          amount: Number(edited.amount)||0,
-          include: (typeof edited.include==="boolean" ? edited.include : !!inc.include)
-        },{merge:true});
+          name: cleanName(ed.name)||inc.name,
+          amount: Number(ed.amount)||0,
+          include: typeof ed.include==="boolean"?ed.include:inc.include
+        }, {merge:true});
         render(uid);
       };
-      btnD.onclick=async()=>{
+      d.onclick = async ()=>{
         if(confirm(`Delete "${cleanName(inc.name)}" (${fmt(inc.amount)})?`)){
           await db.collection("users").doc(uid).collection("incomes").doc(inc.id).delete();
           render(uid);
@@ -270,32 +259,27 @@ function render(uid){
 
     // Expenses
     expenses.forEach(ex=>{
-      totalExp+=Number(ex.amount)||0;
-
-      const row=document.createElement("div"); row.className="row";
-      const line=document.createElement("div");
-      line.textContent=ex.name+" - "+fmt(ex.amount);
+      totalExp += Number(ex.amount)||0;
+      const row = document.createElement("div");
+      row.className = "row";
+      const line = document.createElement("div");
+      line.textContent = ex.name + " - " + fmt(ex.amount);
       row.appendChild(line);
 
-      const actions=document.createElement("div"); actions.className="actions";
-      const btnE=document.createElement("button"); btnE.className="btn btn-primary"; btnE.textContent="Edit";
-      const btnD=document.createElement("button"); btnD.className="btn btn-danger"; btnD.textContent="Delete";
-      actions.append(btnE,btnD); row.appendChild(actions);
+      const act = document.createElement("div");
+      act.className = "actions";
+      const e = document.createElement("button"); e.className = "btn btn-primary"; e.textContent="Edit";
+      const d = document.createElement("button"); d.className = "btn btn-danger";  d.textContent="Delete";
+      act.append(e,d); row.appendChild(act);
 
-      btnE.onclick=async()=>{
-        const edited = await openEditor({
-          title:"Edit Expense",
-          name: ex.name,
-          amount: ex.amount
-        });
-        if(!edited) return;
-        await db.collection("users").doc(uid).collection("expenses").doc(ex.id).set({
-          name: (edited.name||"").trim()||ex.name,
-          amount: Number(edited.amount)||0
-        },{merge:true});
+      e.onclick = async ()=>{
+        const ed = await openEditor({title:"Edit Expense",name:ex.name,amount:ex.amount});
+        if(!ed) return;
+        await db.collection("users").doc(uid).collection("expenses").doc(ex.id)
+          .set({name:(ed.name||ex.name),amount:Number(ed.amount)||0},{merge:true});
         render(uid);
       };
-      btnD.onclick=async()=>{
+      d.onclick = async ()=>{
         if(confirm(`Delete "${ex.name}" (${fmt(ex.amount)})?`)){
           await db.collection("users").doc(uid).collection("expenses").doc(ex.id).delete();
           render(uid);
@@ -304,46 +288,66 @@ function render(uid){
       els.expenseList.appendChild(row);
     });
 
-    // Summary
-    els.sumTotalIncome.textContent=fmt(totalAll);
-    els.sumAvailIncome.textContent=fmt(totalIncl-totalExp);
-    els.sumExpenses.textContent=fmt(totalExp);
-    els.sumPercent.textContent="Spent: "+(totalIncl>0?Math.round(totalExp/totalIncl*100):0)+"%";
+    // Totals
+    els.sumTotalIncome.textContent = fmt(totalAll);
+    els.sumAvailIncome.textContent = fmt(totalIncl - totalExp);
+    els.sumExpenses.textContent    = fmt(totalExp);
+    els.sumPercent.textContent     = "Spent: " + (totalIncl>0 ? Math.round(totalExp/totalIncl*100) : 0) + "%";
   });
 }
 
-/* Auth handlers (same as your working version) */
-els.btnLogin.onclick=()=>auth.signInWithEmailAndPassword(els.authEmail.value,els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
-els.btnRegister.onclick=()=>auth.createUserWithEmailAndPassword(els.authEmail.value,els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
-els.btnLogout.onclick=()=>auth.signOut();
+/* ---------- Auth Logic ---------- */
+els.btnLogin.onclick = () =>
+  auth.signInWithEmailAndPassword(els.authEmail.value, els.authPass.value)
+  .catch(e=>els.authMsg.textContent = e.message);
 
+els.btnRegister.onclick = () =>
+  auth.createUserWithEmailAndPassword(els.authEmail.value, els.authPass.value)
+  .catch(e=>els.authMsg.textContent = e.message);
+
+els.btnLogout.onclick = () => auth.signOut();
+
+/* ---------- Auth State ---------- */
 auth.onAuthStateChanged(user=>{
   if(user){
-    els.userEmail.textContent="Logged in as: "+user.email;
-    els.authWrap.style.display="none"; els.appWrap.style.display="block";
+    els.userEmail.textContent = "Logged in as: " + user.email;
+    els.authWrap.style.display="none";
+    els.appWrap.style.display="block";
     render(user.uid);
 
-    els.addIncome.onclick=()=>{
-      const n=cleanName(els.incName.value), a=Number(els.incAmt.value||0), i=!!els.incInclude.checked;
-      if(!n)return;
-      db.collection("users").doc(user.uid).collection("incomes").add({name:n,amount:a,include:i})
+    els.addIncome.onclick = ()=>{
+      const n = cleanName(els.incName.value);
+      const a = Number(els.incAmt.value||0);
+      const i = !!els.incInclude.checked;
+      if(!n) return;
+      db.collection("users").doc(user.uid).collection("incomes")
+        .add({name:n, amount:a, include:i})
         .then(()=>{ els.incName.value=""; els.incAmt.value=""; els.incInclude.checked=true; render(user.uid); });
     };
-    els.addExpense.onclick=()=>{
-      const n=(els.expName.value||"").trim(), a=Number(els.expAmt.value||0);
-      if(!n)return;
-      db.collection("users").doc(user.uid).collection("expenses").add({name:n,amount:a})
+
+    els.addExpense.onclick = ()=>{
+      const n = (els.expName.value||"").trim();
+      const a = Number(els.expAmt.value||0);
+      if(!n) return;
+      db.collection("users").doc(user.uid).collection("expenses")
+        .add({name:n, amount:a})
         .then(()=>{ els.expName.value=""; els.expAmt.value=""; render(user.uid); });
     };
-    els.resetAll.onclick=async()=>{
-      if(!confirm("Reset all incomes and expenses?"))return;
-      const incs=await db.collection("users").doc(user.uid).collection("incomes").get();
-      const exps=await db.collection("users").doc(user.uid).collection("expenses").get();
-      const ops=[]; incs.forEach(d=>ops.push(d.ref.delete())); exps.forEach(d=>ops.push(d.ref.delete()));
-      await Promise.all(ops); render(user.uid);
+
+    els.resetAll.onclick = async ()=>{
+      if(!confirm("Reset all incomes and expenses?")) return;
+      const incs = await db.collection("users").doc(user.uid).collection("incomes").get();
+      const exps = await db.collection("users").doc(user.uid).collection("expenses").get();
+      const ops = [];
+      incs.forEach(d=>ops.push(d.ref.delete()));
+      exps.forEach(d=>ops.push(d.ref.delete()));
+      await Promise.all(ops);
+      render(user.uid);
     };
-  }else{
-    els.appWrap.style.display="none"; els.authWrap.style.display="block";
+
+  } else {
+    els.appWrap.style.display="none";
+    els.authWrap.style.display="block";
   }
 });
 </script>
