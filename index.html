@@ -1,14 +1,398 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="0;url=https://www.ventsharmblogs.co.uk/">
-    <link rel="manifest" href="manifest.webmanifest">
-    <meta name="theme-color" content="#000000">
-    <title>Redirecting...</title>
-  </head>
-  <body>
-    <p>Redirecting to ventsharmblogs.co.uk...</p>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <title>Budget Calculator</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#000000" />
+  <style>
+    :root {
+      --bg: #0f1115;
+      --card: #151923;
+      --muted: #9aa4b2;
+      --text: #e8eef7;
+      --green: #22c55e;
+      --red: #ef4444;
+      --accent: #60a5fa;
+      --border: #232836;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin:0; padding:0; background:var(--bg); color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;}
+    a { color: var(--accent); text-decoration: none; }
+    .wrap { max-width: 980px; margin: 32px auto; padding: 0 16px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+    .header { padding: 20px 24px; display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border);}
+    .title { font-weight:700; font-size: 20px; letter-spacing:.2px;}
+    .pill { padding: 8px 12px; border:1px solid var(--border); border-radius: 999px; color:var(--muted); font-size: 12px;}
+    .content { padding: 22px 24px; }
+    .row { display:flex; gap:12px; flex-wrap: wrap; }
+    .input, select { background:#111523; color:var(--text); border:1px solid var(--border); border-radius: 12px; padding:12px 14px; outline:none; width:100%; }
+    .btn { border:1px solid var(--border); background:#111523; color:var(--text); padding:12px 16px; border-radius:12px; cursor:pointer; transition:.15s transform ease, .15s opacity ease; }
+    .btn:hover { transform: translateY(-1px); opacity:.95; }
+    .btn.primary { background: linear-gradient(180deg, #1f4ae0, #1537a8); border-color:#1a2f7a; }
+    .btn.green { background: linear-gradient(180deg, #23cf6b, #179e4f); border-color:#147f42; }
+    .btn.red { background: linear-gradient(180deg, #ff5a5a, #d63c3c); border-color:#b23232; }
+    .tabs { display:flex; gap:8px; flex-wrap:wrap; padding: 10px 12px; border-bottom:1px solid var(--border); background: #121622; border-radius: 16px 16px 0 0;}
+    .tab { padding:10px 14px; border-radius:10px; color:var(--muted); cursor:pointer; border:1px solid transparent;}
+    .tab.active { background:#0e1220; color:var(--text); border-color:var(--border);}
+    .section { display:none; }
+    .section.active { display:block; }
+    .list { margin-top:12px; border-top:1px dashed var(--border); }
+    .item { display:grid; grid-template-columns: 1fr 110px 110px 44px; align-items:center; gap:10px; padding:12px 0; border-bottom:1px dashed var(--border); }
+    .item small { color:var(--muted); }
+    .amount.pos { color: var(--green); }
+    .amount.neg { color: var(--red); }
+    .footer { display:flex; justify-content:space-between; padding:16px 24px; border-top:1px solid var(--border); color:var(--muted);}
+    .grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; margin-top:12px; }
+    .stat { background:#0e1220; border:1px solid var(--border); border-radius:12px; padding:16px; }
+    .stat h3 { margin:0 0 8px 0; font-size:13px; color:var(--muted); font-weight:600; }
+    .stat .val { font-size:22px; font-weight:800; }
+    .center { text-align:center; color:var(--muted); }
+    /* Auth */
+    .auth { max-width: 520px; margin: 40px auto; padding: 24px; }
+    .logo { font-weight:800; letter-spacing:.3px; font-size: 22px; display:flex; align-items:center; gap:10px;}
+    .hint { color:var(--muted); font-size:13px; margin-top:8px;}
+    .auth .row > * { flex: 1 1 48%; }
+    .divider { text-align:center; color:var(--muted); margin:12px 0; font-size:12px;}
+    .badge { padding:6px 10px; border-radius:999px; border:1px solid var(--border); color:var(--muted); font-size:12px; }
+    @media (max-width: 640px) {
+      .item { grid-template-columns: 1fr 90px 90px 44px; }
+      .grid { grid-template-columns: 1fr; }
+      .auth .row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- AUTH SCREEN -->
+  <div id="authScreen" class="wrap">
+    <div class="card auth">
+      <div class="header">
+        <div class="logo">💰 Budget Calculator</div>
+        <span class="pill">Secure Login</span>
+      </div>
+      <div class="content">
+        <div class="row">
+          <input id="email" class="input" type="email" placeholder="Email" autocomplete="username" />
+          <input id="password" class="input" type="password" placeholder="Password" autocomplete="current-password" />
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <button id="loginBtn" class="btn primary" style="flex:1;">Sign in</button>
+          <button id="signupBtn" class="btn" style="flex:1;">Create account</button>
+        </div>
+        <div class="hint">You’ll stay signed in (local session). You can sign out anytime.</div>
+        <div class="divider">—</div>
+        <div class="row">
+          <button id="demoBtn" class="btn" style="width:100%;">Try Demo (local only)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP SCREEN -->
+  <div id="appScreen" class="wrap" style="display:none;">
+    <div class="card">
+      <div class="header">
+        <div class="title">💰 Budget Calculator</div>
+        <div class="row" style="align-items:center;">
+          <span id="userEmail" class="pill"></span>
+          <button id="signOutBtn" class="btn" title="Sign out">Sign out</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="incomes">Incomes</div>
+        <div class="tab" data-tab="expenses">Expenses</div>
+        <div class="tab" data-tab="overview">Overview</div>
+      </div>
+
+      <!-- Incomes -->
+      <div id="incomes" class="section active">
+        <div class="content">
+          <div class="row">
+            <input id="incName" class="input" placeholder="Income source (e.g., Salary)" />
+            <input id="incAmount" class="input" placeholder="Amount" inputmode="decimal" />
+            <button id="addIncome" class="btn green">Add income</button>
+          </div>
+          <div class="list" id="incomeList"></div>
+        </div>
+        <div class="footer">
+          <div>Total Incomes</div>
+          <strong id="incomeTotal" class="amount pos">£0.00</strong>
+        </div>
+      </div>
+
+      <!-- Expenses -->
+      <div id="expenses" class="section">
+        <div class="content">
+          <div class="row">
+            <input id="expName" class="input" placeholder="Expense (e.g., Rent)" />
+            <input id="expAmount" class="input" placeholder="Amount" inputmode="decimal" />
+            <select id="expCategory" class="input" style="max-width:220px;">
+              <option value="">Category (optional)</option>
+              <option>Housing</option>
+              <option>Transport</option>
+              <option>Food</option>
+              <option>Utilities</option>
+              <option>Fun</option>
+              <option>Other</option>
+            </select>
+            <button id="addExpense" class="btn red">Add expense</button>
+          </div>
+          <div class="list" id="expenseList"></div>
+        </div>
+        <div class="footer">
+          <div>Total Expenses</div>
+          <strong id="expenseTotal" class="amount neg">£0.00</strong>
+        </div>
+      </div>
+
+      <!-- Overview -->
+      <div id="overview" class="section">
+        <div class="content">
+          <div class="grid">
+            <div class="stat">
+              <h3>Total Incomes</h3>
+              <div id="ovInc" class="val">£0.00</div>
+            </div>
+            <div class="stat">
+              <h3>Total Expenses</h3>
+              <div id="ovExp" class="val">£0.00</div>
+            </div>
+            <div class="stat">
+              <h3>Balance</h3>
+              <div id="ovBal" class="val">£0.00</div>
+            </div>
+          </div>
+          <div class="center hint" style="margin-top:14px;">
+            Data syncs to your account (Firestore). Offline edits queue and sync when online.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase (v9 modular) -->
+  <script type="module">
+    /***** Firebase setup *****/
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    import { getAuth, setPersistence, browserLocalPersistence, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+    // ⬇️ Replace with your Budget App Firebase config (same project you’re using already)
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Optimized session (stay signed in, no reads on load)
+    await setPersistence(auth, browserLocalPersistence);
+
+    /***** UI helpers *****/
+    const £ = sel => document.querySelector(sel);
+    const fmt = n => "£" + (Number(n || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    const authScreen = $("#authScreen");
+    const appScreen  = $("#appScreen");
+    const emailEl = $("#email");
+    const passEl  = $("#password");
+    const loginBtn = $("#loginBtn");
+    const signupBtn = $("#signupBtn");
+    const demoBtn = $("#demoBtn");
+    const userEmail = $("#userEmail");
+    const signOutBtn = $("#signOutBtn");
+
+    // Tabs
+    const tabs = [...document.querySelectorAll(".tab")];
+    const sections = [...document.querySelectorAll(".section")];
+    tabs.forEach(t => t.addEventListener("click", () => {
+      tabs.forEach(x => x.classList.remove("active"));
+      sections.forEach(s => s.classList.remove("active"));
+      t.classList.add("active");
+      $("#" + t.dataset.tab).classList.add("active");
+    }));
+
+    /***** State *****/
+    let uid = null;
+    let incomesUnsub = null;
+    let expensesUnsub = null;
+    let totals = { inc: 0, exp: 0 };
+
+    function resetListeners() {
+      if (incomesUnsub) incomesUnsub();
+      if (expensesUnsub) expensesUnsub();
+      incomesUnsub = expensesUnsub = null;
+      $("#incomeList").innerHTML = "";
+      $("#expenseList").innerHTML = "";
+      totals = { inc: 0, exp: 0 };
+      renderTotals();
+    }
+
+    function renderTotals() {
+      $("#incomeTotal").textContent = fmt(totals.inc);
+      $("#expenseTotal").textContent = fmt(totals.exp);
+      $("#ovInc").textContent = fmt(totals.inc);
+      $("#ovExp").textContent = fmt(totals.exp);
+      $("#ovBal").textContent = fmt(totals.inc - totals.exp);
+    }
+
+    function renderItem(container, id, name, amount, sign) {
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <div>
+          <div>${name || "(untitled)"}</div>
+          <small>${new Date().toLocaleString()}</small>
+        </div>
+        <div class="amount ${sign === "+" ? "pos" : "neg"}">${fmt(amount)}</div>
+        <div><span class="badge">${sign === "+" ? "Income" : "Expense"}</span></div>
+        <button class="btn" data-id="${id}">✕</button>
+      `;
+      container.prepend(div);
+      return div.querySelector("button");
+    }
+
+    async function attachLiveQuery() {
+      // Lazy attach (only after login). One read to set up snapshot; realtime after that.
+      const incCol = collection(db, "users", uid, "incomes");
+      const expCol = collection(db, "users", uid, "expenses");
+
+      incomesUnsub = onSnapshot(query(incCol, orderBy("createdAt", "desc")), (snap) => {
+        $("#incomeList").innerHTML = "";
+        totals.inc = 0;
+        snap.forEach(d => {
+          const data = d.data();
+          totals.inc += Number(data.amount || 0);
+          const delBtn = renderItem($("#incomeList"), d.id, data.name, data.amount, "+");
+          delBtn.onclick = async () => {
+            await deleteDoc(doc(db, "users", uid, "incomes", d.id));
+          };
+        });
+        renderTotals();
+      });
+
+      expensesUnsub = onSnapshot(query(expCol, orderBy("createdAt", "desc")), (snap) => {
+        $("#expenseList").innerHTML = "";
+        totals.exp = 0;
+        snap.forEach(d => {
+          const data = d.data();
+          totals.exp += Number(data.amount || 0);
+          const delBtn = renderItem($("#expenseList"), d.id, data.name, data.amount, "-");
+          delBtn.onclick = async () => {
+            await deleteDoc(doc(db, "users", uid, "expenses", d.id));
+          };
+        });
+        renderTotals();
+      });
+    }
+
+    /***** Auth flows (optimized persistence, no reads before login) *****/
+    loginBtn.addEventListener("click", async () => {
+      const email = emailEl.value.trim();
+      const pass  = passEl.value;
+      if (!email || !pass) return alert("Enter email and password.");
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch (e) {
+        alert(e.message);
+      }
+    });
+
+    signupBtn.addEventListener("click", async () => {
+      const email = emailEl.value.trim();
+      const pass  = passEl.value;
+      if (!email || !pass) return alert("Enter email and password to create an account.");
+      try {
+        await createUserWithEmailAndPassword(auth, email, pass);
+      } catch (e) {
+        alert(e.message);
+      }
+    });
+
+    demoBtn.addEventListener("click", () => {
+      // Demo mode: no auth, local-only lists (will clear on refresh)
+      authScreen.style.display = "none";
+      appScreen.style.display = "block";
+      userEmail.textContent = "Demo (local)";
+      uid = null;
+      resetListeners();
+    });
+
+    signOutBtn.addEventListener("click", async () => {
+      try { await signOut(auth); } catch(e) {}
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        uid = user.uid;
+        userEmail.textContent = user.email || "Signed in";
+        authScreen.style.display = "none";
+        appScreen.style.display = "block";
+        resetListeners();
+        await attachLiveQuery();
+      } else {
+        uid = null;
+        resetListeners();
+        appScreen.style.display = "none";
+        authScreen.style.display = "block";
+      }
+    });
+
+    /***** Add income/expense (reads occur only on user action) *****/
+    $("#addIncome").addEventListener("click", async () => {
+      const name = $("#incName").value.trim();
+      const amount = parseFloat($("#incAmount").value.replace(/,/g, ""));
+      if (!name || isNaN(amount)) return alert("Enter income name and amount.");
+      if (!uid) {
+        // Demo mode
+        totals.inc += amount;
+        renderItem($("#incomeList"), crypto.randomUUID(), name, amount, "+");
+        renderTotals();
+        $("#incName").value = ""; $("#incAmount").value = "";
+        return;
+      }
+      await addDoc(collection(db, "users", uid, "incomes"), {
+        name, amount, createdAt: serverTimestamp()
+      });
+      $("#incName").value = ""; $("#incAmount").value = "";
+    });
+
+    $("#addExpense").addEventListener("click", async () => {
+      const name = $("#expName").value.trim();
+      const amount = parseFloat($("#expAmount").value.replace(/,/g, ""));
+      const category = $("#expCategory").value.trim();
+      if (!name || isNaN(amount)) return alert("Enter expense name and amount.");
+      if (!uid) {
+        // Demo mode
+        totals.exp += amount;
+        renderItem($("#expenseList"), crypto.randomUUID(), name + (category ? ` • ${category}` : ""), amount, "-");
+        renderTotals();
+        $("#expName").value = ""; $("#expAmount").value = ""; $("#expCategory").value = "";
+        return;
+      }
+      await addDoc(collection(db, "users", uid, "expenses"), {
+        name, amount, category: category || null, createdAt: serverTimestamp()
+      });
+      $("#expName").value = ""; $("#expAmount").value = ""; $("#expCategory").value = "";
+    });
+
+    /***** (Optional) Register a basic service worker if present *****/
+    if ("serviceWorker" in navigator) {
+      try { navigator.serviceWorker.register("./sw.js"); } catch (e) {}
+    }
+  </script>
+</body>
 </html>
+```0
