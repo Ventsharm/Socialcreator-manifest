@@ -1,398 +1,298 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  />
-  <title>Budget Calculator</title>
-  <link rel="manifest" href="manifest.webmanifest" />
-  <meta name="theme-color" content="#000000" />
-  <style>
-    :root {
-      --bg: #0f1115;
-      --card: #151923;
-      --muted: #9aa4b2;
-      --text: #e8eef7;
-      --green: #22c55e;
-      --red: #ef4444;
-      --accent: #60a5fa;
-      --border: #232836;
-    }
-    * { box-sizing: border-box; }
-    html, body { margin:0; padding:0; background:var(--bg); color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;}
-    a { color: var(--accent); text-decoration: none; }
-    .wrap { max-width: 980px; margin: 32px auto; padding: 0 16px; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
-    .header { padding: 20px 24px; display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border);}
-    .title { font-weight:700; font-size: 20px; letter-spacing:.2px;}
-    .pill { padding: 8px 12px; border:1px solid var(--border); border-radius: 999px; color:var(--muted); font-size: 12px;}
-    .content { padding: 22px 24px; }
-    .row { display:flex; gap:12px; flex-wrap: wrap; }
-    .input, select { background:#111523; color:var(--text); border:1px solid var(--border); border-radius: 12px; padding:12px 14px; outline:none; width:100%; }
-    .btn { border:1px solid var(--border); background:#111523; color:var(--text); padding:12px 16px; border-radius:12px; cursor:pointer; transition:.15s transform ease, .15s opacity ease; }
-    .btn:hover { transform: translateY(-1px); opacity:.95; }
-    .btn.primary { background: linear-gradient(180deg, #1f4ae0, #1537a8); border-color:#1a2f7a; }
-    .btn.green { background: linear-gradient(180deg, #23cf6b, #179e4f); border-color:#147f42; }
-    .btn.red { background: linear-gradient(180deg, #ff5a5a, #d63c3c); border-color:#b23232; }
-    .tabs { display:flex; gap:8px; flex-wrap:wrap; padding: 10px 12px; border-bottom:1px solid var(--border); background: #121622; border-radius: 16px 16px 0 0;}
-    .tab { padding:10px 14px; border-radius:10px; color:var(--muted); cursor:pointer; border:1px solid transparent;}
-    .tab.active { background:#0e1220; color:var(--text); border-color:var(--border);}
-    .section { display:none; }
-    .section.active { display:block; }
-    .list { margin-top:12px; border-top:1px dashed var(--border); }
-    .item { display:grid; grid-template-columns: 1fr 110px 110px 44px; align-items:center; gap:10px; padding:12px 0; border-bottom:1px dashed var(--border); }
-    .item small { color:var(--muted); }
-    .amount.pos { color: var(--green); }
-    .amount.neg { color: var(--red); }
-    .footer { display:flex; justify-content:space-between; padding:16px 24px; border-top:1px solid var(--border); color:var(--muted);}
-    .grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; margin-top:12px; }
-    .stat { background:#0e1220; border:1px solid var(--border); border-radius:12px; padding:16px; }
-    .stat h3 { margin:0 0 8px 0; font-size:13px; color:var(--muted); font-weight:600; }
-    .stat .val { font-size:22px; font-weight:800; }
-    .center { text-align:center; color:var(--muted); }
-    /* Auth */
-    .auth { max-width: 520px; margin: 40px auto; padding: 24px; }
-    .logo { font-weight:800; letter-spacing:.3px; font-size: 22px; display:flex; align-items:center; gap:10px;}
-    .hint { color:var(--muted); font-size:13px; margin-top:8px;}
-    .auth .row > * { flex: 1 1 48%; }
-    .divider { text-align:center; color:var(--muted); margin:12px 0; font-size:12px;}
-    .badge { padding:6px 10px; border-radius:999px; border:1px solid var(--border); color:var(--muted); font-size:12px; }
-    @media (max-width: 640px) {
-      .item { grid-template-columns: 1fr 90px 90px 44px; }
-      .grid { grid-template-columns: 1fr; }
-      .auth .row { flex-direction: column; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ventsharm Budget</title>
+<style>
+  :root{--bg:#fff;--card:#fff;--ink:#111;--muted:#6b7280;--b:#e9edf3;--shadow:0 6px 18px rgba(0,0,0,.06);--btn:#111;--blue:#3b82f6;--purple:#7c3aed;--orange:#f97316;--lav:#f8f7ff;--lavb:#eae8ff;--ice:#f8fbff;--iceb:#e4efff;--peach:#fff9f6;--peachb:#ffe8df;}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;color:var(--ink);background:#fff;}
+  .wrap{max-width:920px;margin:18px auto;padding:0 14px;}
+  .card{background:var(--card);border:1px solid var(--b);border-radius:16px;box-shadow:var(--shadow);padding:18px;}
+  .h2{margin:0 0 6px;font-size:1.4rem;}
+  .muted{color:var(--muted);}
+
+  /* Tabs */
+  .tabs{display:flex;gap:8px;position:sticky;top:0;z-index:5;background:#fff;padding:8px 0 10px;}
+  .tabbtn{flex:1;padding:12px;border:1px solid var(--b);background:#f9fafb;border-radius:12px;cursor:pointer;font-weight:700}
+  .tabbtn.active{background:#111;color:#fff;border-color:#111}
+  .page{display:none}
+  .page.active{display:block}
+
+  /* Inputs/buttons */
+  input,button{border-radius:12px;font-size:16px}
+  input{padding:12px;border:1px solid #d1d5db}
+  .row{display:grid;gap:10px;margin-bottom:12px}
+  .btn{padding:12px;border:none;background:var(--btn);color:#fff;font-weight:700;cursor:pointer}
+  .btn.ghost{background:#f9fafb;border:1px solid var(--b);color:var(--ink)}
+  .list{display:grid;gap:10px}
+  .rowcard{background:#fff;border:1px solid var(--b);border-radius:12px;padding:10px 12px;box-shadow:0 2px 8px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:6px}
+  .rowbtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .blue{background:#2563eb}.red{background:#ef4444}
+
+  /* Summary cards */
+  .sum{display:grid;gap:12px}
+  .c1{background:var(--ice);border:1px solid var(--iceb)}
+  .c2{background:var(--lav);border:1px solid var(--lavb)}
+  .c3{background:var(--peach);border:1px solid var(--peachb)}
+  .k{font-weight:600}
+  .k.blue{color:var(--blue)} .k.purple{color:var(--purple)} .k.orange{color:var(--orange)}
+  .v{font-weight:800;font-size:1.15rem;margin-top:4px}
+
+  /* Modal */
+  .backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;align-items:center;justify-content:center}
+  .modal{width:90%;max-width:360px} .modal h3{margin:0 0 10px}
+</style>
 </head>
 <body>
 
-  <!-- AUTH SCREEN -->
-  <div id="authScreen" class="wrap">
-    <div class="card auth">
-      <div class="header">
-        <div class="logo">💰 Budget Calculator</div>
-        <span class="pill">Secure Login</span>
-      </div>
-      <div class="content">
-        <div class="row">
-          <input id="email" class="input" type="email" placeholder="Email" autocomplete="username" />
-          <input id="password" class="input" type="password" placeholder="Password" autocomplete="current-password" />
-        </div>
-        <div class="row" style="margin-top:10px;">
-          <button id="loginBtn" class="btn primary" style="flex:1;">Sign in</button>
-          <button id="signupBtn" class="btn" style="flex:1;">Create account</button>
-        </div>
-        <div class="hint">You’ll stay signed in (local session). You can sign out anytime.</div>
-        <div class="divider">—</div>
-        <div class="row">
-          <button id="demoBtn" class="btn" style="width:100%;">Try Demo (local only)</button>
-        </div>
-      </div>
+<div class="wrap">
+  <!-- Auth -->
+  <div id="authWrap" class="card" style="display:none;max-width:520px;margin:24px auto">
+    <h2 class="h2">Sign in to Ventsharm Budget</h2>
+    <p id="authMsg" class="muted">Use the same account on any device.</p>
+    <div class="row">
+      <input id="authEmail" type="email" placeholder="Email">
+      <input id="authPass" type="password" placeholder="Password">
+      <button id="btnLogin" class="btn">Login</button>
+      <button id="btnRegister" class="btn ghost">Create account</button>
     </div>
   </div>
 
-  <!-- APP SCREEN -->
-  <div id="appScreen" class="wrap" style="display:none;">
-    <div class="card">
-      <div class="header">
-        <div class="title">💰 Budget Calculator</div>
-        <div class="row" style="align-items:center;">
-          <span id="userEmail" class="pill"></span>
-          <button id="signOutBtn" class="btn" title="Sign out">Sign out</button>
-        </div>
+  <!-- App -->
+  <div id="appWrap" style="display:none">
+    <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div>
+        <h2 class="h2">Budget Planner</h2>
+        <p id="userEmail" class="muted" style="margin:0"></p>
       </div>
+      <button id="btnLogout" class="btn ghost">Log out</button>
+    </div>
 
-      <div class="tabs">
-        <div class="tab active" data-tab="incomes">Incomes</div>
-        <div class="tab" data-tab="expenses">Expenses</div>
-        <div class="tab" data-tab="overview">Overview</div>
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tabbtn active" data-tab="incomes">Incomes</button>
+      <button class="tabbtn" data-tab="expenses">Expenses</button>
+      <button class="tabbtn" data-tab="overview">Overview</button>
+    </div>
+
+    <!-- Incomes -->
+    <section id="page-incomes" class="page active">
+      <div class="card">
+        <h3 class="h2">Income Sources</h3>
+        <div class="row">
+          <input id="incName" placeholder="Income name e.g. Cashier or Benefit">
+          <input id="incAmt" type="number" step="0.01" min="0" placeholder="Amount e.g. 1200">
+          <label style="display:flex;gap:8px;align-items:center">
+            <input id="incInclude" type="checkbox" checked> <span>Include in available income</span>
+          </label>
+          <button id="addIncome" class="btn">Add Income</button>
+        </div>
+        <div id="incomeList" class="list"></div>
       </div>
+    </section>
 
-      <!-- Incomes -->
-      <div id="incomes" class="section active">
-        <div class="content">
-          <div class="row">
-            <input id="incName" class="input" placeholder="Income source (e.g., Salary)" />
-            <input id="incAmount" class="input" placeholder="Amount" inputmode="decimal" />
-            <button id="addIncome" class="btn green">Add income</button>
-          </div>
-          <div class="list" id="incomeList"></div>
-        </div>
-        <div class="footer">
-          <div>Total Incomes</div>
-          <strong id="incomeTotal" class="amount pos">£0.00</strong>
-        </div>
-      </div>
-
-      <!-- Expenses -->
-      <div id="expenses" class="section">
-        <div class="content">
-          <div class="row">
-            <input id="expName" class="input" placeholder="Expense (e.g., Rent)" />
-            <input id="expAmount" class="input" placeholder="Amount" inputmode="decimal" />
-            <select id="expCategory" class="input" style="max-width:220px;">
-              <option value="">Category (optional)</option>
-              <option>Housing</option>
-              <option>Transport</option>
-              <option>Food</option>
-              <option>Utilities</option>
-              <option>Fun</option>
-              <option>Other</option>
-            </select>
-            <button id="addExpense" class="btn red">Add expense</button>
-          </div>
-          <div class="list" id="expenseList"></div>
-        </div>
-        <div class="footer">
-          <div>Total Expenses</div>
-          <strong id="expenseTotal" class="amount neg">£0.00</strong>
-        </div>
-      </div>
-
-      <!-- Overview -->
-      <div id="overview" class="section">
-        <div class="content">
-          <div class="grid">
-            <div class="stat">
-              <h3>Total Incomes</h3>
-              <div id="ovInc" class="val">£0.00</div>
-            </div>
-            <div class="stat">
-              <h3>Total Expenses</h3>
-              <div id="ovExp" class="val">£0.00</div>
-            </div>
-            <div class="stat">
-              <h3>Balance</h3>
-              <div id="ovBal" class="val">£0.00</div>
-            </div>
-          </div>
-          <div class="center hint" style="margin-top:14px;">
-            Data syncs to your account (Firestore). Offline edits queue and sync when online.
+    <!-- Expenses -->
+    <section id="page-expenses" class="page">
+      <div class="card">
+        <h3 class="h2">Expenses</h3>
+        <div class="row">
+          <input id="expName" placeholder="Bill / Subscription e.g. Rent or Spotify">
+          <input id="expAmt" type="number" step="0.01" min="0" placeholder="Amount e.g. 500">
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button id="addExpense" class="btn" style="flex:1;min-width:160px">Add Bill</button>
+            <button id="resetAll" class="btn ghost" style="flex:1;min-width:160px">Reset All</button>
           </div>
         </div>
+        <div id="expenseList" class="list"></div>
       </div>
+    </section>
+
+    <!-- Overview -->
+    <section id="page-overview" class="page">
+      <div class="sum">
+        <div class="card c1">
+          <div class="k blue">Total Income (All)</div>
+          <div id="sumTotalIncome" class="v">£0.00</div>
+        </div>
+        <div class="card c2">
+          <div class="k purple">Available Income (Included - Expenses)</div>
+          <div id="sumAvailIncome" class="v">£0.00</div>
+          <div id="sumPercent" class="muted" style="margin-top:2px">Spent: 0%</div>
+        </div>
+        <div class="card c3">
+          <div class="k orange">Expenses</div>
+          <div id="sumExpenses" class="v">£0.00</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="modalBackdrop" class="backdrop">
+  <div class="card modal">
+    <h3 id="modalTitle" class="h2">Edit</h3>
+    <div id="modalBody" class="row"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button id="modalCancel" class="btn ghost">Cancel</button>
+      <button id="modalSave" class="btn">Save</button>
     </div>
   </div>
+</div>
 
-  <!-- Firebase (v9 modular) -->
-  <script type="module">
-    /***** Firebase setup *****/
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-    import { getAuth, setPersistence, browserLocalPersistence, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-    import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+<script type="module">
+/* Firebase */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+import { getAuth, setPersistence, browserLocalPersistence, onAuthStateChanged,
+         createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import { getFirestore, collection, doc, getDocs, addDoc, setDoc, deleteDoc, query, orderBy }
+  from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-    // ⬇️ Replace with your Budget App Firebase config (same project you’re using already)
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "SENDER_ID",
-      appId: "APP_ID"
-    };
+/* Your config */
+const firebaseConfig = {
+  apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
+  authDomain: "budget-app-283de.firebaseapp.com",
+  projectId: "budget-app-283de",
+  storageBucket: "budget-app-283de.firebasestorage.app",
+  messagingSenderId: "162369707369",
+  appId: "1:162369707369:web:3faa7f002f8ba22dc0f1f8"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+await setPersistence(auth, browserLocalPersistence);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+/* Helpers */
+const $=id=>document.getElementById(id);
+const els={};["authWrap","authEmail","authPass","btnLogin","btnRegister","authMsg",
+"appWrap","userEmail","btnLogout",
+"incName","incAmt","incInclude","addIncome","incomeList",
+"expName","expAmt","addExpense","resetAll","expenseList",
+"sumTotalIncome","sumAvailIncome","sumExpenses","sumPercent",
+"modalBackdrop","modalTitle","modalBody","modalCancel","modalSave"].forEach(k=>els[k]=$(k));
+function fmt(n){return Number(n||0).toLocaleString(undefined,{style:"currency",currency:"GBP"})}
+function cleanName(n){return (n||"").replace(/^\s*(✅|&#9989;)\s*/i,"").trim()}
+function makeRow(){const d=document.createElement("div");d.className="rowcard";return d}
+function makeBtn(t,c){const b=document.createElement("button");b.textContent=t;b.className="btn";b.style.background=c;return b}
 
-    // Optimized session (stay signed in, no reads on load)
-    await setPersistence(auth, browserLocalPersistence);
+/* Tabs */
+const tabBtns=[...document.querySelectorAll(".tabbtn")];
+const pages={incomes:$("#page-incomes"),expenses:$("#page-expenses"),overview:$("#page-overview")};
+tabBtns.forEach(b=>b.onclick=()=>{
+  tabBtns.forEach(x=>x.classList.remove("active"));
+  Object.values(pages).forEach(p=>p.classList.remove("active"));
+  b.classList.add("active"); pages[b.dataset.tab].classList.add("active");
+});
 
-    /***** UI helpers *****/
-    const £ = sel => document.querySelector(sel);
-    const fmt = n => "£" + (Number(n || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+let state={incomes:[],expenses:[]};
 
-    const authScreen = $("#authScreen");
-    const appScreen  = $("#appScreen");
-    const emailEl = $("#email");
-    const passEl  = $("#password");
-    const loginBtn = $("#loginBtn");
-    const signupBtn = $("#signupBtn");
-    const demoBtn = $("#demoBtn");
-    const userEmail = $("#userEmail");
-    const signOutBtn = $("#signOutBtn");
+function renderSummary(){
+  const totalAll=state.incomes.reduce((s,i)=>s+Number(i.amount||0),0);
+  const totalInc=state.incomes.reduce((s,i)=>s+(i.include?Number(i.amount||0):0),0);
+  const totalExp=state.expenses.reduce((s,e)=>s+Number(e.amount||0),0);
+  const avail=totalInc-totalExp;
+  const pct=totalInc>0?Math.round((totalExp/totalInc)*100):0;
+  els.sumTotalIncome.textContent=fmt(totalAll);
+  els.sumAvailIncome.textContent=fmt(avail);
+  els.sumExpenses.textContent=fmt(totalExp);
+  els.sumPercent.textContent="Spent: "+pct+"%";
+}
+function renderIncomes(uid){
+  els.incomeList.innerHTML="";
+  state.incomes.forEach(inc=>{
+    const row=makeRow();
+    const line=document.createElement("div");
+    line.style.display="flex";line.style.gap="6px";line.style.flexWrap="wrap";
+    if(inc.include){const tick=document.createElement("span");tick.textContent=String.fromCodePoint(0x2705);line.appendChild(tick)}
+    const t=document.createElement("span");t.textContent=`${cleanName(inc.name)} - ${fmt(inc.amount)}`;
+    line.appendChild(t); row.appendChild(line);
+    const btns=document.createElement("div");btns.className="rowbtns";
+    const e=makeBtn("Edit","#2563eb"), d=makeBtn("Delete","#ef4444");
+    e.onclick=()=>editIncome(uid,inc);
+    d.onclick=async()=>{ if(confirm(`Delete "${cleanName(inc.name)}"?`)){ await deleteDoc(doc(db,"users",uid,"incomes",inc.id)); await load(uid); } };
+    btns.append(e,d); row.appendChild(btns); els.incomeList.appendChild(row);
+  });
+}
+function renderExpenses(uid){
+  els.expenseList.innerHTML="";
+  state.expenses.forEach(ex=>{
+    const row=makeRow();
+    const t=document.createElement("div");t.textContent=`${ex.name} - ${fmt(ex.amount)}`;row.appendChild(t);
+    const btns=document.createElement("div");btns.className="rowbtns";
+    const e=makeBtn("Edit","#2563eb"), d=makeBtn("Delete","#ef4444");
+    e.onclick=()=>editExpense(uid,ex);
+    d.onclick=async()=>{ if(confirm(`Delete "${ex.name}"?`)){ await deleteDoc(doc(db,"users",uid,"expenses",ex.id)); await load(uid); } };
+    btns.append(e,d); row.appendChild(btns); els.expenseList.appendChild(row);
+  });
+}
+function renderAll(uid){renderIncomes(uid);renderExpenses(uid);renderSummary()}
 
-    // Tabs
-    const tabs = [...document.querySelectorAll(".tab")];
-    const sections = [...document.querySelectorAll(".section")];
-    tabs.forEach(t => t.addEventListener("click", () => {
-      tabs.forEach(x => x.classList.remove("active"));
-      sections.forEach(s => s.classList.remove("active"));
-      t.classList.add("active");
-      $("#" + t.dataset.tab).classList.add("active");
-    }));
+/* Modal */
+function openModal(title,build,save){$("#modalTitle").textContent=title;$("#modalBody").innerHTML="";build($("#modalBody"));$("#modalBackdrop").style.display="flex";$("#modalSave").onclick=()=>{save();closeModal()};$("#modalCancel").onclick=closeModal;$("#modalBackdrop").onclick=e=>{if(e.target.id==="modalBackdrop")closeModal()}}
+function closeModal(){ $("#modalBackdrop").style.display="none" }
 
-    /***** State *****/
-    let uid = null;
-    let incomesUnsub = null;
-    let expensesUnsub = null;
-    let totals = { inc: 0, exp: 0 };
+/* Firestore */
+async function load(uid){
+  const iq=query(collection(db,"users",uid,"incomes"),orderBy("created","asc"));
+  const eq=query(collection(db,"users",uid,"expenses"),orderBy("created","asc"));
+  const [isnap,esnap]=await Promise.all([getDocs(iq),getDocs(eq)]);
+  state.incomes=isnap.docs.map(d=>({id:d.id,...d.data()}));
+  state.expenses=esnap.docs.map(d=>({id:d.id,...d.data()}));
+  renderAll(uid);
+}
+async function addIncome(uid,name,amount,include){
+  await addDoc(collection(db,"users",uid,"incomes"),{name:cleanName(name),amount:Number(amount)||0,include:!!include,created:Date.now()});
+  await load(uid);
+}
+async function addExpense(uid,name,amount){
+  await addDoc(collection(db,"users",uid,"expenses"),{name:(name||"").trim(),amount:Number(amount)||0,created:Date.now()});
+  await load(uid);
+}
+function editIncome(uid,inc){
+  let n,a,c; openModal("Edit Income",box=>{
+    const l1=document.createElement("label");l1.textContent="Name";
+    n=document.createElement("input");n.value=cleanName(inc.name);
+    const l2=document.createElement("label");l2.textContent="Amount";
+    a=document.createElement("input");a.type="number";a.step="0.01";a.value=inc.amount;
+    const wrap=document.createElement("label");wrap.style.display="flex";wrap.style.gap="8px";wrap.style.alignItems="center";
+    c=document.createElement("input");c.type="checkbox";c.checked=!!inc.include; const sp=document.createElement("span");sp.textContent="Include in available income";
+    wrap.append(c,sp); box.append(l1,n,l2,a,wrap);
+  }, async ()=>{
+    await setDoc(doc(db,"users",uid,"incomes",inc.id),{name:cleanName(n.value)||inc.name,amount:Number(a.value)||0,include:!!c.checked},{merge:true});
+    await load(uid);
+  });
+}
+function editExpense(uid,ex){
+  let n,a; openModal("Edit Expense",box=>{
+    const l1=document.createElement("label");l1.textContent="Name";
+    n=document.createElement("input");n.value=ex.name;
+    const l2=document.createElement("label");l2.textContent="Amount";
+    a=document.createElement("input");a.type="number";a.step="0.01";a.value=ex.amount;
+    box.append(l1,n,l2,a);
+  }, async ()=>{
+    await setDoc(doc(db,"users",uid,"expenses",ex.id),{name:(n.value||"").trim()||ex.name,amount:Number(a.value)||0},{merge:true});
+    await load(uid);
+  });
+}
 
-    function resetListeners() {
-      if (incomesUnsub) incomesUnsub();
-      if (expensesUnsub) expensesUnsub();
-      incomesUnsub = expensesUnsub = null;
-      $("#incomeList").innerHTML = "";
-      $("#expenseList").innerHTML = "";
-      totals = { inc: 0, exp: 0 };
-      renderTotals();
-    }
+/* Auth UI */
+els.btnLogin.onclick=async()=>{const e=els.authEmail.value.trim().toLowerCase(),p=els.authPass.value; if(!e||!p){els.authMsg.textContent="Enter email and password.";return} try{await signInWithEmailAndPassword(auth,e,p)}catch(err){els.authMsg.textContent=err.message||"Login failed"}};
+els.btnRegister.onclick=async()=>{const e=els.authEmail.value.trim().toLowerCase(),p=els.authPass.value; if(!e||!p){els.authMsg.textContent="Enter email and password.";return} try{await createUserWithEmailAndPassword(auth,e,p)}catch(err){els.authMsg.textContent=err.message||"Register failed"}};
+els.btnLogout.onclick=async()=>{try{await signOut(auth)}catch(e){}};
 
-    function renderTotals() {
-      $("#incomeTotal").textContent = fmt(totals.inc);
-      $("#expenseTotal").textContent = fmt(totals.exp);
-      $("#ovInc").textContent = fmt(totals.inc);
-      $("#ovExp").textContent = fmt(totals.exp);
-      $("#ovBal").textContent = fmt(totals.inc - totals.exp);
-    }
-
-    function renderItem(container, id, name, amount, sign) {
-      const div = document.createElement("div");
-      div.className = "item";
-      div.innerHTML = `
-        <div>
-          <div>${name || "(untitled)"}</div>
-          <small>${new Date().toLocaleString()}</small>
-        </div>
-        <div class="amount ${sign === "+" ? "pos" : "neg"}">${fmt(amount)}</div>
-        <div><span class="badge">${sign === "+" ? "Income" : "Expense"}</span></div>
-        <button class="btn" data-id="${id}">✕</button>
-      `;
-      container.prepend(div);
-      return div.querySelector("button");
-    }
-
-    async function attachLiveQuery() {
-      // Lazy attach (only after login). One read to set up snapshot; realtime after that.
-      const incCol = collection(db, "users", uid, "incomes");
-      const expCol = collection(db, "users", uid, "expenses");
-
-      incomesUnsub = onSnapshot(query(incCol, orderBy("createdAt", "desc")), (snap) => {
-        $("#incomeList").innerHTML = "";
-        totals.inc = 0;
-        snap.forEach(d => {
-          const data = d.data();
-          totals.inc += Number(data.amount || 0);
-          const delBtn = renderItem($("#incomeList"), d.id, data.name, data.amount, "+");
-          delBtn.onclick = async () => {
-            await deleteDoc(doc(db, "users", uid, "incomes", d.id));
-          };
-        });
-        renderTotals();
-      });
-
-      expensesUnsub = onSnapshot(query(expCol, orderBy("createdAt", "desc")), (snap) => {
-        $("#expenseList").innerHTML = "";
-        totals.exp = 0;
-        snap.forEach(d => {
-          const data = d.data();
-          totals.exp += Number(data.amount || 0);
-          const delBtn = renderItem($("#expenseList"), d.id, data.name, data.amount, "-");
-          delBtn.onclick = async () => {
-            await deleteDoc(doc(db, "users", uid, "expenses", d.id));
-          };
-        });
-        renderTotals();
-      });
-    }
-
-    /***** Auth flows (optimized persistence, no reads before login) *****/
-    loginBtn.addEventListener("click", async () => {
-      const email = emailEl.value.trim();
-      const pass  = passEl.value;
-      if (!email || !pass) return alert("Enter email and password.");
-      try {
-        await signInWithEmailAndPassword(auth, email, pass);
-      } catch (e) {
-        alert(e.message);
-      }
-    });
-
-    signupBtn.addEventListener("click", async () => {
-      const email = emailEl.value.trim();
-      const pass  = passEl.value;
-      if (!email || !pass) return alert("Enter email and password to create an account.");
-      try {
-        await createUserWithEmailAndPassword(auth, email, pass);
-      } catch (e) {
-        alert(e.message);
-      }
-    });
-
-    demoBtn.addEventListener("click", () => {
-      // Demo mode: no auth, local-only lists (will clear on refresh)
-      authScreen.style.display = "none";
-      appScreen.style.display = "block";
-      userEmail.textContent = "Demo (local)";
-      uid = null;
-      resetListeners();
-    });
-
-    signOutBtn.addEventListener("click", async () => {
-      try { await signOut(auth); } catch(e) {}
-    });
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        uid = user.uid;
-        userEmail.textContent = user.email || "Signed in";
-        authScreen.style.display = "none";
-        appScreen.style.display = "block";
-        resetListeners();
-        await attachLiveQuery();
-      } else {
-        uid = null;
-        resetListeners();
-        appScreen.style.display = "none";
-        authScreen.style.display = "block";
-      }
-    });
-
-    /***** Add income/expense (reads occur only on user action) *****/
-    $("#addIncome").addEventListener("click", async () => {
-      const name = $("#incName").value.trim();
-      const amount = parseFloat($("#incAmount").value.replace(/,/g, ""));
-      if (!name || isNaN(amount)) return alert("Enter income name and amount.");
-      if (!uid) {
-        // Demo mode
-        totals.inc += amount;
-        renderItem($("#incomeList"), crypto.randomUUID(), name, amount, "+");
-        renderTotals();
-        $("#incName").value = ""; $("#incAmount").value = "";
-        return;
-      }
-      await addDoc(collection(db, "users", uid, "incomes"), {
-        name, amount, createdAt: serverTimestamp()
-      });
-      $("#incName").value = ""; $("#incAmount").value = "";
-    });
-
-    $("#addExpense").addEventListener("click", async () => {
-      const name = $("#expName").value.trim();
-      const amount = parseFloat($("#expAmount").value.replace(/,/g, ""));
-      const category = $("#expCategory").value.trim();
-      if (!name || isNaN(amount)) return alert("Enter expense name and amount.");
-      if (!uid) {
-        // Demo mode
-        totals.exp += amount;
-        renderItem($("#expenseList"), crypto.randomUUID(), name + (category ? ` • ${category}` : ""), amount, "-");
-        renderTotals();
-        $("#expName").value = ""; $("#expAmount").value = ""; $("#expCategory").value = "";
-        return;
-      }
-      await addDoc(collection(db, "users", uid, "expenses"), {
-        name, amount, category: category || null, createdAt: serverTimestamp()
-      });
-      $("#expName").value = ""; $("#expAmount").value = ""; $("#expCategory").value = "";
-    });
-
-    /***** (Optional) Register a basic service worker if present *****/
-    if ("serviceWorker" in navigator) {
-      try { navigator.serviceWorker.register("./sw.js"); } catch (e) {}
-    }
-  </script>
+onAuthStateChanged(auth, async user=>{
+  if(user){
+    els.userEmail.textContent="Logged in as: "+(user.email||"");
+    $("#authWrap").style.display="none"; $("#appWrap").style.display="block";
+    els.addIncome.onclick=()=>{const n=els.incName.value.trim(); const a=Number(els.incAmt.value||0); const ic=!!els.incInclude.checked; if(!n)return; addIncome(user.uid,n,a,ic); els.incName.value=""; els.incAmt.value=""; els.incInclude.checked=true};
+    els.addExpense.onclick=()=>{const n=els.expName.value.trim(); const a=Number(els.expAmt.value||0); if(!n)return; addExpense(user.uid,n,a); els.expName.value=""; els.expAmt.value=""};
+    els.resetAll.onclick=async()=>{if(!confirm("Reset all incomes and expenses?"))return; const is=await getDocs(collection(db,"users",user.uid,"incomes")); const es=await getDocs(collection(db,"users",user.uid,"expenses")); for(const d of is.docs){await deleteDoc(doc(db,"users",user.uid,"incomes",d.id))} for(const d of es.docs){await deleteDoc(doc(db,"users",user.uid,"expenses",d.id))} await load(user.uid)};
+    await load(user.uid);
+  }else{
+    $("#appWrap").style.display="none"; $("#authWrap").style.display="block";
+  }
+});
+</script>
 </body>
 </html>
-```0
