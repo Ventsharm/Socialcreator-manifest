@@ -112,6 +112,18 @@
   </div>
 </div>
 
+<!-- Popup -->
+<div id="dlgBack" class="backdrop">
+  <div class="dialog">
+    <h3 id="dlgTitle">Edit</h3>
+    <div id="dlgBody" class="grid"></div>
+    <div class="rowbtns">
+      <button id="dlgCancel" class="btn btn-ghost">Cancel</button>
+      <button id="dlgSave" class="btn btn-primary">Save</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const tabs=document.querySelectorAll('.tab-bar button');
 const contents=document.querySelectorAll('.tab-content');
@@ -123,9 +135,7 @@ tabs.forEach(btn=>{
     document.getElementById(btn.dataset.tab).classList.add('active');
   });
 });
-</script>
-
-<!-- Firebase -->
+</script><!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
@@ -141,41 +151,110 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-const db = firebase.firestore();
+const db   = firebase.firestore();
 
-/* ---------- Local Cache ---------- */
+/* ---------- Cache Helpers ---------- */
 function cacheKey(uid){ return "vb_budget_"+uid; }
 function saveCache(uid,data){ localStorage.setItem(cacheKey(uid), JSON.stringify(data)); }
-function loadCache(uid){ try { return JSON.parse(localStorage.getItem(cacheKey(uid))||"null"); } catch(e){ return null; } }
+function loadCache(uid){ try{return JSON.parse(localStorage.getItem(cacheKey(uid))||"null");}catch(e){return null;} }
 
-/* ---------- Shortcuts ---------- */
+/* ---------- UI Helpers ---------- */
 const $ = id => document.getElementById(id);
-const els = {authWrap:$("authWrap"), authEmail:$("authEmail"), authPass:$("authPass"),
-btnLogin:$("btnLogin"), btnRegister:$("btnRegister"), authMsg:$("authMsg"),
-appWrap:$("appWrap"), userEmail:$("userEmail"), btnLogout:$("btnLogout"),
-incName:$("incName"), incAmt:$("incAmt"), incInclude:$("incInclude"), addIncome:$("addIncome"), incomeList:$("incomeList"),
-expName:$("expName"), expAmt:$("expAmt"), addExpense:$("addExpense"), resetAll:$("resetAll"), expenseList:$("expenseList"),
-sumTotalIncome:$("sumTotalIncome"), sumAvailIncome:$("sumAvailIncome"), sumExpenses:$("sumExpenses"), sumPercent:$("sumPercent")};
-
+const els = {
+  authWrap:$("authWrap"), authEmail:$("authEmail"), authPass:$("authPass"),
+  btnLogin:$("btnLogin"), btnRegister:$("btnRegister"), authMsg:$("authMsg"),
+  appWrap:$("appWrap"), userEmail:$("userEmail"), btnLogout:$("btnLogout"),
+  incName:$("incName"), incAmt:$("incAmt"), incInclude:$("incInclude"),
+  addIncome:$("addIncome"), incomeList:$("incomeList"),
+  expName:$("expName"), expAmt:$("expAmt"), addExpense:$("addExpense"),
+  resetAll:$("resetAll"), expenseList:$("expenseList"),
+  sumTotalIncome:$("sumTotalIncome"), sumAvailIncome:$("sumAvailIncome"),
+  sumExpenses:$("sumExpenses"), sumPercent:$("sumPercent"),
+  dlgBack:$("dlgBack"), dlgTitle:$("dlgTitle"), dlgBody:$("dlgBody"),
+  dlgCancel:$("dlgCancel"), dlgSave:$("dlgSave")
+};
 function fmt(n){return Number(n||0).toLocaleString(undefined,{style:"currency",currency:"GBP"});}
 
-/* ---------- Render ---------- */
-function render(data){
-  const incomes=data.incomes||[], expenses=data.expenses||[];
+/* ---------- Dialog ---------- */
+function openDialog(title,item,hasInclude){
+  return new Promise(resolve=>{
+    els.dlgTitle.textContent = title;
+    els.dlgBody.innerHTML = "";
+    const n=document.createElement("input");
+    n.className="field"; n.value=item.name||"";
+    const a=document.createElement("input");
+    a.type="number"; a.step="0.01"; a.className="field"; a.value=item.amount||0;
+    els.dlgBody.append("Name",n,"Amount",a);
+    let c=null;
+    if(hasInclude){
+      const wrap=document.createElement("label");
+      wrap.style.cssText="display:flex;gap:8px;align-items:center;";
+      c=document.createElement("input"); c.type="checkbox"; c.checked=item.include;
+      const s=document.createElement("span"); s.textContent="Include in available income";
+      wrap.append(c,s); els.dlgBody.append(wrap);
+    }
+    els.dlgBack.style.display="flex";
+    const cancel=()=>finish(null);
+    const save=()=>{finish({name:n.value.trim(),amount:Number(a.value)||0,include:c?c.checked:item.include});};
+    function finish(v){ els.dlgBack.style.display="none"; els.dlgCancel.removeEventListener("click",cancel); els.dlgSave.removeEventListener("click",save); resolve(v);}
+    els.dlgCancel.addEventListener("click",cancel);
+    els.dlgSave.addEventListener("click",save);
+  });
+}
+
+/* ---------- Rendering ---------- */
+function render(uid,data){
+  const incomes=data.incomes||[],expenses=data.expenses||[];
   els.incomeList.innerHTML=""; els.expenseList.innerHTML="";
   let totalAll=0,totalIncl=0,totalExp=0;
+
+  // Incomes
   incomes.forEach(inc=>{
-    totalAll+=Number(inc.amount)||0; if(inc.include) totalIncl+=Number(inc.amount)||0;
+    totalAll+=Number(inc.amount)||0;
+    if(inc.include) totalIncl+=Number(inc.amount)||0;
     const row=document.createElement("div"); row.className="row";
-    row.innerHTML=`${inc.include?"✅ ":""}${inc.name} - ${fmt(inc.amount)}`;
-    els.incomeList.append(row);
+    const line=document.createElement("div"); line.textContent=(inc.include?"✅ ":"")+inc.name+" - "+fmt(inc.amount);
+    row.appendChild(line);
+    const act=document.createElement("div"); act.className="actions";
+    const e=document.createElement("button"); e.className="btn btn-primary"; e.textContent="Edit";
+    const d=document.createElement("button"); d.className="btn btn-danger";  d.textContent="Delete";
+    e.onclick=async()=>{
+      const ed=await openDialog("Edit Income",inc,true); if(!ed)return;
+      await db.collection("users").doc(uid).collection("incomes").doc(inc.id).set(ed,{merge:true});
+      const data=await reload(uid); render(uid,data);
+    };
+    d.onclick=async()=>{
+      if(confirm(`Delete "${inc.name}" (${fmt(inc.amount)})?`)){
+        await db.collection("users").doc(uid).collection("incomes").doc(inc.id).delete();
+        const data=await reload(uid); render(uid,data);
+      }
+    };
+    act.append(e,d); row.appendChild(act); els.incomeList.appendChild(row);
   });
+
+  // Expenses
   expenses.forEach(ex=>{
     totalExp+=Number(ex.amount)||0;
     const row=document.createElement("div"); row.className="row";
-    row.innerHTML=`${ex.name} - ${fmt(ex.amount)}`;
-    els.expenseList.append(row);
+    const line=document.createElement("div"); line.textContent=ex.name+" - "+fmt(ex.amount);
+    row.appendChild(line);
+    const act=document.createElement("div"); act.className="actions";
+    const e=document.createElement("button"); e.className="btn btn-primary"; e.textContent="Edit";
+    const d=document.createElement("button"); d.className="btn btn-danger";  d.textContent="Delete";
+    e.onclick=async()=>{
+      const ed=await openDialog("Edit Expense",ex,false); if(!ed)return;
+      await db.collection("users").doc(uid).collection("expenses").doc(ex.id).set(ed,{merge:true});
+      const data=await reload(uid); render(uid,data);
+    };
+    d.onclick=async()=>{
+      if(confirm(`Delete "${ex.name}" (${fmt(ex.amount)})?`)){
+        await db.collection("users").doc(uid).collection("expenses").doc(ex.id).delete();
+        const data=await reload(uid); render(uid,data);
+      }
+    };
+    act.append(e,d); row.appendChild(act); els.expenseList.appendChild(row);
   });
+
   els.sumTotalIncome.textContent=fmt(totalAll);
   els.sumAvailIncome.textContent=fmt(totalIncl-totalExp);
   els.sumExpenses.textContent=fmt(totalExp);
@@ -187,53 +266,54 @@ els.btnLogin.onclick=()=>auth.signInWithEmailAndPassword(els.authEmail.value,els
 els.btnRegister.onclick=()=>auth.createUserWithEmailAndPassword(els.authEmail.value,els.authPass.value).catch(e=>els.authMsg.textContent=e.message);
 els.btnLogout.onclick=()=>auth.signOut();
 
+/* ---------- Reload + Cache ---------- */
+async function reload(uid){
+  const incSnap=await db.collection("users").doc(uid).collection("incomes").get();
+  const expSnap=await db.collection("users").doc(uid).collection("expenses").get();
+  const data={
+    incomes:incSnap.docs.map(d=>({id:d.id,...d.data()})),
+    expenses:expSnap.docs.map(d=>({id:d.id,...d.data()}))
+  };
+  saveCache(uid,data); return data;
+}
+
 /* ---------- Auth State ---------- */
 auth.onAuthStateChanged(async user=>{
   if(user){
     els.userEmail.textContent="Logged in as: "+user.email;
     els.authWrap.style.display="none"; els.appWrap.style.display="block";
 
-    // Load from cache instantly
-    const cached=loadCache(user.uid);
-    if(cached) render(cached);
+    let cached=loadCache(user.uid);
+    if(cached) render(user.uid,cached); else {cached=await reload(user.uid); render(user.uid,cached);}
 
-    // Add income
     els.addIncome.onclick=async()=>{
-      const n=els.incName.value.trim(), a=Number(els.incAmt.value||0), i=!!els.incInclude.checked;
+      const n=els.incName.value.trim(),a=Number(els.incAmt.value||0),i=!!els.incInclude.checked;
       if(!n)return;
       await db.collection("users").doc(user.uid).collection("incomes").add({name:n,amount:a,include:i});
-      const data=await reloadData(user.uid); render(data);
+      const data=await reload(user.uid); render(user.uid,data);
+      els.incName.value=""; els.incAmt.value=""; els.incInclude.checked=true;
     };
 
-    // Add expense
     els.addExpense.onclick=async()=>{
-      const n=els.expName.value.trim(), a=Number(els.expAmt.value||0);
+      const n=els.expName.value.trim(),a=Number(els.expAmt.value||0);
       if(!n)return;
       await db.collection("users").doc(user.uid).collection("expenses").add({name:n,amount:a});
-      const data=await reloadData(user.uid); render(data);
+      const data=await reload(user.uid); render(user.uid,data);
+      els.expName.value=""; els.expAmt.value="";
     };
 
-    // Reset all
     els.resetAll.onclick=async()=>{
       if(!confirm("Reset all incomes and expenses?"))return;
       const incs=await db.collection("users").doc(user.uid).collection("incomes").get();
       const exps=await db.collection("users").doc(user.uid).collection("expenses").get();
       const ops=[]; incs.forEach(d=>ops.push(d.ref.delete())); exps.forEach(d=>ops.push(d.ref.delete()));
-      await Promise.all(ops); const data=await reloadData(user.uid); render(data);
+      await Promise.all(ops);
+      const data=await reload(user.uid); render(user.uid,data);
     };
   }else{
     els.appWrap.style.display="none"; els.authWrap.style.display="block";
   }
 });
-
-/* ---------- Reload + Cache ---------- */
-async function reloadData(uid){
-  const incSnap=await db.collection("users").doc(uid).collection("incomes").get();
-  const expSnap=await db.collection("users").doc(uid).collection("expenses").get();
-  const data={incomes:incSnap.docs.map(d=>d.data()),expenses:expSnap.docs.map(d=>d.data())};
-  saveCache(uid,data);
-  return data;
-}
 </script>
 </body>
 </html>
