@@ -21,11 +21,14 @@
   .item{display:flex;justify-content:space-between;background:#f8f9fa;padding:8px 12px;margin-bottom:8px;border-radius:10px;}
   .actions button{border:none;background:#eee;margin-left:5px;padding:5px 8px;border-radius:6px;cursor:pointer;}
   .auth{max-width:380px;margin:60px auto;background:#fff;padding:25px;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,.1);}
+  footer{text-align:center;font-size:0.9rem;margin-top:10px;color:#666;}
+  .modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);display:flex;justify-content:center;align-items:center;}
+  .modal{background:#fff;border-radius:12px;padding:20px;max-width:300px;width:90%;}
 </style>
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
+<!-- LOGIN -->
 <div id="authScreen" class="auth">
   <h1>Ventsharm Budget Login</h1>
   <input id="email" type="email" placeholder="Email">
@@ -36,7 +39,7 @@
   <p id="authMsg"></p>
 </div>
 
-<!-- MAIN APP -->
+<!-- APP -->
 <div id="app" class="card hidden">
   <h1>Ventsharm Budget</h1>
 
@@ -58,20 +61,32 @@
   </div>
 
   <div id="tab-expenses" class="hidden">
-    <p>No expenses yet.</p>
     <div id="expenseList"></div>
   </div>
 
   <div id="tab-overview" class="hidden">
-    <p>Overview shows totals and quick stats.</p>
     <div class="summary">
       <div><b>Income</b><br><span id="sumIncome">£0.00</span></div>
       <div><b>Expenses</b><br><span id="sumExpense">£0.00</span></div>
       <div><b>Available</b><br><span id="sumAvailable">£0.00</span></div>
     </div>
+    <p style="text-align:center;">Overview shows totals and lets you toggle “include in available” on any item.</p>
   </div>
 
   <button id="logoutBtn" class="secondary">Logout</button>
+  <footer>Synced via Firebase. Cached offline; 0 reads on refresh.</footer>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal-bg hidden">
+  <div class="modal">
+    <h3>Edit Item</h3>
+    <input id="editTitle">
+    <input id="editAmount" type="number">
+    <label><input type="checkbox" id="editInclude"> Include in available</label>
+    <button id="saveEdit" class="primary">Save</button>
+    <button id="cancelEdit" class="secondary">Cancel</button>
+  </div>
 </div>
 
 <script type="module">
@@ -95,21 +110,16 @@ const authScreen=document.getElementById("authScreen");
 const appDiv=document.getElementById("app");
 const msg=document.getElementById("authMsg");
 const data={incomes:[],expenses:[]};
+let editItemObj=null;
 
 onAuthStateChanged(auth,user=>{
   if(user){authScreen.classList.add("hidden");appDiv.classList.remove("hidden");load();}
   else{appDiv.classList.add("hidden");authScreen.classList.remove("hidden");}
 });
 
-document.getElementById("loginBtn").onclick=async()=>{
-  try{await signInWithEmailAndPassword(auth,email.value,password.value);}catch(e){msg.textContent=e.message;}
-};
-document.getElementById("registerBtn").onclick=async()=>{
-  try{await createUserWithEmailAndPassword(auth,email.value,password.value);msg.textContent="Registered! Login now.";}catch(e){msg.textContent=e.message;}
-};
-document.getElementById("forgotBtn").onclick=async()=>{
-  try{await sendPasswordResetEmail(auth,email.value);msg.textContent="Reset email sent.";}catch(e){msg.textContent=e.message;}
-};
+document.getElementById("loginBtn").onclick=async()=>{try{await signInWithEmailAndPassword(auth,email.value,password.value);}catch(e){msg.textContent=e.message;}};
+document.getElementById("registerBtn").onclick=async()=>{try{await createUserWithEmailAndPassword(auth,email.value,password.value);msg.textContent="Registered! Login now.";}catch(e){msg.textContent=e.message;}};
+document.getElementById("forgotBtn").onclick=async()=>{try{await sendPasswordResetEmail(auth,email.value);msg.textContent="Reset email sent.";}catch(e){msg.textContent=e.message;}};
 document.getElementById("logoutBtn").onclick=()=>signOut(auth);
 
 function save(){localStorage.setItem("budgetData",JSON.stringify(data));render();}
@@ -122,7 +132,7 @@ function load(){
 document.getElementById("addBtn").onclick=()=>{
   const t=titleInput.value.trim();const a=parseFloat(amountInput.value);
   const type=typeSelect.value;if(!t||isNaN(a))return;
-  data[type+"s"].push({id:Date.now(),title:t,amount:a});
+  data[type+"s"].push({id:Date.now(),title:t,amount:a,include:true});
   titleInput.value=amountInput.value="";
   save();
 };
@@ -131,26 +141,50 @@ function render(){
   const incDiv=document.getElementById("incomeList");
   const expDiv=document.getElementById("expenseList");
   incDiv.innerHTML=expDiv.innerHTML="";
-  data.incomes.forEach(i=>{
-    const d=document.createElement("div");
-    d.className="item";
-    d.innerHTML=`<span>${i.title}</span><span>£${i.amount.toFixed(2)}</span>`;
-    incDiv.appendChild(d);
-  });
-  data.expenses.forEach(i=>{
-    const d=document.createElement("div");
-    d.className="item";
-    d.innerHTML=`<span>${i.title}</span><span>£${i.amount.toFixed(2)}</span>`;
-    expDiv.appendChild(d);
-  });
-  const inc=data.incomes.reduce((s,x)=>s+x.amount,0);
-  const exp=data.expenses.reduce((s,x)=>s+x.amount,0);
+  data.incomes.forEach(i=>incDiv.appendChild(makeItem(i,"income")));
+  data.expenses.forEach(i=>expDiv.appendChild(makeItem(i,"expense")));
+  const inc=data.incomes.reduce((s,x)=>s+(x.include?x.amount:0),0);
+  const exp=data.expenses.reduce((s,x)=>s+(x.include?x.amount:0),0);
   document.getElementById("sumIncome").textContent="£"+inc.toFixed(2);
   document.getElementById("sumExpense").textContent="£"+exp.toFixed(2);
   document.getElementById("sumAvailable").textContent="£"+(inc-exp).toFixed(2);
 }
+function makeItem(i,type){
+  const div=document.createElement("div");
+  div.className="item";
+  div.innerHTML=`<span>${i.title}</span><span>£${i.amount.toFixed(2)}</span>
+  <div class="actions">
+    <button onclick="edit('${type}',${i.id})">✏️</button>
+    <button onclick="remove('${type}',${i.id})">🗑️</button>
+  </div>`;
+  return div;
+}
+window.edit=(type,id)=>{
+  const arr=data[type+"s"];
+  editItemObj=arr.find(x=>x.id===id);
+  if(!editItemObj)return;
+  editTitle.value=editItemObj.title;
+  editAmount.value=editItemObj.amount;
+  editInclude.checked=editItemObj.include;
+  document.getElementById("editModal").classList.remove("hidden");
+};
+window.remove=(type,id)=>{
+  const arr=data[type+"s"];
+  const i=arr.findIndex(x=>x.id===id);
+  if(i>-1)arr.splice(i,1);
+  save();
+};
+document.getElementById("cancelEdit").onclick=()=>document.getElementById("editModal").classList.add("hidden");
+document.getElementById("saveEdit").onclick=()=>{
+  if(!editItemObj)return;
+  editItemObj.title=editTitle.value;
+  editItemObj.amount=parseFloat(editAmount.value);
+  editItemObj.include=editInclude.checked;
+  document.getElementById("editModal").classList.add("hidden");
+  save();
+};
 
-// TAB SWITCHING FIX
+// Tabs
 document.querySelectorAll(".tab").forEach(tab=>{
   tab.onclick=()=>{
     document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
