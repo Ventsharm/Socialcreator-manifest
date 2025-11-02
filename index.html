@@ -45,7 +45,11 @@
   .app{display:none; width:min(950px,96vw); margin:24px auto; background:#fff; border:1px solid var(--ring); border-radius:22px; box-shadow:var(--shadow); overflow:hidden}
   .topbar{display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--ring); background:#fff}
   .brand{font-size:20px; font-weight:900}
-  .userbox{display:flex; gap:10px; align-items:center; color:#555; flex-wrap:wrap}
+  .userbox{
+    display:flex; gap:10px; color:#555; flex-wrap:wrap;
+    /* CHANGED: stack email over logout so the button is underneath */
+    flex-direction:column; align-items:flex-end;
+  }
 
   /* Tabs at top */
   .tabs{display:flex; gap:10px; padding:12px 14px; border-bottom:1px solid var(--ring); background:#fff}
@@ -94,9 +98,7 @@
     border-radius:12px; padding:12px 14px; box-shadow:var(--shadow); display:none; z-index:60}
 </style>
 </head>
-<body>
-
-<!-- ==================== AUTH FULL PAGE ==================== -->
+<body><!-- ==================== AUTH FULL PAGE ==================== -->
 <section id="authPage" class="auth-screen" aria-label="Authentication">
   <div class="auth-card">
     <div class="auth-title">Budget Planner</div>
