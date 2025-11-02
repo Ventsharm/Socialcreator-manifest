@@ -146,156 +146,200 @@
     <div id="info"></div>
     <div id="preview"></div>
   </div><script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.js"></script>
-  <script>
-  if (window.pdfjsLib) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.js";
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.js"></script>
+<script>
+if (window.pdfjsLib) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.js";
+}
+
+(function(){
+  const $ = s => document.querySelector(s);
+  const filesEl=$("#files"), formatEl=$("#format"), wEl=$("#width"), hEl=$("#height"),
+        unitsEl=$("#units"), preview=$("#preview"), info=$("#info"),
+        error=$("#error"), convertBtn=$("#convert"), resetBtn=$("#reset"),
+        status=$("#status");
+
+  const MAX_SIZE = 8000;
+  const PDF_DPI = 300; // <- match your older working build
+
+  // px↔in/cm helpers
+  const pxToIn_pdf = px => px / PDF_DPI;
+  const inToPx_pdf = inch => Math.round(inch * PDF_DPI);
+  const cmToIn = cm => cm / 2.54;
+
+  // For image conversions (screen px)
+  const inchToPx_screen = inch => Math.round(inch * 96);
+  const cmToPx_screen = cm => Math.round(cm * 37.7953);
+  const toPx_screen = (v,u) => !v ? undefined : (u==="in" ? inchToPx_screen(v) : u==="cm" ? cmToPx_screen(v) : v);
+
+  let convertCount = 1;
+
+  function clearStatus(){ status.style.display="none"; error.textContent=""; }
+  formatEl.addEventListener("change", clearStatus);
+  unitsEl.addEventListener("change", clearStatus);
+
+  filesEl.addEventListener("change", async e=>{
+    const f = e.target.files[0];
+    preview.innerHTML=""; info.textContent=""; error.textContent=""; status.style.display="none";
+    if(!f) return;
+
+    if (/pdf$/i.test(f.name)) {
+      const buf = await f.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+      const page = await pdf.getPage(1);
+      const vp = page.getViewport({ scale: 1 });
+      const cnv = document.createElement("canvas");
+      cnv.width = vp.width; cnv.height = vp.height;
+      await page.render({ canvasContext: cnv.getContext("2d"), viewport: vp }).promise;
+      const img = new Image(); img.src = cnv.toDataURL();
+      info.textContent = `Original size: ${Math.round(vp.width)} × ${Math.round(vp.height)}px (PDF preview)`;
+      preview.appendChild(img);
+    } else {
+      const url = URL.createObjectURL(f);
+      const img = new Image();
+      img.onload = () => {
+        info.textContent = `Original size: ${img.width} × ${img.height}px`;
+        preview.appendChild(img);
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    }
+  });
+
+  resetBtn.addEventListener("click", ()=>{
+    filesEl.value=""; preview.innerHTML=""; info.textContent="";
+    error.textContent=""; wEl.value=""; hEl.value="";
+    convertCount=1; status.style.display="none";
+  });
+
+  async function fileToImage(f){
+    const u = URL.createObjectURL(f);
+    const img = new Image();
+    await new Promise(r => { img.onload = r; img.src = u; });
+    URL.revokeObjectURL(u);
+    return img;
   }
 
-  (function(){
-    const $ = s => document.querySelector(s);
-    const filesEl = $("#files"),
-          formatEl = $("#format"),
-          wEl = $("#width"),
-          hEl = $("#height"),
-          unitsEl = $("#units"),
-          preview = $("#preview"),
-          info = $("#info"),
-          error = $("#error"),
-          convertBtn = $("#convert"),
-          resetBtn = $("#reset"),
-          status = $("#status");
+  async function imageToCanvas(img, w, h){
+    const c = document.createElement("canvas");
+    c.width = w || img.width;
+    c.height = h || img.height;
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    return c;
+  }
 
-    const MAX_SIZE = 8000;
-    const inchToPx = inch => inch * 96;
-    const cmToPx = cm => cm * 37.7953;
-    const toPx = (val,u)=>!val?undefined:u==="in"?inchToPx(val):u==="cm"?cmToPx(val):val;
-    const toInch = (val,u)=>!val?undefined:u==="cm"?val/2.54:u==="px"?val/96:val;
+  function downloadBlob(blob, name){
+    const u = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = u; a.download = name; a.click();
+    setTimeout(()=>URL.revokeObjectURL(u), 4000);
+  }
 
-    let convertCount = 1;
-    let currentFile=null;
-
-    function clearStatus(){ status.style.display="none"; error.textContent=""; }
-    formatEl.addEventListener("change",clearStatus);
-    unitsEl.addEventListener("change",clearStatus);
-
-    filesEl.addEventListener("change", async e=>{
-      const file=e.target.files[0];
-      if(!file)return;
-      currentFile=file;
-      preview.innerHTML=""; info.textContent=""; error.textContent=""; status.style.display="none";
-
-      if(/pdf$/i.test(file.name)){
-        const buf=await file.arrayBuffer();
-        const pdf=await pdfjsLib.getDocument({data:buf}).promise;
-        const page=await pdf.getPage(1);
-        const vp=page.getViewport({scale:1});
-        const cnv=document.createElement("canvas");
-        const ctx=cnv.getContext("2d");
-        cnv.width=vp.width; cnv.height=vp.height;
-        await page.render({canvasContext:ctx,viewport:vp}).promise;
-        const img=new Image();
-        img.src=cnv.toDataURL();
-        info.textContent=`Original size: ${Math.round(vp.width)} × ${Math.round(vp.height)}px (PDF preview)`;
-        preview.appendChild(img);
-      } else {
-        const url=URL.createObjectURL(file);
-        const img=new Image();
-        img.onload=()=>{
-          info.textContent=`Original size: ${img.width} × ${img.height}px`;
-          preview.appendChild(img);
-          URL.revokeObjectURL(url);
-        };
-        img.src=url;
-      }
-    });
-
-    resetBtn.addEventListener("click",()=>{
-      filesEl.value=""; preview.innerHTML=""; info.textContent="";
-      error.textContent=""; wEl.value=""; hEl.value="";
-      convertCount=1; status.style.display="none";
-    });
-
-    async function fileToImage(f){
-      const u=URL.createObjectURL(f); const i=new Image();
-      await new Promise(r=>{i.onload=r; i.src=u;}); URL.revokeObjectURL(u);
-      return i;
+  // Get target sizes for PDF using original logic (true inches @ 300 DPI)
+  function getPdfTargetInches(imgWpx, imgHpx, wVal, hVal, unit){
+    let wIn, hIn;
+    if (unit === "in") {
+      wIn = wVal || pxToIn_pdf(imgWpx);
+      hIn = hVal || pxToIn_pdf(imgHpx);
+    } else if (unit === "cm") {
+      wIn = (wVal ? cmToIn(wVal) : pxToIn_pdf(imgWpx));
+      hIn = (hVal ? cmToIn(hVal) : pxToIn_pdf(imgHpx));
+    } else { // px
+      wIn = pxToIn_pdf(wVal || imgWpx);
+      hIn = pxToIn_pdf(hVal || imgHpx);
     }
+    return { wIn, hIn };
+  }
 
-    async function imageToCanvas(i,w,h){
-      const c=document.createElement("canvas");
-      c.width=w||i.width; c.height=h||i.height;
-      c.getContext("2d").drawImage(i,0,0,c.width,c.height);
-      return c;
+  // Pixel limits check: compare pixels actually used for the canvas we’ll draw
+  function willUseCanvasPxFor(fmt, wVal, hVal, unit, imgWpx, imgHpx){
+    if (fmt === "pdf") {
+      // For PDF we draw a canvas at 300 DPI, so compute those px
+      const { wIn, hIn } = getPdfTargetInches(imgWpx, imgHpx, wVal, hVal, unit);
+      return { wPx: inToPx_pdf(wIn), hPx: inToPx_pdf(hIn) };
+    } else {
+      return { wPx: toPx_screen(wVal, unit) || imgWpx,
+               hPx: toPx_screen(hVal, unit) || imgHpx };
     }
+  }
 
-    function downloadBlob(blob,name){
-      const u=URL.createObjectURL(blob);
-      const a=document.createElement("a"); a.href=u; a.download=name; a.click();
-      setTimeout(()=>URL.revokeObjectURL(u),4000);
-    }
+  async function convert(){
+    error.textContent=""; status.style.display="none";
+    const files = Array.from(filesEl.files||[]);
+    if(!files.length){ alert("Please choose a file."); return; }
 
-    async function convert(){
-      error.textContent=""; status.style.display="none";
-      const files=Array.from(filesEl.files||[]);
-      if(!files.length){alert("Please choose a file.");return;}
-      const fmt=formatEl.value, unit=unitsEl.value;
-      let wVal=parseFloat(wEl.value), hVal=parseFloat(hEl.value);
-      if(wVal>MAX_SIZE||hVal>MAX_SIZE){
-        error.textContent="Size too large. Try smaller values.";
-        preview.insertAdjacentElement("beforebegin", error);
-        return;
-      }
+    const fmt = formatEl.value;
+    const unit = unitsEl.value;
+    const wVal = parseFloat(wEl.value);
+    const hVal = parseFloat(hEl.value);
 
-      const { jsPDF }=window.jspdf;
+    const { jsPDF } = window.jspdf;
 
-      for(const f of files){
-        const isPDF=/pdf$/i.test(f.name), isIMG=/^image\//.test(f.type);
-        const base=f.name.replace(/\.[^.]+$/,"");
-        const suffix=`-conv${convertCount++}`;
+    for (const f of files){
+      const base = f.name.replace(/\.[^.]+$/, "");
+      const suffix = `-conv${convertCount++}`;
+      const isPDF = /pdf$/i.test(f.name);
+      const isIMG = /^image\//.test(f.type);
 
-        if(isIMG && fmt==="pdf"){
-          const img=await fileToImage(f);
-          // Convert entered units to inches for PDF format
-          const wIn=toInch(wVal||img.width,unit);
-          const hIn=toInch(hVal||img.height,unit);
-          const doc=new jsPDF({unit:"in", format:[wIn||img.width/96, hIn||img.height/96]});
-          const cnv=await imageToCanvas(img, inchToPx(wIn||img.width/96), inchToPx(hIn||img.height/96));
-          doc.addImage(cnv.toDataURL("image/jpeg",0.92),"JPEG",0,0,wIn||img.width/96,hIn||img.height/96);
-          downloadBlob(doc.output("blob"),`${base}${suffix}.pdf`);
+      if (isIMG && fmt === "pdf") {
+        const img = await fileToImage(f);
 
-        } else if(isPDF && fmt!=="pdf"){
-          const ab=await f.arrayBuffer();
-          const pdf=await pdfjsLib.getDocument({data:ab}).promise;
-          for(let p=1;p<=pdf.numPages;p++){
-            const page=await pdf.getPage(p);
-            const vp=page.getViewport({scale:1});
-            const cnv=document.createElement("canvas");
-            const ctx=cnv.getContext("2d");
-            cnv.width=vp.width; cnv.height=vp.height;
-            await page.render({canvasContext:ctx,viewport:vp}).promise;
-            const blob=await new Promise(r=>cnv.toBlob(r,"image/"+fmt,0.92));
-            downloadBlob(blob,`${base}${suffix}-p${p}.${fmt}`);
-          }
+        // Physical PDF page size in inches (true scale) and draw canvas at 300 DPI
+        const { wIn, hIn } = getPdfTargetInches(img.width, img.height, wVal, hVal, unit);
+        const drawWpx = inToPx_pdf(wIn);
+        const drawHpx = inToPx_pdf(hIn);
 
-        } else if(isIMG && fmt!=="pdf"){
-          const img=await fileToImage(f);
-          const W=toPx(wVal,unit)||img.width, H=toPx(hVal,unit)||img.height;
-          const cnv=await imageToCanvas(img,W,H);
-          const blob=await new Promise(r=>cnv.toBlob(r,"image/"+fmt,0.92));
-          downloadBlob(blob,`${base}${suffix}.${fmt}`);
-
-        } else {
-          error.textContent="Unsupported conversion.";
+        // guard against excessive canvas size
+        if (drawWpx > MAX_SIZE || drawHpx > MAX_SIZE) {
+          error.textContent = "Size too large. Try smaller values.";
+          preview.insertAdjacentElement("beforebegin", error);
+          return;
         }
+
+        const cnv = await imageToCanvas(img, drawWpx, drawHpx);
+        const doc = new jsPDF({ unit: "in", format: [wIn, hIn] });
+        doc.addImage(cnv.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, wIn, hIn);
+        downloadBlob(doc.output("blob"), `${base}${suffix}.pdf`);
+
+      } else if (isPDF && fmt !== "pdf") {
+        const ab = await f.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: ab }).promise;
+        for (let p=1; p<=pdf.numPages; p++){
+          const page = await pdf.getPage(p);
+          const vp = page.getViewport({ scale: 1 });
+          const cnv = document.createElement("canvas");
+          cnv.width = vp.width; cnv.height = vp.height;
+          await page.render({ canvasContext: cnv.getContext("2d"), viewport: vp }).promise;
+          const blob = await new Promise(r => cnv.toBlob(r, "image/"+fmt, 0.92));
+          downloadBlob(blob, `${base}${suffix}-p${p}.${fmt}`);
+        }
+
+      } else if (isIMG && fmt !== "pdf") {
+        const img = await fileToImage(f);
+        const { wPx, hPx } = willUseCanvasPxFor(fmt, wVal, hVal, unit, img.width, img.height);
+        if (wPx > MAX_SIZE || hPx > MAX_SIZE) {
+          error.textContent = "Size too large. Try smaller values.";
+          preview.insertAdjacentElement("beforebegin", error);
+          return;
+        }
+        const cnv = await imageToCanvas(img, wPx, hPx);
+        const blob = await new Promise(r => cnv.toBlob(r, "image/"+fmt, 0.92));
+        downloadBlob(blob, `${base}${suffix}.${fmt}`);
+
+      } else {
+        error.textContent = "Unsupported conversion.";
       }
-      status.style.display="block";
     }
 
-    convertBtn.addEventListener("click",convert);
-    if("serviceWorker" in navigator){ navigator.serviceWorker.register("service-worker.js"); }
-  })();
-  </script>
+    status.style.display="block";
+  }
+
+  convertBtn.addEventListener("click", convert);
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js");
+  }
+})();
+</script>
 </body>
 </html>
