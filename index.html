@@ -2,61 +2,83 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Ventsharm Budget</title>
 <link rel="icon" href="Icon-192.png" />
 <style>
-  :root { --bg:#f5f6f8; --card:#fff; --text:#1b1b1f; --muted:#6b7280; --blue:#0d6efd; --blue2:#00b2ff; --border:#e5e7eb; }
-  *{box-sizing:border-box}
-  html,body{margin:0;height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:var(--bg)}
-  .wrap{display:flex;align-items:flex-start;justify-content:center;padding:28px 12px}
-  .card{width:100%;max-width:760px;background:var(--card);border-radius:22px;box-shadow:0 10px 26px rgba(0,0,0,.08);padding:20px}
-  .header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  :root{
+    --bg:#f5f6f8;--card:#fff;--text:#111;--muted:#6b7280;
+    --blue:#0d6efd;--blue2:#00b2ff;--border:#e5e7eb;
+  }
+  *{box-sizing:border-box} html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;}
+  .wrap{display:flex;justify-content:center;padding:28px 12px}
+  .card{width:100%;max-width:760px;background:var(--card);border-radius:22px;
+    box-shadow:0 10px 26px rgba(0,0,0,.08);padding:20px;position:relative}
+  .header{display:flex;gap:12px;align-items:center;margin-bottom:12px}
   .logo{width:28px;height:28px;border-radius:6px}
-  .title{font-size:1.7rem;font-weight:800;line-height:1.1}
+  .title{font-size:1.7rem;font-weight:800}
   .spacer{flex:1}
   .btn{appearance:none;border:0;border-radius:14px;padding:10px 16px;font-weight:700;cursor:pointer}
   .btn-blue{background:linear-gradient(90deg,var(--blue),var(--blue2));color:#fff}
   .btn-ghost{background:#f3f4f6;color:#111;border:1px solid #e5e7eb}
-  .tabs{display:flex;gap:10px;margin:10px 0 14px}
-  .tab{flex:0 0 auto;padding:10px 16px;border:1px solid var(--border);background:#fff;border-radius:12px;font-weight:700;color:#111;cursor:pointer}
+  .tabs{display:flex;gap:10px;margin:8px 0 14px}
+  .tab{padding:10px 16px;border:1px solid var(--border);border-radius:12px;background:#fff;font-weight:700;cursor:pointer}
   .tab.active{border-color:#cfe1ff;background:#f3f8ff;color:#0b57d0;box-shadow:0 0 0 3px rgba(13,110,253,.12)}
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .select,.input{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:12px;font-size:16px;background:#fff}
+  .input,.select{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:16px}
   .row{display:flex;gap:10px;align-items:center;margin-top:10px}
   .pill{border:1px solid var(--border);border-radius:16px;padding:12px 14px;min-width:140px;text-align:center;background:#fff}
-  .pill h4{margin:0 0 6px 0;font-size:.95rem;color:#111}
-  .pill p{margin:0;font-size:1.15rem;font-weight:900}
+  .pill h4{margin:0 0 6px 0;font-size:.95rem} .pill p{margin:0;font-size:1.15rem;font-weight:900}
   .muted{color:var(--muted);font-size:.95rem;margin-top:12px;text-align:center}
   hr{border:0;height:1px;background:var(--border);margin:16px 0}
   .list{margin-top:10px}
-  .item{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:8px}
+  .item{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:8px;background:#fff}
   .chip{font-size:.85rem;color:#555;background:#f1f5f9;padding:4px 8px;border-radius:999px;border:1px solid #e5e7eb}
-  .actions{display:flex;gap:8px}
-  .link{background:#fff;border:1px solid var(--border);padding:8px 10px;border-radius:10px;cursor:pointer}
-  /* Modal */
-  .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:30}
-  .modal{width:100%;max-width:420px;background:#fff;border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.22);padding:18px}
-  .modal h3{margin:0 0 12px 0}
-  .modal .row{margin-top:8px}
-  /* Login modal */
-  .auth-wrap{display:none}
-  .auth-title{margin:6px 0 12px 0;font-size:1.25rem;font-weight:800}
-  .auth-links{display:flex;gap:10px;margin-top:8px}
-  .err{color:#c30000;margin-top:8px;min-height:1.2em}
-  .ok{color:#128a12;margin-top:8px;min-height:1.2em}
-  @media(max-width:560px){ .grid-2{grid-template-columns:1fr} .spacer{display:none} }
+  .actions{display:flex;gap:8px} .link{background:#fff;border:1px solid var(--border);padding:8px 10px;border-radius:10px;cursor:pointer}
+  @media(max-width:560px){.grid-2{grid-template-columns:1fr}}
+
+  /* Gate (hard login) */
+  .gate{position:fixed;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.35));
+    display:flex;align-items:center;justify-content:center;z-index:30}
+  .gate-box{width:100%;max-width:420px;background:#fff;border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,.3);padding:20px}
+  .gate-box h2{margin:8px 0 0 0}
+  .gate-box p{color:var(--muted);margin:8px 0 14px}
+  .err{color:#c30000;min-height:1.2em;margin-top:6px} .ok{color:#128a12;min-height:1.2em;margin-top:6px}
 </style>
 </head>
 <body>
+<!-- LOGIN GATE (blocks the app until signed in & verified) -->
+<div class="gate" id="gate">
+  <div class="gate-box">
+    <div style="display:flex;align-items:center;gap:10px">
+      <img src="Icon-192.png" class="logo" alt="">
+      <h2>Ventsharm Budget</h2>
+    </div>
+    <p>Please sign in to use your budget (cloud-synced).</p>
+    <input id="gEmail" class="input" placeholder="Email" autocomplete="email" />
+    <input id="gPass" class="input" placeholder="Password" type="password" autocomplete="current-password" style="margin-top:10px" />
+    <div class="row">
+      <button class="btn btn-blue" id="gLogin">Login</button>
+      <button class="btn btn-ghost" id="gRegister">Register</button>
+      <button class="btn" id="gClose" style="display:none">Close</button>
+    </div>
+    <div class="row" style="margin-top:6px">
+      <button class="link" id="gForgot">Forgot password?</button>
+      <button class="link" id="gResend" style="display:none">Resend verification</button>
+    </div>
+    <div id="gErr" class="err"></div>
+    <div id="gOk" class="ok"></div>
+  </div>
+</div>
+
 <div class="wrap">
-  <div class="card" id="app">
+  <div class="card" id="app" aria-hidden="true">
     <div class="header">
       <img src="Icon-192.png" class="logo" alt="">
       <div class="title">Ventsharm Budget</div>
       <div class="spacer"></div>
-      <button class="btn btn-blue" id="loginBtn">Login / Register</button>
-      <button class="btn btn-ghost" id="logoutBtn" style="display:none">Logout</button>
+      <button class="btn btn-ghost" id="logoutBtn" title="Sign out">Logout</button>
     </div>
 
     <div class="tabs">
@@ -95,21 +117,19 @@
       <div id="overviewList" class="list"></div>
     </div>
 
-    <p class="muted" id="footNote">
-      Synced via Firebase. Cached offline; <b>0 reads</b> on refresh.
-    </p>
+    <p class="muted" id="footNote">Synced via Firebase. Cached offline; <b>0 reads</b> on refresh.</p>
   </div>
 </div>
 
-<!-- Edit Modal -->
-<div class="modal-back" id="editBack">
-  <div class="modal">
-    <h3>Edit item</h3>
+<!-- Edit modal -->
+<div class="gate" id="editBack" style="display:none;background:rgba(0,0,0,.35)">
+  <div class="gate-box" style="max-width:520px">
+    <h2>Edit item</h2>
     <div class="grid-2">
       <input class="input" id="editTitle" />
       <input class="input" id="editAmount" inputmode="decimal" />
     </div>
-    <div class="row">
+    <div class="row" style="margin-top:8px">
       <label class="chip"><input id="editInclude" type="checkbox" style="transform:translateY(2px);margin-right:6px"> Include in available</label>
       <div class="spacer"></div>
       <button class="btn btn-ghost" id="deleteBtn">Delete</button>
@@ -119,35 +139,13 @@
   </div>
 </div>
 
-<!-- Auth Modal -->
-<div class="modal-back" id="authBack">
-  <div class="modal">
-    <div class="auth-wrap" id="authStep">
-      <div class="auth-title" id="authTitle">Login</div>
-      <input class="input" id="authEmail" placeholder="Email" autocomplete="email" />
-      <input class="input" id="authPass" placeholder="Password" type="password" autocomplete="current-password" style="margin-top:10px" />
-      <div class="row">
-        <button class="btn btn-blue" id="authDo">Login</button>
-        <button class="btn btn-ghost" id="authToRegister">Register</button>
-        <button class="btn" id="authCancel">Close</button>
-      </div>
-      <div class="auth-links">
-        <button class="link" id="authForgot">Forgot password?</button>
-        <button class="link" id="authVerify" style="display:none">Resend verification</button>
-      </div>
-      <div class="err" id="authErr"></div>
-      <div class="ok" id="authOk"></div>
-    </div>
-  </div>
-</div>
-
 <script type="module">
-/* ------------------------ Firebase (v10 modular) ------------------------ */
+/* ------------------------ Firebase v10 (modular) ------------------------ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-/* Your project (from your message) */
+/* Your Firebase config (from your message) */
 const firebaseConfig = {
   apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
   authDomain: "budget-app-283de.firebaseapp.com",
@@ -160,67 +158,67 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
-/* ----------------------------- DOM helpers ----------------------------- */
+/* ------------------------------- Helpers -------------------------------- */
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
-const fmt = n => "£" + (Number(n||0)).toFixed(2);
+const money = v => "£" + (Number(v||0)).toFixed(2);
+const uid = () => Math.random().toString(36).slice(2,10);
 
-/* --------------------------- State & Caching --------------------------- */
-const LS_KEY = "vb-budget-v1";
+const LS_KEY="vb-budget-v2";
+const SS_HYDRATED="vb-hydrated";   // per tab/page — ensures 0 reads on refresh
+
 const state = {
   user: null,
-  items: { incomes: [], expenses: [] }, // {id,title,amount,include:true}
-  activeTab: "incomes",
-  loadedFromServer: false,    // ensures 0 reads on refresh (lazy fetch on login)
+  items: { incomes:[], expenses:[] }, // {id,title,amount,include}
+  tab: "incomes"
 };
 
+/* --------------------------- Local cache I/O ---------------------------- */
 function loadCache(){
-  try {
+  try{
     const raw = localStorage.getItem(LS_KEY);
-    if (raw) {
-      const data = JSON.parse(raw);
-      if (data && data.items) state.items = data.items;
-    }
-  } catch {}
+    if(raw){ const data=JSON.parse(raw); if(data?.items) state.items = data.items; }
+  }catch{}
 }
-function saveCache(){
-  localStorage.setItem(LS_KEY, JSON.stringify({ items: state.items }));
-}
+function saveCache(){ localStorage.setItem(LS_KEY, JSON.stringify({items:state.items})); }
 
-/* ------------------------------- UI logic ------------------------------ */
-function setAuthUI(){
-  const logged = !!state.user;
-  $("#loginBtn").style.display  = logged ? "none" : "";
-  $("#logoutBtn").style.display = logged ? "" : "none";
-  $("#footNote").innerHTML = logged
-    ? "Synced via Firebase. Cached offline; <b>0 reads</b> on refresh."
-    : "Local mode (not signed in). Data stays on this device.";
+/* ------------------------------- Gate UI -------------------------------- */
+function openGate(mode="login"){
+  $("#gate").style.display="flex";
+  $("#gErr").textContent=""; $("#gOk").textContent="";
+  $("#gResend").style.display = (auth.currentUser && !auth.currentUser.emailVerified) ? "" : "none";
+  $("#gClose").style.display = "none";
+  $("#gLogin").textContent = "Login"; $("#gRegister").textContent = "Register";
 }
-function setActiveTab(name){
-  state.activeTab = name;
-  $$(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab===name));
+function closeGate(){ $("#gate").style.display="none"; }
+
+/* ------------------------------ App UI --------------------------------- */
+function setTab(name){
+  state.tab=name;
+  $$(".tab").forEach(t=>t.classList.toggle("active", t.dataset.tab===name));
   $("#tab-incomes").style.display  = name==="incomes" ? "" : "none";
   $("#tab-expenses").style.display = name==="expenses"? "" : "none";
   $("#tab-overview").style.display = name==="overview"? "" : "none";
 }
+$$(".tab").forEach(t=>t.onclick=()=>setTab(t.dataset.tab));
+
 function totals(){
   const inc = state.items.incomes.filter(x=>x.include!==false).reduce((s,x)=>s+Number(x.amount||0),0);
   const exp = state.items.expenses.filter(x=>x.include!==false).reduce((s,x)=>s+Number(x.amount||0),0);
-  $("#sumIncome").textContent   = fmt(inc);
-  $("#sumExpense").textContent  = fmt(exp);
-  $("#sumAvailable").textContent= fmt(inc-exp);
+  $("#sumIncome").textContent=money(inc);
+  $("#sumExpense").textContent=money(exp);
+  $("#sumAvailable").textContent=money(inc-exp);
 }
-function renderLists(){
-  const domIn = $("#tab-incomes"), domEx = $("#tab-expenses"), ovr = $("#overviewList");
-  domIn.innerHTML = "";
-  domEx.innerHTML = "";
-  ovr.innerHTML   = "";
-  const paint = (wrap, arr, type) => {
-    if (!arr.length) { wrap.innerHTML = `<p class="muted">No ${type} yet.</p>`; return; }
+
+function paintLists(){
+  const incWrap=$("#tab-incomes"), expWrap=$("#tab-expenses"), ovWrap=$("#overviewList");
+  incWrap.innerHTML=""; expWrap.innerHTML=""; ovWrap.innerHTML="";
+  const paint=(wrap,arr,type,emptyText)=>{
+    if(!arr.length){ wrap.innerHTML=`<p class="muted">${emptyText}</p>`; return; }
     arr.forEach(x=>{
       const row=document.createElement("div");
       row.className="item";
-      row.innerHTML = `
+      row.innerHTML=`
         <div>
           <div style="font-weight:700">${x.title}</div>
           <div class="muted" style="margin-top:4px">
@@ -228,58 +226,55 @@ function renderLists(){
             <span class="chip">${x.include===false?"Excluded":"Included"}</span>
           </div>
         </div>
-        <div style="font-weight:800">${fmt(x.amount)}</div>
-        <div class="actions">
-          <button class="link edit" data-id="${x.id}" data-type="${type}">Edit</button>
-        </div>`;
+        <div style="font-weight:800">${money(x.amount)}</div>
+        <div class="actions"><button class="link edit" data-id="${x.id}" data-type="${type}">Edit</button></div>`;
       wrap.appendChild(row);
 
-      // overview mirror
-      const o=document.createElement("div");
-      o.className="item";
-      o.innerHTML=`
-        <div><div style="font-weight:700">${x.title}</div>
-        <div class="muted" style="margin-top:4px"><span class="chip">${type}</span></div></div>
-        <div style="font-weight:800">${fmt(x.amount)}</div>
-        <div class="actions"><button class="link edit" data-id="${x.id}" data-type="${type}">Edit</button></div>`;
-      ovr.appendChild(o);
+      // overview mirror row
+      const o=row.cloneNode(true);
+      ovWrap.appendChild(o);
     });
   };
-  paint(domIn, state.items.incomes, "income");
-  paint(domEx, state.items.expenses,"expense");
+  paint(incWrap,state.items.incomes,"income","No income yet.");
+  paint(expWrap,state.items.expenses,"expense","No expense yet.");
   totals();
 }
-function uid(){ return Math.random().toString(36).slice(2,10); }
+function bootUI(){
+  $("#app").ariaHidden="false";
+  setTab("incomes"); paintLists();
+  $("#footNote").innerHTML = "Synced via Firebase. Cached offline; <b>0 reads</b> on refresh.";
+}
 
-/* ------------------------------ Edit modal ----------------------------- */
-let editCtx = null;
+/* --------------------------- Edit modal logic -------------------------- */
+let editCtx=null;
 function openEdit(type,id){
   const arr = type==="income"? state.items.incomes : state.items.expenses;
   const it  = arr.find(a=>a.id===id); if(!it) return;
-  editCtx = { type, id };
-  $("#editTitle").value   = it.title;
-  $("#editAmount").value  = it.amount;
-  $("#editInclude").checked= it.include!==false;
+  editCtx={type,id};
+  $("#editTitle").value=it.title;
+  $("#editAmount").value=it.amount;
+  $("#editInclude").checked=(it.include!==false);
   $("#editBack").style.display="flex";
 }
 function closeEdit(){ $("#editBack").style.display="none"; editCtx=null; }
 $("#cancelEdit").onclick=closeEdit;
-$("#deleteBtn").onclick=()=>{
-  if(!editCtx) return;
-  const arr = editCtx.type==="income"? state.items.incomes : state.items.expenses;
-  const i = arr.findIndex(x=>x.id===editCtx.id);
-  if(i>-1) arr.splice(i,1);
-  saveCache(); renderLists(); closeEdit(); lazySync();
-};
 $("#saveBtn").onclick=()=>{
   if(!editCtx) return;
   const arr = editCtx.type==="income"? state.items.incomes : state.items.expenses;
-  const it = arr.find(x=>x.id===editCtx.id);
-  if(!it) return;
+  const it  = arr.find(a=>a.id===editCtx.id); if(!it) return;
   it.title   = $("#editTitle").value.trim() || it.title;
   it.amount  = parseFloat($("#editAmount").value)||0;
   it.include = $("#editInclude").checked;
-  saveCache(); renderLists(); closeEdit(); lazySync();
+  saveCache(); paintLists(); syncLazy();
+  closeEdit();
+};
+$("#deleteBtn").onclick=()=>{
+  if(!editCtx) return;
+  const arr = editCtx.type==="income"? state.items.incomes : state.items.expenses;
+  const i = arr.findIndex(a=>a.id===editCtx.id);
+  if(i>-1) arr.splice(i,1);
+  saveCache(); paintLists(); syncLazy();
+  closeEdit();
 };
 $("#tab-incomes").addEventListener("click",e=>{
   const b=e.target.closest(".edit"); if(b) openEdit(b.dataset.type,b.dataset.id);
@@ -291,130 +286,118 @@ $("#overviewList").addEventListener("click",e=>{
   const b=e.target.closest(".edit"); if(b) openEdit(b.dataset.type,b.dataset.id);
 });
 
-/* ------------------------------- Auth UI ------------------------------- */
-function showAuth(mode="login"){
-  $("#authBack").style.display="flex";
-  $("#authStep").style.display="block";
-  $("#authTitle").textContent = mode==="register" ? "Create account" : "Login";
-  $("#authDo").textContent    = mode==="register" ? "Register"      : "Login";
-  $("#authToRegister").textContent = mode==="register" ? "Back to Login" : "Register";
-  $("#authErr").textContent=""; $("#authOk").textContent="";
-  $("#authVerify").style.display="none";
-  $("#authBack").dataset.mode = mode;
-}
-function closeAuth(){ $("#authBack").style.display="none"; }
-$("#loginBtn").onclick = ()=> showAuth("login");
-$("#authCancel").onclick= closeAuth;
-$("#authToRegister").onclick=()=>{
-  const cur=$("#authBack").dataset.mode==="register"?"login":"register";
-  showAuth(cur);
-};
-$("#authForgot").onclick= async ()=>{
-  const email = $("#authEmail").value.trim();
-  $("#authErr").textContent=""; $("#authOk").textContent="";
-  if(!email){ $("#authErr").textContent="Enter your email first."; return; }
-  try{
-    await sendPasswordResetEmail(auth,email);
-    $("#authOk").textContent="Reset email sent.";
-  }catch(e){ $("#authErr").textContent=e.message; }
-};
-$("#authDo").onclick= async ()=>{
-  const email=$("#authEmail").value.trim(), pass=$("#authPass").value;
-  $("#authErr").textContent=""; $("#authOk").textContent="";
-  try{
-    if($("#authBack").dataset.mode==="register"){
-      const cred=await createUserWithEmailAndPassword(auth,email,pass);
-      await sendEmailVerification(cred.user);
-      $("#authOk").textContent="Account created. Verification email sent.";
-      $("#authVerify").style.display="";
-    }else{
-      await signInWithEmailAndPassword(auth,email,pass);
-      closeAuth();
-    }
-  }catch(e){ $("#authErr").textContent=e.message; }
-};
-$("#authVerify").onclick= async ()=>{
-  if(auth.currentUser){ await sendEmailVerification(auth.currentUser); $("#authOk").textContent="Verification re-sent."; }
-};
-$("#logoutBtn").onclick=()=>signOut(auth);
-
-/* --------------------------- Add / Reset (UI) -------------------------- */
-$("#addBtn").onclick=()=>{
+/* ------------------------- Add / Reset handlers ------------------------ */
+$("#addBtn").onclick=async ()=>{
+  if(!(await ensureHydrated())) return; // lazy 1st read here
   const title=$("#titleInput").value.trim();
   const amt=parseFloat($("#amountInput").value);
-  const type=$("#typeSelect").value; // income | expense
+  const type=$("#typeSelect").value;
   if(!title || isNaN(amt)) return;
   const entry={ id:uid(), title, amount:amt, include:true };
-  (type==="income"? state.items.incomes:state.items.expenses).push(entry);
+  (type==="income"?state.items.incomes:state.items.expenses).push(entry);
   $("#titleInput").value=""; $("#amountInput").value="";
-  saveCache(); renderLists(); lazySync();
+  saveCache(); paintLists(); syncLazy();
 };
-$("#resetLocalBtn").onclick=()=>{
+$("#resetLocalBtn").onclick=async ()=>{
+  if(!(await ensureHydrated())) return; // lazy hydrate before destructive sync
   state.items={ incomes:[], expenses:[] };
-  saveCache(); renderLists(); lazySync();
+  saveCache(); paintLists(); syncLazy();
 };
 
-/* -------------------------- Tabs & boot render ------------------------- */
-$$(".tab").forEach(t=>t.onclick=()=> setActiveTab(t.dataset.tab));
-
-/* -------------------------- Firestore sync logic ----------------------- */
-/* 0 reads on refresh:
-   - We render from localStorage.
-   - On login, we do ONE read (getDoc) to hydrate.
-   - After that, writes overwrite the doc; reads only re-run if the user refreshes & logs in again. */
-async function lazySync(){
-  if(!state.user) return; // local only
-  const ref = doc(db,"budgets",state.user.uid);
-  try{
-    await setDoc(ref, state.items, { merge:false });
-  }catch(e){ /* ignore offline errors; next write will fix */ }
-}
-
-async function fetchOnceIfNeeded(){
-  if(!state.user || state.loadedFromServer) return;
+/* ----------------------- Lazy hydrate & cloud sync --------------------- */
+// Guarantees: 0 reads on refresh. Only first real action calls getDoc once.
+async function ensureHydrated(){
+  if(!state.user){ openGate(); return false; }
+  if(sessionStorage.getItem(SS_HYDRATED)) return true;
   try{
     const ref = doc(db,"budgets",state.user.uid);
-    const sp = await getDoc(ref); // ← exactly one read after login
-    if(sp.exists()){
-      // prefer server only if local is empty
-      const server = sp.data();
+    const snap = await getDoc(ref); // ← exactly ONE read on first need
+    if(snap.exists()){
+      // If local is empty, use server; otherwise keep local (user’s current edits)
       const localEmpty = !state.items.incomes.length && !state.items.expenses.length;
-      if(localEmpty) state.items = server;
-      saveCache();
+      if(localEmpty) state.items = snap.data();
+      saveCache(); paintLists();
     }else{
-      await setDoc(ref, state.items, { merge:false });
+      await setDoc(ref, state.items, {merge:false});
     }
-  }catch(e){/* offline → keep local */}
-  state.loadedFromServer = true;
-  renderLists();
+  }catch(e){ /* offline: skip */ }
+  sessionStorage.setItem(SS_HYDRATED,"1");
+  return true;
+}
+async function syncLazy(){
+  if(!state.user) return;
+  try{
+    const ref = doc(db,"budgets",state.user.uid);
+    await setDoc(ref, state.items, { merge:false });
+  }catch(e){ /* offline; next time will sync */ }
 }
 
-/* ------------------------------ Auth watch ---------------------------- */
+/* ----------------------------- Auth flows ------------------------------ */
+function showResendIfNeeded(){
+  $("#gResend").style.display = (auth.currentUser && !auth.currentUser.emailVerified) ? "" : "none";
+}
+$("#gLogin").onclick=async ()=>{
+  $("#gErr").textContent=""; $("#gOk").textContent="";
+  try{
+    const cred=await signInWithEmailAndPassword(auth,$("#gEmail").value.trim(),$("#gPass").value);
+    // Require verified email to proceed (you asked for confirm email flow)
+    if(!cred.user.emailVerified){
+      $("#gOk").textContent="Check your inbox and verify your email, then log in again.";
+      $("#gResend").style.display="";
+      return;
+    }
+    closeGate();
+  }catch(e){ $("#gErr").textContent=e.message; }
+};
+$("#gRegister").onclick=async ()=>{
+  $("#gErr").textContent=""; $("#gOk").textContent="";
+  try{
+    const cred=await createUserWithEmailAndPassword(auth,$("#gEmail").value.trim(),$("#gPass").value);
+    await sendEmailVerification(cred.user);
+    $("#gOk").textContent="Account created. Verification email sent.";
+    $("#gResend").style.display="";
+  }catch(e){ $("#gErr").textContent=e.message; }
+};
+$("#gForgot").onclick=async ()=>{
+  $("#gErr").textContent=""; $("#gOk").textContent="";
+  const email=$("#gEmail").value.trim(); if(!email){ $("#gErr").textContent="Enter your email first."; return; }
+  try{ await sendPasswordResetEmail(auth,email); $("#gOk").textContent="Password reset email sent."; }
+  catch(e){ $("#gErr").textContent=e.message; }
+};
+$("#gResend").onclick=async ()=>{
+  try{ if(auth.currentUser) await sendEmailVerification(auth.currentUser); $("#gOk").textContent="Verification email re-sent."; }
+  catch(e){ $("#gErr").textContent=e.message; }
+};
+
+$("#logoutBtn").onclick=()=>signOut(auth);
+
+/* -------------------------- Auth state watch --------------------------- */
 onAuthStateChanged(auth, (u)=>{
   state.user = u || null;
-  setAuthUI();
-  // if logged in and email not verified, still allow, but nudge:
-  if(u && !u.emailVerified){
-    $("#footNote").innerHTML = `Logged in (email not verified). <button class="link" id="resendInFoot">Resend verification</button>`;
-    $("#resendInFoot").onclick = async ()=>{ try{ await sendEmailVerification(auth.currentUser); }catch{} };
-  } else if(!u){
-    $("#footNote").innerHTML = "Local mode (not signed in). Data stays on this device.";
-  } else {
-    $("#footNote").innerHTML = "Synced via Firebase. Cached offline; <b>0 reads</b> on refresh.";
+  showResendIfNeeded();
+  if(!u){ // lock the app
+    openGate();
+    $("#app").ariaHidden="true";
+    sessionStorage.removeItem(SS_HYDRATED);
+  }else{
+    if(u.emailVerified){
+      closeGate();
+      $("#app").ariaHidden="false";
+      // stay at 0 reads until user acts
+    }else{
+      openGate();
+    }
   }
-  fetchOnceIfNeeded();
 });
 
-/* ------------------------------- Service worker ----------------------- */
+/* ---------------------------- SW registration -------------------------- */
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("./service-worker.js").catch(()=>{});
 }
 
-/* ------------------------------- Boot --------------------------------- */
+/* ------------------------------- Boot ---------------------------------- */
 loadCache();
-renderLists();
-setActiveTab("incomes");
-setAuthUI();
+bootUI();
 </script>
 </body>
 </html>
