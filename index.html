@@ -1,150 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Ventsharm Budget</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Ventsharm Budget</title>
 
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#000000">
-  <link rel="icon" href="Icon-192.png">
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#000000" />
+<link rel="icon" href="Icon-192.png" />
 
-  <style>
-    body{font-family:system-ui,sans-serif;background:#f5f6f8;display:flex;flex-direction:column;align-items:center;padding:30px 10px;color:#222}
-    .app{background:#fff;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,.1);padding:25px 20px;width:100%;max-width:420px;box-sizing:border-box}
-    h1{display:flex;align-items:center;justify-content:center;gap:8px;font-size:1.4rem;margin-bottom:20px}
-    h1 img{width:28px;height:28px}
-    label{font-weight:600;display:block;margin:15px 0 6px}
-    input,select,button{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #ccc;font-size:1rem;box-sizing:border-box}
-    .row{display:flex;gap:10px}
-    button{border:none;color:#fff;font-weight:600;cursor:pointer;transition:opacity .2s}
-    button:hover{opacity:.9}
-    .blue{background:linear-gradient(90deg,#007bff,#00aaff)}
-    .gray{background:#ccc;color:#000}
-    .muted{color:#666;font-size:.95rem;text-align:center;margin-top:10px}
-    #status{display:none;text-align:center;color:#0a0;font-weight:600;margin-top:10px}
-    #error{color:#e00;font-weight:500;margin:8px 0;text-align:center}
-    .section{margin-top:14px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .list{margin-top:10px;border:1px solid #e5e5e5;border-radius:12px;padding:10px;max-height:280px;overflow:auto}
-    .item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f1f1}
-    .item:last-child{border-bottom:none}
-  </style>
+<style>
+  :root { --bg:#f5f6f8; --card:#fff; --text:#111; --muted:#666; --b:#e5e7eb; --pri:#0d6efd; --ok:#128a12; --err:#c30000; }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);font-family:system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;color:var(--text)}
+  .wrap{max-width:900px;margin:26px auto;padding:0 12px}
+  .card{background:var(--card);border:1px solid var(--b);border-radius:18px;box-shadow:0 6px 18px rgba(0,0,0,.06);padding:16px}
+  h1{display:flex;align-items:center;gap:10px;font-size:1.4rem;margin:0 0 10px}
+  h1 img{width:28px;height:28px}
+  .topbar{display:flex;gap:8px;justify-content:space-between;align-items:center;margin:8px 0 14px}
+  .topbar .actions{display:flex;gap:8px}
+  button{border:1px solid var(--b);background:#fff;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer}
+  .btn{background:linear-gradient(90deg,#007bff,#00aaff);color:#fff;border:none}
+  .btn.gray{background:#f2f4f7;color:#111;border:1px solid #d9d9d9}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--b);padding-bottom:6px;margin-bottom:14px}
+  .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--b);background:#fff;cursor:pointer}
+  .tab.active{background:#eef6ff;border-color:#b6dbff;color:#064d96}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  input,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #cfcfcf;font-size:1rem}
+  .list{margin-top:10px;border:1px solid var(--b);border-radius:12px;overflow:hidden}
+  .row{display:grid;grid-template-columns:1fr auto auto;gap:10px;padding:10px 12px;border-bottom:1px solid #f0f0f0;align-items:center}
+  .row:last-child{border-bottom:none}
+  .pill{font-size:.85rem;padding:4px 8px;border-radius:999px;border:1px solid var(--b);background:#fafafa}
+  .money{font-weight:700}
+  .muted{color:var(--muted);font-size:.92rem}
+  .stat{background:#fafafa;border:1px solid var(--b);border-radius:12px;padding:10px 12px}
+  .ok{color:var(--ok)} .err{color:var(--err)}
+  .note{margin-top:8px;font-size:.9rem;text-align:center;color:var(--muted)}
+  /* Modal */
+  .modalBack{position:fixed;inset:0;background:rgba(0,0,0,.25);display:none;align-items:center;justify-content:center;padding:12px}
+  .modal{background:#fff;border-radius:16px;max-width:460px;width:100%;padding:16px;border:1px solid var(--b)}
+  .modal h3{margin:0 0 10px;font-size:1.1rem}
+  .switch{display:flex;align-items:center;gap:8px}
+  .switch input{width:auto}
+  @media (max-width:720px){ .grid3{grid-template-columns:1fr} .row{grid-template-columns:1fr auto auto} }
+</style>
 </head>
 <body>
-  <div class="app">
+<div class="wrap">
+  <div class="card">
     <h1><img src="Icon-192.png" alt="icon"> Ventsharm Budget</h1>
 
-    <!-- Auth / header actions (placeholder; hook up to Firebase as in your saved build) -->
-    <div class="row">
-      <button id="loginBtn" class="blue">Login / Register</button>
-      <button id="logoutBtn" class="gray">Logout</button>
-    </div>
-    <div id="status">✅ Signed in</div>
-    <div id="error"></div>
-
-    <!-- Quick add -->
-    <div class="section">
-      <label>Add entry</label>
-      <div class="grid">
-        <input id="title" placeholder="Title (e.g. Salary, Rent)" />
-        <input id="amount" type="number" placeholder="Amount" />
-      </div>
-      <div class="grid" style="margin-top:10px">
-        <select id="type">
-          <option value="income">Income</option>
-          <option value="expense">Expense</option>
-        </select>
-        <button id="add" class="blue">Add</button>
+    <div class="topbar">
+      <div id="authState" class="muted">Signed out</div>
+      <div class="actions">
+        <button id="btnLogin" class="btn">Login / Register</button>
+        <button id="btnLogout" class="btn gray">Logout</button>
       </div>
     </div>
 
-    <!-- Overview -->
-    <div class="section">
-      <label>Overview</label>
-      <div class="grid">
-        <input id="totalIncome" disabled placeholder="Total income: 0" />
-        <input id="totalExpense" disabled placeholder="Total expense: 0" />
-      </div>
-      <div class="grid" style="margin-top:10px">
-        <input id="available" disabled placeholder="Available: 0" />
-        <button id="reset" class="gray">Reset (local)</button>
-      </div>
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" data-tab="incomes">Incomes</div>
+      <div class="tab" data-tab="expenses">Expenses</div>
+      <div class="tab" data-tab="overview">Overview</div>
     </div>
+
+    <!-- Add form -->
+    <div class="grid3" style="margin-bottom:10px">
+      <input id="title" placeholder="Title (e.g. Salary, Rent)" />
+      <input id="amount" type="number" placeholder="Amount" />
+      <select id="kind">
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+    </div>
+    <div class="grid2" style="margin-bottom:12px">
+      <button id="btnAdd" class="btn">Add</button>
+      <button id="btnResetLocal" class="btn gray">Reset (local)</button>
+    </div>
+    <div id="msg" class="muted"></div>
 
     <!-- Lists -->
-    <div class="section">
-      <label>Entries</label>
-      <div class="list" id="list"></div>
+    <div id="pane-incomes">
+      <div class="list" id="listIncomes"></div>
     </div>
-
-    <p class="muted">Data can sync with Firebase (use your saved build). This version is isolated to <code>/Socialcreator-manifest/</code> so it won’t merge with other PWAs.</p>
+    <div id="pane-expenses" style="display:none">
+      <div class="list" id="listExpenses"></div>
+    </div>
+    <div id="pane-overview" style="display:none">
+      <div class="grid3">
+        <div class="stat"><div class="muted">Total income</div><div id="statIncome" class="money">£0.00</div></div>
+        <div class="stat"><div class="muted">Total expense</div><div id="statExpense" class="money">£0.00</div></div>
+        <div class="stat"><div class="muted">Available</div><div id="statAvail" class="money ok">£0.00</div></div>
+      </div>
+      <p class="note">“Available” respects the <strong>Include in available</strong> toggle set on each income.</p>
+    </div>
   </div>
 
-  <script>
-    // --- Minimal local-only logic (safe placeholder) ---
-    const $ = s => document.querySelector(s);
-    const listEl = $("#list"), err = $("#error"), statusEl = $("#status");
-    const storeKey = "vb_budget_local_v1";
-    let entries = JSON.parse(localStorage.getItem(storeKey) || "[]");
+  <p class="note">Syncs via Firebase. Cached locally for offline; 0 reads on refresh. Scope isolated to <code>/Socialcreator-manifest/</code>.</p>
+</div>
 
-    function fmt(n){ return Number(n||0).toLocaleString(undefined,{maximumFractionDigits:2}); }
-    function render(){
-      listEl.innerHTML = "";
-      let inc=0, exp=0;
-      entries.forEach((e,i)=>{
-        if(e.type==="income") inc += Number(e.amount||0);
-        else exp += Number(e.amount||0);
-        const row = document.createElement("div");
-        row.className = "item";
-        row.innerHTML = `
-          <div>${e.title || "(untitled)"} — <strong>${e.type}</strong></div>
-          <div>
-            £${fmt(e.amount)}
-            <button data-i="${i}" class="del" style="margin-left:12px;background:#eee;color:#000;border:1px solid #ddd;border-radius:8px;padding:4px 8px">Delete</button>
-          </div>`;
-        listEl.appendChild(row);
-      });
-      $("#totalIncome").value = `Total income: £${fmt(inc)}`;
-      $("#totalExpense").value = `Total expense: £${fmt(exp)}`;
-      $("#available").value   = `Available: £${fmt(inc - exp)}`;
-      localStorage.setItem(storeKey, JSON.stringify(entries));
-      listEl.querySelectorAll(".del").forEach(b=>{
-        b.onclick = () => { entries.splice(Number(b.dataset.i),1); render(); };
-      });
-    }
-    render();
+<!-- Edit Modal -->
+<div id="editBack" class="modalBack">
+  <div class="modal">
+    <h3>Edit entry</h3>
+    <div class="grid2" style="margin-bottom:10px">
+      <input id="editTitle" />
+      <input id="editAmount" type="number" />
+    </div>
+    <div class="grid2" style="margin-bottom:10px">
+      <select id="editKind">
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+      <label class="switch"><input id="editInclude" type="checkbox" /> Include in available</label>
+    </div>
+    <div class="grid2">
+      <button id="saveEdit" class="btn">Save</button>
+      <button id="cancelEdit" class="btn gray">Cancel</button>
+    </div>
+  </div>
+</div>
 
-    $("#add").onclick = () => {
-      const title = $("#title").value.trim();
-      const amount = Number($("#amount").value);
-      const type = $("#type").value;
-      if(!title || !amount){ err.textContent = "Please enter a title and amount."; return; }
-      err.textContent = "";
-      entries.push({ title, amount, type, ts: Date.now() });
-      $("#title").value = ""; $("#amount").value = "";
-      render();
-    };
+<!-- Firebase v10.13.2 -->
+<script type="module" src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"></script>
+<script type="module" src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"></script>
+<script type="module" src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js"></script>
 
-    $("#reset").onclick = () => {
-      if(confirm("Clear local entries?")) { entries = []; render(); }
-    };
+<!-- App logic (next part) -->
+<script type="module" src="./main.js"></script>
 
-    // Placeholder auth UI — replace with your saved Firebase logic
-    $("#loginBtn").onclick = () => { statusEl.style.display = "block"; statusEl.textContent = "✅ Signed in (placeholder)"; };
-    $("#logoutBtn").onclick = () => { statusEl.style.display = "none"; };
-
-  </script>
-
-  <!-- Scoped Service Worker just for /Socialcreator-manifest/ -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/Socialcreator-manifest/service-worker.js', { scope: '/Socialcreator-manifest/' })
-        .then(() => console.log('✅ Budget SW registered (scoped)'))
-        .catch(err => console.error('SW registration failed:', err));
-    }
-  </script>
+<!-- Scoped Service Worker -->
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/Socialcreator-manifest/service-worker.js', { scope: '/Socialcreator-manifest/' })
+    .then(()=>console.log('✅ Budget SW registered'))
+    .catch(e=>console.error('SW reg failed', e));
+}
+</script>
 </body>
 </html>
