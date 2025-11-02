@@ -7,216 +7,301 @@
 <link rel="icon" href="Icon-192.png" />
 <style>
   :root{
-    --bg:#f4f6fb; --card:#fff; --text:#1f2328; --muted:#6b7280; --ring:#dbe3f3;
-    --blue:#1d4ed8; --blue2:#3b82f6; --red:#ef4444; --green:#16a34a; --violet:#7c3aed;
-    --shadow:0 6px 28px rgba(2,6,23,.08);
-    --radius:18px;
+    --bg1:#0b1020; --bg2:#0a0f2c; --glass:rgba(255,255,255,.08);
+    --text:#f7f8fc; --muted:#b7bfd6; --ring:rgba(255,255,255,.25);
+    --accent:#6ea8ff; --accent2:#b095ff; --ok:#22c55e; --bad:#ef4444;
+    --card-radius:18px; --btn-radius:14px; --shadow:0 12px 32px rgba(0,0,0,.35);
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0; background:var(--bg); color:var(--text);
-    font:16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-    display:flex; justify-content:center; padding:24px;
+    margin:0; color:var(--text); font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+    background:linear-gradient(160deg,var(--bg1),var(--bg2)) fixed;
+    display:flex; justify-content:center; padding:18px;
   }
   .app{
-    width:100%; max-width:820px; background:var(--card);
-    border-radius:var(--radius); box-shadow:var(--shadow); padding:22px;
+    width:100%; max-width:820px; min-height:calc(100vh - 36px);
+    backdrop-filter: blur(8px);
+    background:linear-gradient(transparent,transparent) padding-box, var(--glass) border-box;
+    border:1px solid var(--ring); border-radius:22px; box-shadow:var(--shadow);
+    display:flex; flex-direction:column; overflow:hidden;
   }
-  h1{margin:4px 0 18px; font-size:34px; letter-spacing:.3px}
-  .topbar{display:flex; gap:16px; align-items:center; justify-content:space-between; margin-bottom:8px}
-  .status{color:var(--muted); font-size:.95rem}
-  .tabs{display:flex; gap:12px; margin:14px 0 18px}
-  .tab{
-    border:1px solid var(--ring); background:#eef2ff; color:#1e3a8a;
-    padding:10px 16px; border-radius:999px; font-weight:700; cursor:pointer;
-  }
-  .tab[aria-selected="true"]{background:linear-gradient(90deg,var(--blue),var(--blue2)); color:#fff; border-color:transparent}
-  .row{display:flex; gap:12px}
-  .row > *{flex:1}
-  input[type="text"], input[type="number"], input[type="email"], input[type="password"]{
-    width:100%; padding:12px 14px; border:1px solid var(--ring); border-radius:12px; outline:none;
-    background:#fff; font-size:16px;
-  }
-  input:focus{border-color:var(--blue2); box-shadow:0 0 0 4px rgba(59,130,246,.15)}
+  /* Top bar */
+  .topbar{display:flex; align-items:center; justify-content:space-between; padding:16px 18px 8px}
+  .brand{font-weight:900; letter-spacing:.3px; font-size:20px}
+  .userbox{display:flex; gap:10px; align-items:center; color:var(--muted); font-size:.95rem; flex-wrap:wrap}
   .btn{
-    border:0; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer;
+    background:#fff; color:#000; border:1.5px solid #000; border-radius:var(--btn-radius);
+    padding:10px 14px; font-weight:800; cursor:pointer; transition:transform .06s ease, box-shadow .1s ease;
   }
-  .btn.primary{background:linear-gradient(90deg,var(--blue),var(--blue2)); color:#fff}
-  .btn.gray{background:#e5e7eb}
-  .btn.red{background:var(--red); color:#fff}
-  .btn.blue{background:var(--blue2); color:#fff}
-  .section{margin:18px 0 10px; font-size:1.1rem; font-weight:800}
-  .card{background:#fff; border:1px solid var(--ring); border-radius:14px; padding:14px}
-  .list{display:flex; flex-direction:column; gap:12px; margin-top:12px}
+  .btn:active{transform:translateY(1px)}
+  .btn.sm{padding:8px 12px; font-weight:700}
+  .btn.ghost{background:transparent; color:#fff; border-color:#fff}
+  .muted{color:var(--muted)}
+
+  /* Content cards */
+  .content{padding:10px 14px 80px; display:grid; gap:12px}
+  .card{
+    background:linear-gradient(transparent,transparent) padding-box, var(--glass) border-box;
+    border:1px solid var(--ring); border-radius:var(--card-radius); padding:16px 14px;
+  }
+  h2.section{margin:4px 0 12px; font-size:1.1rem; font-weight:900; color:#eaf0ff}
+
+  /* Inputs */
+  .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  @media (max-width:640px){ .row{grid-template-columns:1fr} }
+  input[type="text"], input[type="number"], input[type="email"], input[type="password"]{
+    width:100%; padding:12px 14px; border-radius:14px; background:#0f1733; color:#fff;
+    border:1px solid rgba(255,255,255,.25); outline:none;
+  }
+  input:focus{box-shadow:0 0 0 4px rgba(110,168,255,.18)}
+
+  /* Include display (read-only) */
+  .include-pill{font-weight:800; font-size:.95rem}
+  .include-yes{color:#86efac}
+  .include-no{color:#fca5a5}
+
+  /* Lists */
+  .list{display:flex; flex-direction:column; gap:10px; margin-top:12px}
   .item{
-    display:grid; grid-template-columns:auto 1fr auto auto; gap:12px; align-items:center;
     border:1px solid var(--ring); border-radius:14px; padding:12px;
+    background:rgba(255,255,255,.05);
   }
-  .item .title{font-weight:700}
-  .item .amount{font-weight:800}
-  .check-readonly{pointer-events:none; transform:scale(1.2)}
-  .pill{
-    padding:16px; border:1px solid var(--ring); border-radius:14px; background:#fafafa; margin-bottom:12px
+  .item_head{
+    display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center;
+    cursor:pointer;
   }
-  .pill.gray{background:#f5f7ff}
-  .pill.violet{background:#faf5ff}
-  .pill.red{background:#fff5f5}
-  .pill .h{font-weight:800; margin-bottom:6px}
-  .footer{margin-top:16px; color:var(--muted); text-align:center; font-size:.95rem}
-  /* Login dialog */
-  dialog::backdrop{background:rgba(15,23,42,.45); backdrop-filter:blur(4px)}
-  dialog{
-    border:0; border-radius:18px; padding:0; width:min(520px,90vw); box-shadow:var(--shadow);
+  .item_title{font-weight:900}
+  .item_amount{font-weight:900; color:#eaf0ff}
+  .item_meta{font-size:.9rem; color:var(--muted)}
+  .item_actions{
+    display:none;
+    margin-top:10px; padding-top:10px; border-top:1px dashed rgba(255,255,255,.18);
+    animation:reveal .18s ease;
   }
-  .modal{padding:20px}
-  .modal h2{margin:0 0 12px}
-  .modal .actions{display:flex; gap:10px; margin-top:14px}
-  /* Edit modal */
-  .field{display:flex; flex-direction:column; gap:6px}
-  label.small{font-size:.92rem; color:var(--muted); font-weight:700}
-  .switch{display:flex; align-items:center; gap:10px; margin-top:6px}
-  /* Overview: vertical stack */
-  .overview .pill + .pill{margin-top:14px}
-  .hidden{display:none!important}
+  .item.show .item_actions{display:flex; gap:8px}
+  @keyframes reveal{from{opacity:0; transform:translateY(-4px)} to{opacity:1; transform:none}}
+
+  /* Overview */
+  .kpi{
+    border:1px solid var(--ring); border-radius:16px; padding:16px; margin-bottom:12px;
+    background:rgba(255,255,255,.05);
+  }
+  .kpi .k{font-size:.9rem; color:#cfd8ff; font-weight:800; margin-bottom:6px}
+  .kpi .v{font-size:1.6rem; font-weight:900}
+  #ovw-total{color:#86c5ff}
+  #ovw-available{color:#b095ff}
+  #ovw-exp{color:#ff9aa8}
+
+  /* Bottom nav (kept where it was) */
+  .tabbar{
+    position:sticky; bottom:0; margin-top:auto;
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;
+    padding:10px; background:linear-gradient(transparent, rgba(0,0,0,.35));
+    backdrop-filter: blur(6px);
+  }
+  .tabbtn{
+    background:#fff; color:#000; border:1.5px solid #000; border-radius:14px; padding:10px 12px; font-weight:800; cursor:pointer;
+  }
+  .tabbtn.active{box-shadow:0 0 0 2px #000 inset}
+
+  /* Modals (plain white) */
+  dialog::backdrop{background:rgba(0,0,0,.55)}
+  dialog{border:0; border-radius:18px; padding:0; width:min(520px,92vw); box-shadow:var(--shadow); background:#fff}
+  .modal{padding:18px}
+  .modal h3{margin:0 0 10px; color:#111}
+  .modal .row{gap:12px}
+  .modal label{font-weight:800; color:#111; font-size:.95rem}
+  .modal .note{font-size:.92rem; color:#0a0a0a; opacity:.8}
+  .divider{height:1px; background:#e5e7eb; margin:12px 0}
+  .modal .actions{display:flex; gap:10px; margin-top:12px}
+
+  /* Small helpers */
+  .sr{position:absolute; left:-9999px}
+  .center-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
 </style>
 </head>
 <body>
 <div class="app" id="app">
+
+  <!-- Top bar -->
   <div class="topbar">
-    <h1>Budget Planner</h1>
-    <div class="status" id="status">Signed out</div>
+    <div class="brand">Budget Planner</div>
+    <div class="userbox">
+      <span id="userEmail" class="muted">Signed out</span>
+      <button id="btnOpenAuth" class="btn sm">Login / Register</button>
+      <button id="btnLogout" class="btn sm" style="display:none">Logout</button>
+    </div>
   </div>
 
-  <!-- Login CTA (shown when signed out) -->
-  <div id="auth-bar" class="card" style="display:flex; align-items:center; gap:12px; justify-content:space-between;">
-    <span>Welcome! Please sign in to sync with Firebase.</span>
-    <button class="btn primary" id="openLogin">Login / Register</button>
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Incomes -->
+    <section class="card" id="view-incomes" aria-label="Incomes">
+      <h2 class="section">Income Sources</h2>
+      <div class="row">
+        <input id="inc-name" type="text" placeholder="Income name e.g. Salary / Benefit" />
+        <input id="inc-amt" type="number" min="0" step="0.01" placeholder="Amount e.g. 1200" />
+      </div>
+      <div class="center-row" style="margin-top:8px">
+        <span class="muted">Include in available income:</span>
+        <input id="inc-include" type="checkbox" />
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button id="add-inc" class="btn">Add Income</button>
+        <button id="reset-inc" class="btn">Reset</button>
+      </div>
+
+      <div id="inc-list" class="list" aria-live="polite">
+        <!-- items injected here -->
+      </div>
+    </section>
+
+    <!-- Expenses -->
+    <section class="card" id="view-expenses" aria-label="Expenses" style="display:none">
+      <h2 class="section">Expenses</h2>
+      <div class="row">
+        <input id="exp-name" type="text" placeholder="Bill e.g. Rent / Spotify" />
+        <input id="exp-amt" type="number" min="0" step="0.01" placeholder="Amount e.g. 500" />
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button id="add-exp" class="btn">Add Bill</button>
+        <button id="reset-exp" class="btn">Reset</button>
+      </div>
+
+      <div id="exp-list" class="list" aria-live="polite">
+        <!-- items injected here -->
+      </div>
+    </section>
+
+    <!-- Overview -->
+    <section class="card" id="view-overview" aria-label="Overview" style="display:none">
+      <h2 class="section">Overview</h2>
+      <div class="kpi">
+        <div class="k">Total Income (All)</div>
+        <div id="ovw-total" class="v">£0.00</div>
+      </div>
+      <div class="kpi">
+        <div class="k">Available Income (Included − Expenses)</div>
+        <div id="ovw-available" class="v">£0.00</div>
+      </div>
+      <div class="kpi">
+        <div class="k">Expenses</div>
+        <div id="ovw-exp" class="v">£0.00</div>
+      </div>
+    </section>
+
   </div>
 
-  <!-- Tabs -->
-  <div class="tabs" id="tabs" aria-label="Sections" role="tablist" hidden>
-    <button class="tab" role="tab" id="tab-inc" aria-controls="panel-inc" aria-selected="true">Incomes</button>
-    <button class="tab" role="tab" id="tab-exp" aria-controls="panel-exp" aria-selected="false">Expenses</button>
-    <button class="tab" role="tab" id="tab-ovw" aria-controls="panel-ovw" aria-selected="false">Overview</button>
-  </div>
-
-  <!-- Incomes -->
-  <section id="panel-inc" role="tabpanel" aria-labelledby="tab-inc" class="card" hidden>
-    <div class="section">Income Sources</div>
-    <div class="row">
-      <input id="inc-name" type="text" placeholder="Income name e.g. Cashier or Benefit">
-      <input id="inc-amt" type="number" placeholder="Amount e.g. 1200" min="0" step="0.01">
-    </div>
-    <div class="switch">
-      <input id="inc-include" type="checkbox">
-      <label for="inc-include">Include in available income</label>
-    </div>
-    <div class="row" style="margin-top:10px">
-      <button class="btn primary" id="add-inc">Add Income</button>
-      <button class="btn gray" id="reset-inc">Reset</button>
-    </div>
-
-    <div id="inc-list" class="list" aria-live="polite"></div>
-    <div class="row" style="margin-top:14px">
-      <button class="btn gray" id="logout1">Logout</button>
-    </div>
-  </section>
-
-  <!-- Expenses -->
-  <section id="panel-exp" role="tabpanel" aria-labelledby="tab-exp" class="card" hidden>
-    <div class="section">Expenses</div>
-    <div class="row">
-      <input id="exp-name" type="text" placeholder="Bill / Subscription e.g. Rent or Spotify">
-      <input id="exp-amt" type="number" placeholder="Amount e.g. 500" min="0" step="0.01">
-    </div>
-    <div class="row" style="margin-top:10px">
-      <button class="btn primary" id="add-exp">Add Bill</button>
-      <button class="btn gray" id="reset-exp">Reset</button>
-    </div>
-
-    <div id="exp-list" class="list" aria-live="polite"></div>
-    <div class="row" style="margin-top:14px">
-      <button class="btn gray" id="logout2">Logout</button>
-    </div>
-  </section>
-
-  <!-- Overview (stacked cards) -->
-  <section id="panel-ovw" role="tabpanel" aria-labelledby="tab-ovw" class="card overview" hidden>
-    <div class="section">Overview</div>
-    <div class="pill gray">
-      <div class="h">Total Income (All)</div>
-      <div id="ovw-total" style="font-weight:900; font-size:1.6rem">£0.00</div>
-    </div>
-    <div class="pill violet">
-      <div class="h">Available Income (Included - Expenses)</div>
-      <div id="ovw-available" style="font-weight:900; font-size:1.6rem">£0.00</div>
-    </div>
-    <div class="pill red">
-      <div class="h">Expenses</div>
-      <div id="ovw-exp" style="font-weight:900; font-size:1.6rem">£0.00</div>
-    </div>
-    <div class="row" style="margin-top:14px">
-      <button class="btn gray" id="logout3">Logout</button>
-    </div>
-  </section>
-
-  <div class="footer" id="foot">Synced via Firebase. Cached offline; <b id="reads">0</b> reads on refresh.</div>
+  <!-- Bottom tab bar (kept) -->
+  <nav class="tabbar" role="tablist" aria-label="Bottom Navigation">
+    <button class="tabbtn active" data-tab="incomes" aria-selected="true">Incomes</button>
+    <button class="tabbtn" data-tab="expenses" aria-selected="false">Expenses</button>
+    <button class="tabbtn" data-tab="overview" aria-selected="false">Overview</button>
+  </nav>
 </div>
 
-<!-- EDIT MODAL -->
+<!-- EDIT MODAL (plain white) -->
 <dialog id="editModal">
-  <form method="dialog" class="modal" id="editForm">
-    <h2 id="editTitle">Edit Item</h2>
-    <div class="field">
-      <label class="small" for="edit-name">Name</label>
-      <input id="edit-name" type="text" required>
-    </div>
-    <div class="field" style="margin-top:10px">
-      <label class="small" for="edit-amt">Amount</label>
-      <input id="edit-amt" type="number" step="0.01" min="0" required>
-    </div>
-    <div class="switch">
-      <input id="edit-include" type="checkbox">
-      <label for="edit-include">Include in available income</label>
-    </div>
-    <div class="actions">
-      <button class="btn primary" value="save">Save</button>
-      <button class="btn gray" value="cancel">Cancel</button>
-    </div>
-  </form>
-</dialog>
-
-<!-- LOGIN / REGISTER MODAL -->
-<dialog id="loginModal">
   <div class="modal">
-    <h2 id="loginTitle">Ventsharm Budget Login</h2>
-    <div class="field">
-      <label class="small" for="email">Email</label>
-      <input id="email" type="email" autocomplete="email" required>
+    <h3 id="editTitle">Edit Item</h3>
+    <div class="row">
+      <div>
+        <label for="edit-name">Name</label>
+        <input id="edit-name" type="text" required />
+      </div>
+      <div>
+        <label for="edit-amt">Amount</label>
+        <input id="edit-amt" type="number" min="0" step="0.01" required />
+      </div>
     </div>
-    <div class="field" style="margin-top:10px">
-      <label class="small" for="pass">Password</label>
-      <input id="pass" type="password" autocomplete="current-password" required>
+    <div class="divider"></div>
+    <div id="edit-include-wrap" class="center-row">
+      <label for="edit-include" style="margin-right:6px">Include in available income</label>
+      <input id="edit-include" type="checkbox" />
     </div>
     <div class="actions">
-      <button class="btn primary" id="btnLogin">Login</button>
-      <button class="btn blue" id="btnRegister">Register</button>
-      <button class="btn gray" id="btnForgot" type="button">Forgot Password</button>
-      <button class="btn gray" id="btnResend" type="button">Resend Verify</button>
-      <button class="btn" id="btnCloseLogin" type="button">Close</button>
+      <button id="edit-save" class="btn">Save</button>
+      <button id="edit-cancel" class="btn">Cancel</button>
     </div>
-    <p id="authMsg" style="margin-top:8px; color:#0f766e"></p>
   </div>
 </dialog>
 
-<!-- Firebase SDKs -->
+<!-- AUTH MODAL (dark glass with tab toggles, but buttons styled white) -->
+<dialog id="authModal">
+  <div class="modal">
+    <h3 style="text-align:center; color:#111; margin-bottom:6px">Sign in to Budget Planner</h3>
+    <div class="center-row" style="justify-content:center; margin-bottom:10px">
+      <button class="btn sm" data-auth="login">Login</button>
+      <button class="btn sm" data-auth="register">Register</button>
+      <button class="btn sm" data-auth="forgot">Forgot</button>
+    </div>
+
+    <!-- Login -->
+    <div id="auth-login" class="auth-view">
+      <div class="row">
+        <div>
+          <label for="login-email">Email</label>
+          <input id="login-email" type="email" autocomplete="email" />
+        </div>
+        <div>
+          <label for="login-pass">Password</label>
+          <input id="login-pass" type="password" autocomplete="current-password" />
+        </div>
+      </div>
+      <div class="actions">
+        <button id="do-login" class="btn">Login</button>
+        <button id="close-auth" class="btn">Close</button>
+      </div>
+      <p id="auth-msg" class="note" style="display:none"></p>
+    </div>
+
+    <!-- Register -->
+    <div id="auth-register" class="auth-view" style="display:none">
+      <div class="row">
+        <div>
+          <label for="reg-email">Email</label>
+          <input id="reg-email" type="email" autocomplete="email" />
+        </div>
+        <div>
+          <label for="reg-pass">Password (min 6)</label>
+          <input id="reg-pass" type="password" autocomplete="new-password" />
+        </div>
+      </div>
+      <div class="actions">
+        <button id="do-register" class="btn">Create Account</button>
+        <button id="close-auth-2" class="btn">Close</button>
+      </div>
+    </div>
+
+    <!-- Forgot -->
+    <div id="auth-forgot" class="auth-view" style="display:none">
+      <div class="row">
+        <div>
+          <label for="rst-email">Email for reset link</label>
+          <input id="rst-email" type="email" autocomplete="email" />
+        </div>
+        <div style="align-self:end">
+          <button id="do-reset" class="btn">Send Reset</button>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="close-auth-3" class="btn">Close</button>
+      </div>
+    </div>
+  </div>
+</dialog><!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
 
 <script>
-/* ========== Firebase setup ========== */
+/* ========= Helpers ========= */
+const $ = sel => document.querySelector(sel);
+const fmt = n => "£" + (Number(n||0)).toFixed(2);
+
+/* ========= Firebase init ========= */
 const firebaseConfig = {
   apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
   authDomain: "budget-app-283de.firebaseapp.com",
@@ -230,263 +315,334 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 firebase.firestore().enablePersistence({synchronizeTabs:true}).catch(()=>{});
 
-/* ========== DOM helpers ========== */
-const $ = sel => document.querySelector(sel);
-const fmt = n => "£" + (Number(n||0)).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2});
-const readsEl = $("#reads"); let reads = 0;
-const statusEl = $("#status");
-const authBar = $("#auth-bar");
-const tabs = $("#tabs");
-const panels = {
-  inc: $("#panel-inc"),
-  exp: $("#panel-exp"),
-  ovw: $("#panel-ovw")
-};
-const openLoginBtn = $("#openLogin");
-const loginModal = $("#loginModal");
-const editModal = $("#editModal");
+/* ========= State ========= */
+let user = null;
+let state = { incomes: [], expenses: [] };
+const LCKEY = uid => `bp-cache:${uid}`;
 
-/* ========== State ========== */
-let currentUser = null;
-let items = { incomes: [], expenses: [] }; // local cache
-let editing = { type:null, id:null };
+/* ========= UI refs ========= */
+const userEmailEl   = $("#userEmail");
+const btnOpenAuth   = $("#btnOpenAuth");
+const btnLogout     = $("#btnLogout");
 
-/* ========== Tabs ========== */
-function showTab(key){
-  // aria states
-  $("#tab-inc").setAttribute("aria-selected", key==="inc");
-  $("#tab-exp").setAttribute("aria-selected", key==="exp");
-  $("#tab-ovw").setAttribute("aria-selected", key==="ovw");
-  panels.inc.hidden = key!=="inc";
-  panels.exp.hidden = key!=="exp";
-  panels.ovw.hidden = key!=="ovw";
+const tabbar        = document.querySelectorAll(".tabbtn");
+const viewIncomes   = $("#view-incomes");
+const viewExpenses  = $("#view-expenses");
+const viewOverview  = $("#view-overview");
+
+const incName       = $("#inc-name");
+const incAmt        = $("#inc-amt");
+const incInclude    = $("#inc-include");
+const addInc        = $("#add-inc");
+const incList       = $("#inc-list");
+const resetInc      = $("#reset-inc");
+
+const expName       = $("#exp-name");
+const expAmt        = $("#exp-amt");
+const addExp        = $("#add-exp");
+const expList       = $("#exp-list");
+const resetExp      = $("#reset-exp");
+
+const ovwTotal      = $("#ovw-total");
+const ovwAvail      = $("#ovw-available");
+const ovwExp        = $("#ovw-exp");
+
+/* Modals */
+const authModal     = $("#authModal");
+const editModal     = $("#editModal");
+const authViews     = document.querySelectorAll(".auth-view");
+const authTabs      = document.querySelectorAll('[data-auth]');
+const authMsg       = $("#auth-msg");
+
+/* Auth fields */
+const loginEmail    = $("#login-email");
+const loginPass     = $("#login-pass");
+const regEmail      = $("#reg-email");
+const regPass       = $("#reg-pass");
+const rstEmail      = $("#rst-email");
+
+/* Auth actions */
+const doLoginBtn    = $("#do-login");
+const doRegisterBtn = $("#do-register");
+const doResetBtn    = $("#do-reset");
+const closeAuthBtns = [$("#close-auth"), $("#close-auth-2"), $("#close-auth-3")];
+
+/* Edit modal fields */
+const editTitle     = $("#editTitle");
+const editName      = $("#edit-name");
+const editAmount    = $("#edit-amt");
+const editInclude   = $("#edit-include");
+const editIncWrap   = $("#edit-include-wrap");
+const editSave      = $("#edit-save");
+const editCancel    = $("#edit-cancel");
+
+let editingRef = { type:null, id:null };
+
+/* ========= Navigation ========= */
+function showTab(which){
+  tabbar.forEach(b=>{
+    const active = b.dataset.tab === which;
+    b.classList.toggle("active", active);
+    b.setAttribute("aria-selected", active);
+  });
+  viewIncomes.style.display  = (which==="incomes" ? "" : "none");
+  viewExpenses.style.display = (which==="expenses"? "" : "none");
+  viewOverview.style.display = (which==="overview"? "" : "none");
 }
-$("#tab-inc").onclick=()=>showTab("inc");
-$("#tab-exp").onclick=()=>showTab("exp");
-$("#tab-ovw").onclick=()=>showTab("ovw");
+tabbar.forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
 
-/* ========== Rendering ========== */
-function renderLists(){
-  // INCOMES
-  const incList = $("#inc-list"); incList.innerHTML="";
-  items.incomes.forEach(doc=>{
-    const row = document.createElement("div");
-    row.className="item";
-    row.innerHTML = `
-      <input type="checkbox" class="check-readonly" ${doc.include?'checked':''} aria-label="Included">
-      <div>
-        <div class="title">${doc.title}</div>
+/* ========= Auth modal logic ========= */
+function showAuth(view="login"){
+  authViews.forEach(v=>v.style.display="none");
+  $("#auth-"+view).style.display = "block";
+  authMsg.textContent = ""; authMsg.style.display = "none";
+  authModal.showModal();
+}
+authTabs.forEach(t=>{
+  t.addEventListener("click", ()=>{
+    const which = t.dataset.auth;
+    showAuth(which);
+  });
+});
+btnOpenAuth.addEventListener("click", ()=>showAuth("login"));
+closeAuthBtns.forEach(b=>b.addEventListener("click", ()=>authModal.close()));
+
+/* ========= Auth actions ========= */
+doRegisterBtn.addEventListener("click", async ()=>{
+  try{
+    const e = regEmail.value.trim();
+    const p = regPass.value;
+    if(!e || !p) return alert("Enter email and password.");
+    const cred = await auth.createUserWithEmailAndPassword(e,p);
+    await cred.user.sendEmailVerification();
+    alert("✅ Please verify your email before logging in.");
+    showAuth("login");
+  }catch(err){ alert(err.message); }
+});
+doLoginBtn.addEventListener("click", async ()=>{
+  try{
+    const e = loginEmail.value.trim();
+    const p = loginPass.value;
+    if(!e || !p) return alert("Enter email and password.");
+    const cred = await auth.signInWithEmailAndPassword(e,p);
+    if(!cred.user.emailVerified){
+      alert("Please verify your email first, then log in.");
+      await auth.signOut();
+      return;
+    }
+    authModal.close();
+  }catch(err){ alert(err.message); }
+});
+doResetBtn.addEventListener("click", async ()=>{
+  try{
+    const e = rstEmail.value.trim();
+    if(!e) return alert("Enter your email.");
+    await auth.sendPasswordResetEmail(e);
+    alert("Password reset email sent.");
+  }catch(err){ alert(err.message); }
+});
+
+btnLogout.addEventListener("click", async ()=>{ await auth.signOut(); });
+
+/* ========= Local cache ========= */
+function readCache(uid){
+  try{ return JSON.parse(localStorage.getItem(LCKEY(uid)) || '{"incomes":[],"expenses":[]}'); }
+  catch { return {incomes:[],expenses:[]}; }
+}
+function writeCache(uid, data){
+  localStorage.setItem(LCKEY(uid), JSON.stringify(data));
+}
+
+/* ========= Firestore (lazy) ========= */
+function userBase(uid){ return db.collection("users").doc(uid); }
+async function pullOnce(){
+  if(!user) return;
+  const incSnap = await userBase(user.uid).collection("incomes").get();
+  const expSnap = await userBase(user.uid).collection("expenses").get();
+  state.incomes = incSnap.docs.map(d=>({id:d.id, ...d.data()}));
+  state.expenses= expSnap.docs.map(d=>({id:d.id, ...d.data()}));
+  writeCache(user.uid, state);
+  renderAll();
+}
+function addDoc(type, data){
+  const id = db.collection("_").doc().id;
+  state[type].push({ id, ...data });
+  renderAll();
+  writeCache(user.uid, state);
+  userBase(user.uid).collection(type).doc(id).set(data).catch(console.warn);
+}
+function updateDocFS(type, id, patch){
+  const i = state[type].findIndex(x=>x.id===id);
+  if(i>-1){ state[type][i] = {...state[type][i], ...patch}; }
+  renderAll();
+  writeCache(user.uid, state);
+  userBase(user.uid).collection(type).doc(id).update(patch).catch(console.warn);
+}
+function deleteDocFS(type, id){
+  state[type] = state[type].filter(x=>x.id!==id);
+  renderAll();
+  writeCache(user.uid, state);
+  userBase(user.uid).collection(type).doc(id).delete().catch(console.warn);
+}
+
+/* ========= Renderers ========= */
+function renderAll(){
+  // Lists
+  incList.innerHTML = "";
+  state.incomes.forEach(doc=>{
+    const li = document.createElement("div");
+    li.className = "item";
+    li.innerHTML = `
+      <div class="item_head" data-type="incomes" data-id="${doc.id}">
+        <div class="include-pill ${doc.include?'include-yes':'include-no'}">${doc.include?'✅':'❌'}</div>
+        <div class="item_title">${doc.title}</div>
+        <div class="item_amount">${fmt(doc.amount)}</div>
       </div>
-      <div class="amount">${fmt(doc.amount)}</div>
-      <div class="row" style="gap:8px">
-        <button class="btn blue" data-edit="${doc.id}" data-type="incomes">Edit</button>
-        <button class="btn red" data-del="${doc.id}" data-type="incomes">Delete</button>
-      </div>`;
-    incList.appendChild(row);
+      <div class="item_actions">
+        <button class="btn" data-act="edit" data-type="incomes" data-id="${doc.id}">Edit</button>
+        <button class="btn" data-act="del"  data-type="incomes" data-id="${doc.id}">Delete</button>
+      </div>
+    `;
+    incList.appendChild(li);
   });
 
-  // EXPENSES
-  const expList = $("#exp-list"); expList.innerHTML="";
-  items.expenses.forEach(doc=>{
-    const row = document.createElement("div");
-    row.className="item";
-    row.innerHTML = `
-      <input type="checkbox" class="check-readonly" checked aria-label="Expense" style="opacity:.35">
-      <div>
-        <div class="title">${doc.title}</div>
+  expList.innerHTML = "";
+  state.expenses.forEach(doc=>{
+    const li = document.createElement("div");
+    li.className = "item";
+    li.innerHTML = `
+      <div class="item_head" data-type="expenses" data-id="${doc.id}">
+        <div class="include-pill include-yes" style="opacity:.35">•</div>
+        <div class="item_title">${doc.title}</div>
+        <div class="item_amount">${fmt(doc.amount)}</div>
       </div>
-      <div class="amount">${fmt(doc.amount)}</div>
-      <div class="row" style="gap:8px">
-        <button class="btn blue" data-edit="${doc.id}" data-type="expenses">Edit</button>
-        <button class="btn red" data-del="${doc.id}" data-type="expenses">Delete</button>
-      </div>`;
-    expList.appendChild(row);
+      <div class="item_actions">
+        <button class="btn" data-act="edit" data-type="expenses" data-id="${doc.id}">Edit</button>
+        <button class="btn" data-act="del"  data-type="expenses" data-id="${doc.id}">Delete</button>
+      </div>
+    `;
+    expList.appendChild(li);
   });
 
   // Overview
-  const totalIncomeAll = items.incomes.reduce((s,x)=>s+Number(x.amount||0),0);
-  const totalIncomeIncluded = items.incomes.filter(x=>x.include).reduce((s,x)=>s+Number(x.amount||0),0);
-  const totalExpenses = items.expenses.reduce((s,x)=>s+Number(x.amount||0),0);
-  $("#ovw-total").textContent = fmt(totalIncomeAll);
-  $("#ovw-available").textContent = fmt(totalIncomeIncluded - totalExpenses);
-  $("#ovw-exp").textContent = fmt(totalExpenses);
+  const totalIncomeAll = state.incomes.reduce((s,x)=>s+Number(x.amount||0),0);
+  const totalIncomeInc = state.incomes.filter(x=>x.include).reduce((s,x)=>s+Number(x.amount||0),0);
+  const totalExp       = state.expenses.reduce((s,x)=>s+Number(x.amount||0),0);
+  ovwTotal.textContent = fmt(totalIncomeAll);
+  ovwAvail.textContent = fmt(totalIncomeInc - totalExp);
+  ovwExp.textContent   = fmt(totalExp);
+
+  // Hook up expand/reveal
+  hookListInteractions();
 }
 
-function setSignedInUI(emailVerified){
-  statusEl.textContent = currentUser ? (currentUser.email + (emailVerified ? "" : " (verify email)")) : "Signed out";
-  authBar.style.display = "none";
-  tabs.hidden = false;
-  showTab("inc");
-  renderLists();
-}
-function setSignedOutUI(){
-  statusEl.textContent = "Signed out";
-  tabs.hidden = true;
-  panels.inc.hidden = panels.exp.hidden = panels.ovw.hidden = true;
-  authBar.style.display = "flex";
+function hookListInteractions(){
+  // Toggle show actions on item tap
+  document.querySelectorAll(".item").forEach(row=>{
+    const head = row.querySelector(".item_head");
+    head.onclick = ()=> row.classList.toggle("show");
+  });
+
+  // Edit / Delete buttons (event delegation)
+  document.querySelectorAll(".item_actions .btn").forEach(btn=>{
+    btn.onclick = ()=>{
+      const act  = btn.dataset.act;
+      const type = btn.dataset.type;
+      const id   = btn.dataset.id;
+      if(act==="edit") openEdit(type,id);
+      if(act==="del"){
+        if(confirm("Delete this item?")) deleteDocFS(type,id);
+      }
+    };
+  });
 }
 
-/* ========== Local cache helpers ========== */
-const LS_KEY = "bp-cache-v1";
-function saveCache(){
-  if(!currentUser) return;
-  const key = LS_KEY + ":" + currentUser.uid;
-  localStorage.setItem(key, JSON.stringify(items));
-}
-function loadCache(uid){
-  const key = LS_KEY + ":" + uid;
-  try { return JSON.parse(localStorage.getItem(key) || '{"incomes":[],"expenses":[]}'); }
-  catch { return {incomes:[],expenses:[]}; }
-}
-
-/* ========== Firestore operations (lazy) ========== */
-async function fetchAll(){
-  if(!currentUser) return;
-  reads++;
-  readsEl.textContent = reads;
-  const base = db.collection("users").doc(currentUser.uid);
-  const incSnap = await base.collection("incomes").get();
-  const expSnap = await base.collection("expenses").get();
-  items.incomes = incSnap.docs.map(d=>({id:d.id, ...d.data()}));
-  items.expenses = expSnap.docs.map(d=>({id:d.id, ...d.data()}));
-  saveCache(); renderLists();
-}
-function addItem(type, data){
-  const id = db.collection("_").doc().id;
-  const doc = { id, ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
-  items[type].push(doc);
-  renderLists(); saveCache();
-  if(currentUser){
-    db.collection("users").doc(currentUser.uid).collection(type).doc(id).set(data).catch(console.warn);
+/* ========= Edit modal ========= */
+function openEdit(type, id){
+  const arr = state[type];
+  const obj = arr.find(x=>x.id===id); if(!obj) return;
+  editingRef = { type, id };
+  editTitle.textContent = type==="incomes" ? "Edit Income" : "Edit Expense";
+  editName.value   = obj.title;
+  editAmount.value = obj.amount;
+  if(type==="incomes"){
+    editIncWrap.style.display = "flex";
+    editInclude.checked = !!obj.include;
+  }else{
+    editIncWrap.style.display = "none";
   }
+  editModal.showModal();
 }
-function updateItem(type, id, patch){
-  const idx = items[type].findIndex(x=>x.id===id);
-  if(idx>-1){ items[type][idx] = {...items[type][idx], ...patch}; }
-  renderLists(); saveCache();
-  if(currentUser){
-    db.collection("users").doc(currentUser.uid).collection(type).doc(id).update(patch).catch(console.warn);
-  }
-}
-function deleteItem(type, id){
-  items[type] = items[type].filter(x=>x.id!==id);
-  renderLists(); saveCache();
-  if(currentUser){
-    db.collection("users").doc(currentUser.uid).collection(type).doc(id).delete().catch(console.warn);
-  }
-}
-
-/* ========== Add / Edit / Delete handlers ========== */
-$("#add-inc").onclick = ()=>{
-  const title = $("#inc-name").value.trim();
-  const amount = parseFloat($("#inc-amt").value);
-  const include = $("#inc-include").checked;
-  if(!title || isNaN(amount)) return alert("Enter a name and amount.");
-  addItem("incomes", {title, amount, include});
-  $("#inc-name").value=""; $("#inc-amt").value=""; $("#inc-include").checked=true;
-};
-
-$("#add-exp").onclick = ()=>{
-  const title = $("#exp-name").value.trim();
-  const amount = parseFloat($("#exp-amt").value);
-  if(!title || isNaN(amount)) return alert("Enter a name and amount.");
-  addItem("expenses", {title, amount});
-  $("#exp-name").value=""; $("#exp-amt").value="";
-};
-
-$("#reset-inc").onclick = ()=>{$("#inc-name").value=""; $("#inc-amt").value=""; $("#inc-include").checked=false;};
-$("#reset-exp").onclick = ()=>{$("#exp-name").value=""; $("#exp-amt").value="";};
-
-$("#inc-list").addEventListener("click", (e)=>{
-  const btn = e.target.closest("button"); if(!btn) return;
-  const type = btn.dataset.type;
-  const id = btn.dataset.edit || btn.dataset.del;
-  if(btn.dataset.edit){
-    const doc = items[type].find(x=>x.id===id);
-    editing = { type, id };
-    $("#editTitle").textContent = type==="incomes" ? "Edit Income" : "Edit Expense";
-    $("#edit-name").value = doc.title;
-    $("#edit-amt").value = doc.amount;
-    // only incomes have 'include'
-    $("#edit-include").parentElement.style.display = type==="incomes" ? "flex" : "none";
-    $("#edit-include").checked = !!doc.include;
-    editModal.showModal();
-  }else if(btn.dataset.del){
-    if(confirm("Delete this item?")) deleteItem(type, id);
-  }
+editCancel.addEventListener("click", ()=>editModal.close());
+editSave.addEventListener("click", ()=>{
+  const name = editName.value.trim();
+  const amt  = parseFloat(editAmount.value);
+  if(!name || !isFinite(amt)) return alert("Enter a valid name and amount.");
+  const patch = { title:name, amount:amt };
+  if(editingRef.type==="incomes") patch.include = !!editInclude.checked;
+  updateDocFS(editingRef.type, editingRef.id, patch);
+  editModal.close();
 });
 
-$("#exp-list").addEventListener("click", (e)=>$("#inc-list").dispatchEvent(new Event("click"))); // delegate to same logic
-
-editModal.addEventListener("close", ()=>{
-  if(editModal.returnValue === "save"){
-    const name = $("#edit-name").value.trim();
-    const amt  = parseFloat($("#edit-amt").value);
-    if(!name || isNaN(amt)) return;
-    const patch = { title:name, amount:amt };
-    if(editing.type==="incomes") patch.include = $("#edit-include").checked;
-    updateItem(editing.type, editing.id, patch);
-  }
+/* ========= Add / Reset ========= */
+addInc.addEventListener("click", ()=>{
+  const title = incName.value.trim();
+  const amount= parseFloat(incAmt.value);
+  const include = !!incInclude.checked;
+  if(!title || !isFinite(amount)) return alert("Enter a valid name and amount.");
+  addDoc("incomes", { title, amount, include });
+  incName.value=""; incAmt.value=""; incInclude.checked=false;
+});
+resetInc.addEventListener("click", ()=>{
+  incName.value=""; incAmt.value=""; incInclude.checked=false;
 });
 
-/* ========== Auth (login/register/forgot/verify) ========== */
-openLoginBtn.onclick = ()=> loginModal.showModal();
-$("#btnCloseLogin").onclick = ()=> loginModal.close();
+addExp.addEventListener("click", ()=>{
+  const title = expName.value.trim();
+  const amount= parseFloat(expAmt.value);
+  if(!title || !isFinite(amount)) return alert("Enter a valid name and amount.");
+  addDoc("expenses", { title, amount });
+  expName.value=""; expAmt.value="";
+});
+resetExp.addEventListener("click", ()=>{
+  expName.value=""; expAmt.value="";
+});
 
-$("#btnLogin").onclick = async ()=>{
-  const email = $("#email").value.trim(), pass = $("#pass").value;
-  try{
-    const r = await auth.signInWithEmailAndPassword(email, pass);
-    $("#authMsg").textContent = r.user.emailVerified ? "Logged in." : "Logged in — please verify your email.";
-  }catch(e){ alert(e.message); }
-};
-
-$("#btnRegister").onclick = async ()=>{
-  const email = $("#email").value.trim(), pass = $("#pass").value;
-  try{
-    const r = await auth.createUserWithEmailAndPassword(email, pass);
-    await r.user.sendEmailVerification();
-    $("#authMsg").textContent = "Registered. Verification email sent — please verify then re-login.";
-  }catch(e){ alert(e.message); }
-};
-
-$("#btnForgot").onclick = async ()=>{
-  const email = $("#email").value.trim();
-  if(!email) return alert("Enter your email first.");
-  try{ await auth.sendPasswordResetEmail(email); $("#authMsg").textContent="Password reset email sent."; }
-  catch(e){ alert(e.message); }
-};
-$("#btnResend").onclick = async ()=>{
-  if(auth.currentUser){ await auth.currentUser.sendEmailVerification(); $("#authMsg").textContent="Verification email re-sent."; }
-  else alert("Log in first, then tap Resend Verify.");
-};
-
-$("#logout1").onclick = $("#logout2").onclick = $("#logout3").onclick = async ()=>{ await auth.signOut(); };
-
-/* ========== Auth state ========== */
+/* ========= Auth state ========= */
 auth.onAuthStateChanged(async (u)=>{
-  currentUser = u;
+  user = u;
   if(!u){
-    setSignedOutUI();
-    loginModal.showModal();
+    userEmailEl.textContent = "Signed out";
+    btnOpenAuth.style.display = "";
+    btnLogout.style.display   = "none";
+    showAuth("login");
+    // Hide app views until login
+    showTab("incomes"); // default
     return;
   }
   if(!u.emailVerified){
-    setSignedInUI(false);
-    loginModal.showModal();
-    $("#authMsg").textContent = "Please verify your email to continue.";
+    userEmailEl.textContent = `${u.email} (verify)`;
+    btnOpenAuth.style.display = "";
+    btnLogout.style.display   = "none";
+    showAuth("login");
     return;
   }
-  // load cache instantly, then lazy-fetch Firestore once
-  items = loadCache(u.uid);
-  setSignedInUI(true);
-  renderLists();
-  if((items.incomes.length===0 && items.expenses.length===0) || !localStorage.getItem(LS_KEY+":"+u.uid)){
-    await fetchAll(); // first time
-  }else{
-    // lazy check Firestore after first write; here we skip to honor "0 reads on refresh"
-    // (You can force a sync by uncommenting the next line)
-    // await fetchAll();
+  // Signed-in + verified
+  userEmailEl.textContent = u.email || "Account";
+  btnOpenAuth.style.display = "none";
+  btnLogout.style.display   = "";
+
+  // Load from cache immediately
+  state = readCache(u.uid);
+  if(!state.incomes) state = { incomes:[], expenses:[] };
+  renderAll();
+
+  // Lazy pull once from Firestore (first login of session); 0 reads on refresh if cached is present
+  if(!localStorage.getItem(LCKEY(u.uid))){
+    await pullOnce();
+  } else {
+    // Optional: refresh cloud silently after first interaction
+    // await pullOnce();
   }
 });
 </script>
