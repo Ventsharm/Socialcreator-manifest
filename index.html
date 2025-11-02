@@ -168,12 +168,10 @@
           status = $("#status");
 
     const MAX_SIZE = 8000;
-    const inchToPx = inch => inch * 96;       // normal image scaling
+    const inchToPx = inch => inch * 96;
     const cmToPx = cm => cm * 37.7953;
-    const inchToPdf = inch => inch * 72;      // correct jsPDF scale
-    const cmToPdf = cm => cm * 28.3465;
     const toPx = (val,u)=>!val?undefined:u==="in"?inchToPx(val):u==="cm"?cmToPx(val):val;
-    const toPdfPx = (val,u)=>!val?undefined:u==="in"?inchToPdf(val):u==="cm"?cmToPdf(val):val;
+    const toInch = (val,u)=>!val?undefined:u==="cm"?val/2.54:u==="px"?val/96:val;
 
     let convertCount = 1;
     let currentFile=null;
@@ -243,13 +241,8 @@
       const files=Array.from(filesEl.files||[]);
       if(!files.length){alert("Please choose a file.");return;}
       const fmt=formatEl.value, unit=unitsEl.value;
-      const isPDFOutput = fmt === "pdf";
-      const convertFunc = isPDFOutput ? toPdfPx : toPx;
-
-      let w=convertFunc(parseFloat(wEl.value),unit),
-          h=convertFunc(parseFloat(hEl.value),unit);
-
-      if(w>MAX_SIZE||h>MAX_SIZE){
+      let wVal=parseFloat(wEl.value), hVal=parseFloat(hEl.value);
+      if(wVal>MAX_SIZE||hVal>MAX_SIZE){
         error.textContent="Size too large. Try smaller values.";
         preview.insertAdjacentElement("beforebegin", error);
         return;
@@ -264,10 +257,12 @@
 
         if(isIMG && fmt==="pdf"){
           const img=await fileToImage(f);
-          const W=w||img.width, H=h||img.height;
-          const doc=new jsPDF({unit:"px",format:[W,H]});
-          const cnv=await imageToCanvas(img,W,H);
-          doc.addImage(cnv.toDataURL("image/jpeg",0.92),"JPEG",0,0,W,H);
+          // Convert entered units to inches for PDF format
+          const wIn=toInch(wVal||img.width,unit);
+          const hIn=toInch(hVal||img.height,unit);
+          const doc=new jsPDF({unit:"in", format:[wIn||img.width/96, hIn||img.height/96]});
+          const cnv=await imageToCanvas(img, inchToPx(wIn||img.width/96), inchToPx(hIn||img.height/96));
+          doc.addImage(cnv.toDataURL("image/jpeg",0.92),"JPEG",0,0,wIn||img.width/96,hIn||img.height/96);
           downloadBlob(doc.output("blob"),`${base}${suffix}.pdf`);
 
         } else if(isPDF && fmt!=="pdf"){
@@ -286,7 +281,7 @@
 
         } else if(isIMG && fmt!=="pdf"){
           const img=await fileToImage(f);
-          const W=w||img.width, H=h||img.height;
+          const W=toPx(wVal,unit)||img.width, H=toPx(hVal,unit)||img.height;
           const cnv=await imageToCanvas(img,W,H);
           const blob=await new Promise(r=>cnv.toBlob(r,"image/"+fmt,0.92));
           downloadBlob(blob,`${base}${suffix}.${fmt}`);
