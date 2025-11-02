@@ -1,248 +1,420 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Ventsharm Budget</title>
-<link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#0d6efd">
-<link rel="icon" href="Icon-192.png">
+<link rel="icon" href="Icon-192.png" />
 <style>
-:root{
-  --bg:#f5f6f8;--card:#fff;--text:#111;--muted:#6b7280;
-  --b:#e5e7eb;--b2:#d1d5db;--pri:#0d6efd;--pri2:#00aaff;
-  --shadow:0 8px 24px rgba(0,0,0,.08);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
-  background:var(--bg);color:var(--text);
-  display:flex;justify-content:center;align-items:center;
-  min-height:100vh;padding:20px;
-}
-.card{
-  background:var(--card);
-  border-radius:22px;
-  box-shadow:var(--shadow);
-  padding:26px 22px;
-  width:100%;max-width:420px;
-  box-sizing:border-box;
-}
-h1{font-size:1.4rem;text-align:center;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px}
-h1 img{width:28px;height:28px}
-input,button,select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--b);font-size:1rem;margin-top:10px}
-button{cursor:pointer;font-weight:600}
-.primary{background:linear-gradient(90deg,var(--pri),var(--pri2));color:#fff;border:none}
-.gray{background:#f3f4f6}
-.hidden{display:none}
-.note{text-align:center;color:var(--muted);font-size:.9rem;margin-top:12px}
-.tabs{display:flex;gap:8px;margin-top:18px}
-.tab{flex:1;text-align:center;padding:10px;border:1px solid var(--b2);border-radius:12px;cursor:pointer;user-select:none;}
-.tab.active{background:#eef6ff;border-color:#b6dbff;color:#064d96}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.row{display:flex;gap:10px;margin-top:10px}
-.totals{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
-.totals .box{background:#f7f7f9;border:1px solid var(--b);border-radius:12px;padding:12px;text-align:center}
-.totals b{display:block;margin-top:4px}
-.item{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--b)}
-.item:last-child{border-bottom:none}
-.modal-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;padding:14px;z-index:30}
-.modal{background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:16px;max-width:420px;width:100%}
+  :root { --bg:#f5f6f8; --card:#fff; --text:#1b1b1f; --muted:#6b7280; --blue:#0d6efd; --blue2:#00b2ff; --border:#e5e7eb; }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:var(--bg)}
+  .wrap{display:flex;align-items:flex-start;justify-content:center;padding:28px 12px}
+  .card{width:100%;max-width:760px;background:var(--card);border-radius:22px;box-shadow:0 10px 26px rgba(0,0,0,.08);padding:20px}
+  .header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .logo{width:28px;height:28px;border-radius:6px}
+  .title{font-size:1.7rem;font-weight:800;line-height:1.1}
+  .spacer{flex:1}
+  .btn{appearance:none;border:0;border-radius:14px;padding:10px 16px;font-weight:700;cursor:pointer}
+  .btn-blue{background:linear-gradient(90deg,var(--blue),var(--blue2));color:#fff}
+  .btn-ghost{background:#f3f4f6;color:#111;border:1px solid #e5e7eb}
+  .tabs{display:flex;gap:10px;margin:10px 0 14px}
+  .tab{flex:0 0 auto;padding:10px 16px;border:1px solid var(--border);background:#fff;border-radius:12px;font-weight:700;color:#111;cursor:pointer}
+  .tab.active{border-color:#cfe1ff;background:#f3f8ff;color:#0b57d0;box-shadow:0 0 0 3px rgba(13,110,253,.12)}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .select,.input{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:12px;font-size:16px;background:#fff}
+  .row{display:flex;gap:10px;align-items:center;margin-top:10px}
+  .pill{border:1px solid var(--border);border-radius:16px;padding:12px 14px;min-width:140px;text-align:center;background:#fff}
+  .pill h4{margin:0 0 6px 0;font-size:.95rem;color:#111}
+  .pill p{margin:0;font-size:1.15rem;font-weight:900}
+  .muted{color:var(--muted);font-size:.95rem;margin-top:12px;text-align:center}
+  hr{border:0;height:1px;background:var(--border);margin:16px 0}
+  .list{margin-top:10px}
+  .item{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:8px}
+  .chip{font-size:.85rem;color:#555;background:#f1f5f9;padding:4px 8px;border-radius:999px;border:1px solid #e5e7eb}
+  .actions{display:flex;gap:8px}
+  .link{background:#fff;border:1px solid var(--border);padding:8px 10px;border-radius:10px;cursor:pointer}
+  /* Modal */
+  .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:30}
+  .modal{width:100%;max-width:420px;background:#fff;border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.22);padding:18px}
+  .modal h3{margin:0 0 12px 0}
+  .modal .row{margin-top:8px}
+  /* Login modal */
+  .auth-wrap{display:none}
+  .auth-title{margin:6px 0 12px 0;font-size:1.25rem;font-weight:800}
+  .auth-links{display:flex;gap:10px;margin-top:8px}
+  .err{color:#c30000;margin-top:8px;min-height:1.2em}
+  .ok{color:#128a12;margin-top:8px;min-height:1.2em}
+  @media(max-width:560px){ .grid-2{grid-template-columns:1fr} .spacer{display:none} }
 </style>
 </head>
 <body>
+<div class="wrap">
+  <div class="card" id="app">
+    <div class="header">
+      <img src="Icon-192.png" class="logo" alt="">
+      <div class="title">Ventsharm Budget</div>
+      <div class="spacer"></div>
+      <button class="btn btn-blue" id="loginBtn">Login / Register</button>
+      <button class="btn btn-ghost" id="logoutBtn" style="display:none">Logout</button>
+    </div>
 
-<!-- LOGIN CARD -->
-<div class="card" id="loginCard">
-  <h1><img src="Icon-192.png"> Ventsharm Budget</h1>
-  <input id="email" type="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button id="loginBtn" class="primary">Login / Register</button>
-  <button id="forgotBtn" class="gray">Forgot Password</button>
-  <button id="verifyBtn" class="gray hidden">Resend Verification</button>
-  <p class="note">Sign in or create an account to access your budget.</p>
+    <div class="tabs">
+      <button class="tab active" data-tab="incomes">Incomes</button>
+      <button class="tab" data-tab="expenses">Expenses</button>
+      <button class="tab" data-tab="overview">Overview</button>
+    </div>
+
+    <div id="formArea">
+      <div class="grid-2">
+        <input class="input" id="titleInput" placeholder="Title (e.g. Salary, Rent)" />
+        <input class="input" id="amountInput" placeholder="Amount" inputmode="decimal" />
+      </div>
+      <div class="row">
+        <select class="select" id="typeSelect">
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+        <button class="btn btn-blue" id="addBtn" style="min-width:100px">Add</button>
+        <button class="btn btn-ghost" id="resetLocalBtn">Reset (local)</button>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:14px">
+      <div class="pill"><h4>Income</h4><p id="sumIncome">£0.00</p></div>
+      <div class="pill"><h4>Expense</h4><p id="sumExpense">£0.00</p></div>
+      <div class="pill"><h4>Available</h4><p id="sumAvailable">£0.00</p></div>
+    </div>
+
+    <hr/>
+
+    <div id="tab-incomes" class="list"></div>
+    <div id="tab-expenses" class="list" style="display:none"></div>
+    <div id="tab-overview" style="display:none">
+      <p class="muted">Overview shows totals and lets you quickly toggle “include in available” on any item.</p>
+      <div id="overviewList" class="list"></div>
+    </div>
+
+    <p class="muted" id="footNote">
+      Synced via Firebase. Cached offline; <b>0 reads</b> on refresh.
+    </p>
+  </div>
 </div>
 
-<!-- MAIN APP CARD -->
-<div class="card hidden" id="appCard">
-  <div class="header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-    <h1 style="margin:0;display:flex;align-items:center;gap:8px"><img src="Icon-192.png"> Ventsharm Budget</h1>
-    <button id="logoutBtn" class="gray" style="width:auto">Logout</button>
-  </div>
-
-  <div class="tabs">
-    <div class="tab active" data-tab="inc">Incomes</div>
-    <div class="tab" data-tab="exp">Expenses</div>
-    <div class="tab" data-tab="ov">Overview</div>
-  </div>
-
-  <div class="grid2">
-    <input id="title" placeholder="Title (e.g. Salary, Rent)">
-    <input id="amount" type="number" placeholder="Amount">
-  </div>
-
-  <div class="row">
-    <select id="kind">
-      <option value="income">Income</option>
-      <option value="expense">Expense</option>
-    </select>
-    <button id="addBtn" class="primary" style="flex:1">Add</button>
-  </div>
-
-  <div class="totals">
-    <div class="box"><span class="muted">Income</span><b id="tInc">£0.00</b></div>
-    <div class="box"><span class="muted">Expense</span><b id="tExp">£0.00</b></div>
-    <div class="box"><span class="muted">Available</span><b id="tAvail">£0.00</b></div>
-  </div>
-
-  <div id="pane-inc" style="margin-top:10px"></div>
-  <div id="pane-exp" class="hidden" style="margin-top:10px"></div>
-  <div id="pane-ov" class="hidden note" style="margin-top:10px"></div>
-
-  <p class="note">Synced via Firebase. Cached offline; 0 reads on refresh.</p>
-</div>
-
-<!-- MODAL -->
-<div id="modalBack" class="modal-back">
+<!-- Edit Modal -->
+<div class="modal-back" id="editBack">
   <div class="modal">
-    <h3>Edit Entry</h3>
-    <input id="mTitleInput" placeholder="Title">
-    <input id="mAmountInput" type="number" placeholder="Amount" style="margin-top:10px">
-    <div class="row" style="margin-top:12px">
-      <button id="mSave" class="primary" style="flex:1">Save</button>
-      <button id="mDelete" class="gray">Delete</button>
-      <button id="mClose" class="gray">Close</button>
+    <h3>Edit item</h3>
+    <div class="grid-2">
+      <input class="input" id="editTitle" />
+      <input class="input" id="editAmount" inputmode="decimal" />
+    </div>
+    <div class="row">
+      <label class="chip"><input id="editInclude" type="checkbox" style="transform:translateY(2px);margin-right:6px"> Include in available</label>
+      <div class="spacer"></div>
+      <button class="btn btn-ghost" id="deleteBtn">Delete</button>
+      <button class="btn btn-blue" id="saveBtn">Save</button>
+      <button class="btn" id="cancelEdit">Cancel</button>
     </div>
   </div>
-</div><script type="module">
+</div>
+
+<!-- Auth Modal -->
+<div class="modal-back" id="authBack">
+  <div class="modal">
+    <div class="auth-wrap" id="authStep">
+      <div class="auth-title" id="authTitle">Login</div>
+      <input class="input" id="authEmail" placeholder="Email" autocomplete="email" />
+      <input class="input" id="authPass" placeholder="Password" type="password" autocomplete="current-password" style="margin-top:10px" />
+      <div class="row">
+        <button class="btn btn-blue" id="authDo">Login</button>
+        <button class="btn btn-ghost" id="authToRegister">Register</button>
+        <button class="btn" id="authCancel">Close</button>
+      </div>
+      <div class="auth-links">
+        <button class="link" id="authForgot">Forgot password?</button>
+        <button class="link" id="authVerify" style="display:none">Resend verification</button>
+      </div>
+      <div class="err" id="authErr"></div>
+      <div class="ok" id="authOk"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+/* ------------------------ Firebase (v10 modular) ------------------------ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-import { getAuth, setPersistence, browserLocalPersistence, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-const app = initializeApp({
-  apiKey:"AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
-  authDomain:"budget-app-283de.firebaseapp.com",
-  projectId:"budget-app-283de",
-  storageBucket:"budget-app-283de.firebasestorage.app",
-  messagingSenderId:"162369707369",
-  appId:"1:162369707369:web:3faa7f002f8ba22dc0f1f8"
+/* Your project (from your message) */
+const firebaseConfig = {
+  apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
+  authDomain: "budget-app-283de.firebaseapp.com",
+  projectId: "budget-app-283de",
+  storageBucket: "budget-app-283de.firebasestorage.app",
+  messagingSenderId: "162369707369",
+  appId: "1:162369707369:web:3faa7f002f8ba22dc0f1f8"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+/* ----------------------------- DOM helpers ----------------------------- */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const fmt = n => "£" + (Number(n||0)).toFixed(2);
+
+/* --------------------------- State & Caching --------------------------- */
+const LS_KEY = "vb-budget-v1";
+const state = {
+  user: null,
+  items: { incomes: [], expenses: [] }, // {id,title,amount,include:true}
+  activeTab: "incomes",
+  loadedFromServer: false,    // ensures 0 reads on refresh (lazy fetch on login)
+};
+
+function loadCache(){
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data && data.items) state.items = data.items;
+    }
+  } catch {}
+}
+function saveCache(){
+  localStorage.setItem(LS_KEY, JSON.stringify({ items: state.items }));
+}
+
+/* ------------------------------- UI logic ------------------------------ */
+function setAuthUI(){
+  const logged = !!state.user;
+  $("#loginBtn").style.display  = logged ? "none" : "";
+  $("#logoutBtn").style.display = logged ? "" : "none";
+  $("#footNote").innerHTML = logged
+    ? "Synced via Firebase. Cached offline; <b>0 reads</b> on refresh."
+    : "Local mode (not signed in). Data stays on this device.";
+}
+function setActiveTab(name){
+  state.activeTab = name;
+  $$(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab===name));
+  $("#tab-incomes").style.display  = name==="incomes" ? "" : "none";
+  $("#tab-expenses").style.display = name==="expenses"? "" : "none";
+  $("#tab-overview").style.display = name==="overview"? "" : "none";
+}
+function totals(){
+  const inc = state.items.incomes.filter(x=>x.include!==false).reduce((s,x)=>s+Number(x.amount||0),0);
+  const exp = state.items.expenses.filter(x=>x.include!==false).reduce((s,x)=>s+Number(x.amount||0),0);
+  $("#sumIncome").textContent   = fmt(inc);
+  $("#sumExpense").textContent  = fmt(exp);
+  $("#sumAvailable").textContent= fmt(inc-exp);
+}
+function renderLists(){
+  const domIn = $("#tab-incomes"), domEx = $("#tab-expenses"), ovr = $("#overviewList");
+  domIn.innerHTML = "";
+  domEx.innerHTML = "";
+  ovr.innerHTML   = "";
+  const paint = (wrap, arr, type) => {
+    if (!arr.length) { wrap.innerHTML = `<p class="muted">No ${type} yet.</p>`; return; }
+    arr.forEach(x=>{
+      const row=document.createElement("div");
+      row.className="item";
+      row.innerHTML = `
+        <div>
+          <div style="font-weight:700">${x.title}</div>
+          <div class="muted" style="margin-top:4px">
+            <span class="chip">${type}</span>
+            <span class="chip">${x.include===false?"Excluded":"Included"}</span>
+          </div>
+        </div>
+        <div style="font-weight:800">${fmt(x.amount)}</div>
+        <div class="actions">
+          <button class="link edit" data-id="${x.id}" data-type="${type}">Edit</button>
+        </div>`;
+      wrap.appendChild(row);
+
+      // overview mirror
+      const o=document.createElement("div");
+      o.className="item";
+      o.innerHTML=`
+        <div><div style="font-weight:700">${x.title}</div>
+        <div class="muted" style="margin-top:4px"><span class="chip">${type}</span></div></div>
+        <div style="font-weight:800">${fmt(x.amount)}</div>
+        <div class="actions"><button class="link edit" data-id="${x.id}" data-type="${type}">Edit</button></div>`;
+      ovr.appendChild(o);
+    });
+  };
+  paint(domIn, state.items.incomes, "income");
+  paint(domEx, state.items.expenses,"expense");
+  totals();
+}
+function uid(){ return Math.random().toString(36).slice(2,10); }
+
+/* ------------------------------ Edit modal ----------------------------- */
+let editCtx = null;
+function openEdit(type,id){
+  const arr = type==="income"? state.items.incomes : state.items.expenses;
+  const it  = arr.find(a=>a.id===id); if(!it) return;
+  editCtx = { type, id };
+  $("#editTitle").value   = it.title;
+  $("#editAmount").value  = it.amount;
+  $("#editInclude").checked= it.include!==false;
+  $("#editBack").style.display="flex";
+}
+function closeEdit(){ $("#editBack").style.display="none"; editCtx=null; }
+$("#cancelEdit").onclick=closeEdit;
+$("#deleteBtn").onclick=()=>{
+  if(!editCtx) return;
+  const arr = editCtx.type==="income"? state.items.incomes : state.items.expenses;
+  const i = arr.findIndex(x=>x.id===editCtx.id);
+  if(i>-1) arr.splice(i,1);
+  saveCache(); renderLists(); closeEdit(); lazySync();
+};
+$("#saveBtn").onclick=()=>{
+  if(!editCtx) return;
+  const arr = editCtx.type==="income"? state.items.incomes : state.items.expenses;
+  const it = arr.find(x=>x.id===editCtx.id);
+  if(!it) return;
+  it.title   = $("#editTitle").value.trim() || it.title;
+  it.amount  = parseFloat($("#editAmount").value)||0;
+  it.include = $("#editInclude").checked;
+  saveCache(); renderLists(); closeEdit(); lazySync();
+};
+$("#tab-incomes").addEventListener("click",e=>{
+  const b=e.target.closest(".edit"); if(b) openEdit(b.dataset.type,b.dataset.id);
+});
+$("#tab-expenses").addEventListener("click",e=>{
+  const b=e.target.closest(".edit"); if(b) openEdit(b.dataset.type,b.dataset.id);
+});
+$("#overviewList").addEventListener("click",e=>{
+  const b=e.target.closest(".edit"); if(b) openEdit(b.dataset.type,b.dataset.id);
 });
 
-const auth=getAuth(app); const db=getFirestore(app);
-await setPersistence(auth,browserLocalPersistence);
-
-const loginCard=document.getElementById("loginCard");
-const appCard=document.getElementById("appCard");
-const email=document.getElementById("email");
-const pass=document.getElementById("password");
-const loginBtn=document.getElementById("loginBtn");
-const forgotBtn=document.getElementById("forgotBtn");
-const verifyBtn=document.getElementById("verifyBtn");
-const logoutBtn=document.getElementById("logoutBtn");
-const LS="vb_cache_final";
-let cache=JSON.parse(localStorage.getItem(LS)||'{"entries":[],"uid":null}');
-let UID=cache.uid;function save(){localStorage.setItem(LS,JSON.stringify(cache));}
-function fmt(n){return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
-
-loginBtn.onclick=async()=>{
-  if(!email.value||!pass.value){alert("Enter email and password");return;}
+/* ------------------------------- Auth UI ------------------------------- */
+function showAuth(mode="login"){
+  $("#authBack").style.display="flex";
+  $("#authStep").style.display="block";
+  $("#authTitle").textContent = mode==="register" ? "Create account" : "Login";
+  $("#authDo").textContent    = mode==="register" ? "Register"      : "Login";
+  $("#authToRegister").textContent = mode==="register" ? "Back to Login" : "Register";
+  $("#authErr").textContent=""; $("#authOk").textContent="";
+  $("#authVerify").style.display="none";
+  $("#authBack").dataset.mode = mode;
+}
+function closeAuth(){ $("#authBack").style.display="none"; }
+$("#loginBtn").onclick = ()=> showAuth("login");
+$("#authCancel").onclick= closeAuth;
+$("#authToRegister").onclick=()=>{
+  const cur=$("#authBack").dataset.mode==="register"?"login":"register";
+  showAuth(cur);
+};
+$("#authForgot").onclick= async ()=>{
+  const email = $("#authEmail").value.trim();
+  $("#authErr").textContent=""; $("#authOk").textContent="";
+  if(!email){ $("#authErr").textContent="Enter your email first."; return; }
   try{
-    await signInWithEmailAndPassword(auth,email.value,pass.value);
-  }catch{
-    const u=await createUserWithEmailAndPassword(auth,email.value,pass.value);
-    await sendEmailVerification(u.user);
-    alert("Account created! Check your email for verification.");
-  }
+    await sendPasswordResetEmail(auth,email);
+    $("#authOk").textContent="Reset email sent.";
+  }catch(e){ $("#authErr").textContent=e.message; }
 };
-forgotBtn.onclick=async()=>{
-  if(!email.value)return alert("Enter your email first");
-  await sendPasswordResetEmail(auth,email.value);
-  alert("Password reset email sent!");
+$("#authDo").onclick= async ()=>{
+  const email=$("#authEmail").value.trim(), pass=$("#authPass").value;
+  $("#authErr").textContent=""; $("#authOk").textContent="";
+  try{
+    if($("#authBack").dataset.mode==="register"){
+      const cred=await createUserWithEmailAndPassword(auth,email,pass);
+      await sendEmailVerification(cred.user);
+      $("#authOk").textContent="Account created. Verification email sent.";
+      $("#authVerify").style.display="";
+    }else{
+      await signInWithEmailAndPassword(auth,email,pass);
+      closeAuth();
+    }
+  }catch(e){ $("#authErr").textContent=e.message; }
 };
-verifyBtn.onclick=async()=>{
-  if(auth.currentUser){await sendEmailVerification(auth.currentUser);alert("Verification email sent again!");}
+$("#authVerify").onclick= async ()=>{
+  if(auth.currentUser){ await sendEmailVerification(auth.currentUser); $("#authOk").textContent="Verification re-sent."; }
 };
-logoutBtn.onclick=()=>signOut(auth);
+$("#logoutBtn").onclick=()=>signOut(auth);
 
-onAuthStateChanged(auth,async u=>{
-  if(u && u.emailVerified){
-    UID=u.uid;cache.uid=UID;save();
-    loginCard.classList.add("hidden");
-    appCard.classList.remove("hidden");
-    const q=await getDocs(collection(db,"users",UID,"entries"));
-    cache.entries=q.docs.map(d=>d.data());save();render();
-  }else{
-    UID=null;cache.uid=null;save();
-    loginCard.classList.remove("hidden");
-    appCard.classList.add("hidden");
-    verifyBtn.classList.toggle("hidden",!u);
+/* --------------------------- Add / Reset (UI) -------------------------- */
+$("#addBtn").onclick=()=>{
+  const title=$("#titleInput").value.trim();
+  const amt=parseFloat($("#amountInput").value);
+  const type=$("#typeSelect").value; // income | expense
+  if(!title || isNaN(amt)) return;
+  const entry={ id:uid(), title, amount:amt, include:true };
+  (type==="income"? state.items.incomes:state.items.expenses).push(entry);
+  $("#titleInput").value=""; $("#amountInput").value="";
+  saveCache(); renderLists(); lazySync();
+};
+$("#resetLocalBtn").onclick=()=>{
+  state.items={ incomes:[], expenses:[] };
+  saveCache(); renderLists(); lazySync();
+};
+
+/* -------------------------- Tabs & boot render ------------------------- */
+$$(".tab").forEach(t=>t.onclick=()=> setActiveTab(t.dataset.tab));
+
+/* -------------------------- Firestore sync logic ----------------------- */
+/* 0 reads on refresh:
+   - We render from localStorage.
+   - On login, we do ONE read (getDoc) to hydrate.
+   - After that, writes overwrite the doc; reads only re-run if the user refreshes & logs in again. */
+async function lazySync(){
+  if(!state.user) return; // local only
+  const ref = doc(db,"budgets",state.user.uid);
+  try{
+    await setDoc(ref, state.items, { merge:false });
+  }catch(e){ /* ignore offline errors; next write will fix */ }
+}
+
+async function fetchOnceIfNeeded(){
+  if(!state.user || state.loadedFromServer) return;
+  try{
+    const ref = doc(db,"budgets",state.user.uid);
+    const sp = await getDoc(ref); // ← exactly one read after login
+    if(sp.exists()){
+      // prefer server only if local is empty
+      const server = sp.data();
+      const localEmpty = !state.items.incomes.length && !state.items.expenses.length;
+      if(localEmpty) state.items = server;
+      saveCache();
+    }else{
+      await setDoc(ref, state.items, { merge:false });
+    }
+  }catch(e){/* offline → keep local */}
+  state.loadedFromServer = true;
+  renderLists();
+}
+
+/* ------------------------------ Auth watch ---------------------------- */
+onAuthStateChanged(auth, (u)=>{
+  state.user = u || null;
+  setAuthUI();
+  // if logged in and email not verified, still allow, but nudge:
+  if(u && !u.emailVerified){
+    $("#footNote").innerHTML = `Logged in (email not verified). <button class="link" id="resendInFoot">Resend verification</button>`;
+    $("#resendInFoot").onclick = async ()=>{ try{ await sendEmailVerification(auth.currentUser); }catch{} };
+  } else if(!u){
+    $("#footNote").innerHTML = "Local mode (not signed in). Data stays on this device.";
+  } else {
+    $("#footNote").innerHTML = "Synced via Firebase. Cached offline; <b>0 reads</b> on refresh.";
   }
+  fetchOnceIfNeeded();
 });
 
-const panes={inc:document.getElementById("pane-inc"),exp:document.getElementById("pane-exp"),ov:document.getElementById("pane-ov")};
-function setTab(id){
-  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===id));
-  Object.values(panes).forEach(p=>p.classList.add("hidden"));
-  panes[id].classList.remove("hidden");
+/* ------------------------------- Service worker ----------------------- */
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("./service-worker.js").catch(()=>{});
 }
-document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>setTab(t.dataset.tab));
-setTab("inc");
 
-const tInc=document.getElementById("tInc"),tExp=document.getElementById("tExp"),tAvail=document.getElementById("tAvail");
-function render(){
-  panes.inc.innerHTML="";panes.exp.innerHTML="";
-  cache.entries.filter(e=>e.kind==="income").forEach(e=>panes.inc.append(row(e)));
-  cache.entries.filter(e=>e.kind==="expense").forEach(e=>panes.exp.append(row(e)));
-  const inc=cache.entries.filter(e=>e.kind==="income").reduce((a,b)=>a+Number(b.amount||0),0);
-  const exp=cache.entries.filter(e=>e.kind==="expense").reduce((a,b)=>a+Number(b.amount||0),0);
-  tInc.textContent="£"+fmt(inc);tExp.textContent="£"+fmt(exp);tAvail.textContent="£"+fmt(inc-exp);
-}
-function row(e){
-  const el=document.createElement("div");
-  el.className="item";
-  el.innerHTML=`<div>${e.title}</div><div>£${fmt(e.amount)}</div><button class='gray' data-a='edit'>Edit</button><button class='gray' data-a='del'>Del</button>`;
-  el.querySelector("[data-a='edit']").onclick=()=>openEdit(e.id);
-  el.querySelector("[data-a='del']").onclick=()=>del(e.id);
-  return el;
-}
-const title=document.getElementById("title"),amount=document.getElementById("amount"),kind=document.getElementById("kind");
-document.getElementById("addBtn").onclick=async()=>{
-  if(!title.value||!amount.value)return;
-  const e={id:crypto.randomUUID(),title:title.value,amount:Number(amount.value),kind:kind.value};
-  cache.entries.unshift(e);save();render();
-  title.value="";amount.value="";
-  if(UID)await setDoc(doc(db,"users",UID,"entries",e.id),e);
-};
-
-let editing=null;
-const modalBack=document.getElementById("modalBack");
-function openEdit(id){
-  const e=cache.entries.find(x=>x.id===id);
-  if(!e)return;
-  editing=id;
-  document.getElementById("mTitleInput").value=e.title;
-  document.getElementById("mAmountInput").value=e.amount;
-  modalBack.style.display="flex";
-}
-document.getElementById("mClose").onclick=()=>modalBack.style.display="none";
-document.getElementById("mSave").onclick=async()=>{
-  const e=cache.entries.find(x=>x.id===editing);
-  if(!e)return;
-  e.title=document.getElementById("mTitleInput").value;
-  e.amount=Number(document.getElementById("mAmountInput").value);
-  save();render();modalBack.style.display="none";
-  if(UID)await setDoc(doc(db,"users",UID,"entries",e.id),e);
-};
-document.getElementById("mDelete").onclick=async()=>{
-  cache.entries=cache.entries.filter(x=>x.id!==editing);
-  save();render();modalBack.style.display="none";
-  if(UID)await deleteDoc(doc(db,"users",UID,"entries",editing));
-};
-render();
-
-if("serviceWorker"in navigator){
-  navigator.serviceWorker.register("/Socialcreator-manifest/service-worker.js",{scope:"/Socialcreator-manifest/"});
-}
+/* ------------------------------- Boot --------------------------------- */
+loadCache();
+renderLists();
+setActiveTab("incomes");
+setAuthUI();
 </script>
 </body>
 </html>
