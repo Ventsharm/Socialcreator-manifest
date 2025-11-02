@@ -6,15 +6,15 @@
 <title>Ventsharm Budget</title>
 <link rel="icon" href="Icon-192.png">
 <style>
-  body {font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f5f6f8;margin:0;padding:0;color:#222;}
-  .card {max-width:420px;margin:40px auto;background:#fff;padding:20px;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,.1);}
-  h1 {text-align:center;font-size:1.6rem;margin-bottom:20px;}
-  input,select,button {width:100%;padding:10px;border:1px solid #ccc;border-radius:10px;font-size:1rem;box-sizing:border-box;}
-  button.primary {background:linear-gradient(90deg,#007bff,#00aaff);color:#fff;font-weight:600;border:none;cursor:pointer;}
-  button.secondary {background:#ccc;border:none;cursor:pointer;}
-  .tabs {display:flex;justify-content:space-between;margin-bottom:15px;}
-  .tabs button {flex:1;padding:10px;border:none;border-radius:10px;margin:0 5px;background:#eee;cursor:pointer;font-weight:600;}
-  .tabs button.active {background:#007bff;color:#fff;}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f5f6f8;margin:0;padding:0;color:#222;}
+  .card{max-width:420px;margin:40px auto;background:#fff;padding:20px;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,.1);}
+  h1{text-align:center;font-size:1.6rem;margin-bottom:20px;}
+  input,select,button{width:100%;padding:10px;border:1px solid #ccc;border-radius:10px;font-size:1rem;box-sizing:border-box;}
+  button.primary{background:linear-gradient(90deg,#007bff,#00aaff);color:#fff;font-weight:600;border:none;cursor:pointer;}
+  button.secondary{background:#ccc;border:none;cursor:pointer;}
+  .tabs{display:flex;justify-content:space-between;margin-bottom:15px;}
+  .tabs button{flex:1;padding:10px;border:none;border-radius:10px;margin:0 5px;background:#eee;cursor:pointer;font-weight:600;}
+  .tabs button.active{background:#007bff;color:#fff;}
   .hidden{display:none;}
   .summary{display:flex;justify-content:space-between;margin:15px 0;text-align:center;}
   .summary div{flex:1;background:#f1f3f5;margin:0 5px;padding:10px;border-radius:10px;}
@@ -22,7 +22,8 @@
   .actions button{border:none;background:#eee;margin-left:5px;padding:5px 8px;border-radius:6px;cursor:pointer;}
   .auth{max-width:380px;margin:60px auto;background:#fff;padding:25px;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,.1);}
   footer{text-align:center;font-size:0.9rem;margin-top:10px;color:#666;}
-  .modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);display:flex;justify-content:center;align-items:center;}
+  .modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);display:none;justify-content:center;align-items:center;}
+  .modal-bg.show{display:flex;}
   .modal{background:#fff;border-radius:12px;padding:20px;max-width:300px;width:90%;}
 </style>
 </head>
@@ -78,7 +79,7 @@
 </div>
 
 <!-- EDIT MODAL -->
-<div id="editModal" class="modal-bg hidden">
+<div id="editModal" class="modal-bg">
   <div class="modal">
     <h3>Edit Item</h3>
     <input id="editTitle">
@@ -92,7 +93,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
@@ -104,7 +105,7 @@ const firebaseConfig = {
 };
 const appFB = initializeApp(firebaseConfig);
 const auth = getAuth(appFB);
-const db = getFirestore(appFB);
+getFirestore(appFB);
 
 const authScreen=document.getElementById("authScreen");
 const appDiv=document.getElementById("app");
@@ -166,7 +167,7 @@ window.edit=(type,id)=>{
   editTitle.value=editItemObj.title;
   editAmount.value=editItemObj.amount;
   editInclude.checked=editItemObj.include;
-  document.getElementById("editModal").classList.remove("hidden");
+  document.getElementById("editModal").classList.add("show");
 };
 window.remove=(type,id)=>{
   const arr=data[type+"s"];
@@ -174,13 +175,13 @@ window.remove=(type,id)=>{
   if(i>-1)arr.splice(i,1);
   save();
 };
-document.getElementById("cancelEdit").onclick=()=>document.getElementById("editModal").classList.add("hidden");
+document.getElementById("cancelEdit").onclick=()=>document.getElementById("editModal").classList.remove("show");
 document.getElementById("saveEdit").onclick=()=>{
   if(!editItemObj)return;
   editItemObj.title=editTitle.value;
   editItemObj.amount=parseFloat(editAmount.value);
   editItemObj.include=editInclude.checked;
-  document.getElementById("editModal").classList.add("hidden");
+  document.getElementById("editModal").classList.remove("show");
   save();
 };
 
