@@ -1,386 +1,306 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ventsharm Budget (Firebase)</title>
-<style>
-  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial; background:#f7f8fa; color:#111; }
-  .tab-bar { display:flex; justify-content:space-around; background:#fff; border-bottom:1px solid #e9edf3; position:sticky; top:0; z-index:99; }
-  .tab-bar button { flex:1; padding:14px; border:none; background:none; font-weight:600; cursor:pointer; color:#555; }
-  .tab-bar button.active { color:#111; border-bottom:3px solid #111; }
-  .tab-content { display:none; padding:0 14px; }
-  .tab-content.active { display:block; }
-  .box {background:#fff;border:1px solid #e9edf3;border-radius:16px;box-shadow:0 6px 18px rgba(0,0,0,.06);padding:18px;margin-top:14px;}
-  .row {background:#fff;border:1px solid #e9edf3;border-radius:12px;padding:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-  .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
-  .btn{flex:1;min-width:130px;padding:10px 12px;border:none;border-radius:10px;color:#fff;cursor:pointer}
-  .btn-primary{background:#2563eb}
-  .btn-danger{background:#ef4444}
-  .btn-ghost{background:#f9fafb;border:1px solid #e5e7eb;color:#111}
-  .field{padding:12px;border-radius:12px;border:1px solid #d1d5db}
-  .backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center}
-  .dialog{width:90%;max-width:380px;background:#fff;border:1px solid #e9edf3;border-radius:16px;box-shadow:0 10px 24px rgba(0,0,0,.2);padding:16px}
-  .dialog h3{margin:0 0 10px}
-  .dialog .grid{display:grid;gap:10px}
-  .dialog .rowbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
-  .small { font-size:.92rem; color:#6b7280; }
-  .link { color:#2563eb; text-decoration:none; cursor:pointer; }
-</style>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#000000">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>File Converter</title>
+  <link rel="icon" href="Icon-192.png" type="image/png" />
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #f9f9f9;
+      color: #222;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    header img {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+    }
+
+    header h1 {
+      font-size: 1.4em;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      max-width: 480px;
+      width: 100%;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1em;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    #convert {
+      background: linear-gradient(90deg, #007bff, #0078e7);
+      color: white;
+      font-weight: 600;
+    }
+
+    #reset {
+      background: #eee;
+      margin-top: 8px;
+    }
+
+    #error {
+      color: red;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    #status {
+      color: #1ba548;
+      font-weight: 600;
+      text-align: center;
+      display: none;
+      margin-top: 10px;
+    }
+
+    #info {
+      text-align: center;
+      color: #333;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    #preview img {
+      display: block;
+      max-width: 100%;
+      border-radius: 12px;
+      margin: 0 auto 15px auto;
+    }
+  </style>
 </head>
 <body>
+  <header>
+    <img src="Icon-192.png" alt="App Icon" />
+    <h1>File Converter</h1>
+  </header>
 
-<!-- ===== Auth ===== -->
-<div id="authWrap" style="max-width:480px;margin:30px auto;padding:0 14px;">
-  <div class="box">
-    <h2 style="margin:0 0 6px;font-size:1.4rem;text-align:center;">Sign in to Ventsharm Budget</h2>
-    <p id="authMsg" class="small" style="margin:6px 0 16px;text-align:center;">
-      Use the same account on any device.
-    </p>
-    <div style="display:grid;gap:10px;">
-      <input id="authEmail" type="email" placeholder="Email" class="field" autocomplete="username">
-      <input id="authPass" type="password" placeholder="Password" class="field" autocomplete="current-password">
-      <div class="small" style="text-align:right;margin-top:-6px;">
-        <a id="forgotLink" class="link">Forgot password?</a>
-      </div>
-      <button id="btnLogin" class="btn" style="background:#111;color:#fff;font-weight:700;">Login</button>
-      <button id="btnRegister" class="btn btn-ghost">Create account</button>
-    </div>
-  </div>
-</div>
+  <div class="container">
+    <label for="files">Choose File</label>
+    <input type="file" id="files" accept="image/*,.pdf" multiple>
 
-<!-- ===== Verify Email Notice ===== -->
-<div id="verifyWrap" style="display:none;max-width:560px;margin:26px auto;padding:0 14px;">
-  <div class="box" style="border-color:#eae8ff;background:#f8f7ff;">
-    <h3 style="margin:0 0 10px;color:#7c3aed;">Verify your email</h3>
-    <p id="verifyMsg" class="small" style="margin:0 0 12px;">
-      We’ve sent a verification email to <b id="verifyEmail"></b>. Please open it and click the link to continue.
-    </p>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <button id="btnResendVerify" class="btn btn-primary" style="flex:1;min-width:160px;">Resend email</button>
-      <button id="btnLogoutFromVerify" class="btn btn-ghost" style="flex:1;min-width:160px;">Log out</button>
-    </div>
-    <p class="small" style="margin-top:12px;">After verifying, return here and log in. If you can’t find the email, check your spam/junk folder.</p>
-  </div>
-</div>
+    <label for="format">Output Format</label>
+    <select id="format">
+      <option value="jpg">JPEG (.jpg)</option>
+      <option value="png">PNG (.png)</option>
+      <option value="webp">WEBP (.webp)</option>
+      <option value="pdf">PDF (.pdf)</option>
+    </select>
 
-<!-- ===== App ===== -->
-<div id="appWrap" style="display:none;max-width:880px;margin:20px auto;color:#111;">
-  <div class="box" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-    <div>
-      <h2 style="margin:0;font-size:1.4rem;">Budget Planner</h2>
-      <p id="userEmail" style="margin:0;color:#6b7280;font-size:.95rem;"></p>
-    </div>
-    <button id="btnLogout" class="btn btn-ghost">Log out</button>
-  </div>
+    <label for="width">Resize (optional)</label>
+    <input type="number" id="width" placeholder="Width">
+    <input type="number" id="height" placeholder="Height">
+    <select id="units">
+      <option value="px">px</option>
+      <option value="in">in</option>
+      <option value="cm">cm</option>
+    </select>
 
-  <!-- Tabs -->
-  <div class="tab-bar">
-    <button class="active" data-tab="incomeTab">Incomes</button>
-    <button data-tab="expenseTab">Expenses</button>
-    <button data-tab="overviewTab">Overview</button>
-  </div>
+    <button id="convert">Convert & Download</button>
+    <button id="reset">Reset</button>
 
-  <!-- Income Tab -->
-  <div id="incomeTab" class="tab-content active">
-    <div class="box">
-      <h3>Income Sources</h3>
-      <div style="display:grid;gap:10px;margin-bottom:12px;">
-        <input id="incName" placeholder="Income name e.g. Cashier or Benefit" class="field">
-        <input id="incAmt" type="number" min="0" step="0.01" placeholder="Amount e.g. 1200" class="field">
-        <label style="display:flex;gap:8px;align-items:center;">
-          <input id="incInclude" type="checkbox" checked>
-          <span>Include in available income</span>
-        </label>
-        <button id="addIncome" class="btn" style="background:#111;color:#fff;font-weight:700;">Add Income</button>
-      </div>
-      <div id="incomeList" style="display:grid;gap:10px;"></div>
-    </div>
-  </div>
-
-  <!-- Expense Tab -->
-  <div id="expenseTab" class="tab-content">
-    <div class="box">
-      <h3>Expenses</h3>
-      <div style="display:grid;gap:10px;margin-bottom:12px;">
-        <input id="expName" placeholder="Bill / Subscription e.g. Rent or Spotify" class="field">
-        <input id="expAmt" type="number" min="0" step="0.01" placeholder="Amount e.g. 500" class="field">
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <button id="addExpense" class="btn" style="flex:1;min-width:160px;background:#111;color:#fff;font-weight:700;">Add Bill</button>
-          <button id="resetAll" class="btn btn-ghost" style="flex:1;min-width:160px;">Reset All</button>
-        </div>
-      </div>
-      <div id="expenseList" style="display:grid;gap:10px;"></div>
-    </div>
-  </div>
-
-  <!-- Overview Tab -->
-  <div id="overviewTab" class="tab-content">
-    <div style="display:grid;gap:12px;margin-top:14px;">
-      <div class="box" style="background:#f8fbff;">
-        <div style="color:#3b82f6;font-weight:600;">Total Income (All)</div>
-        <div id="sumTotalIncome" style="font-weight:800;font-size:1.15rem;">£0.00</div>
-      </div>
-      <div class="box" style="background:#f8f7ff;">
-        <div style="color:#7c3aed;font-weight:600;">Available Income (Included - Expenses)</div>
-        <div id="sumAvailIncome" style="font-weight:800;font-size:1.15rem;">£0.00</div>
-        <div id="sumPercent" style="color:#6b7280;font-size:.92rem;">Spent: 0%</div>
-      </div>
-      <div class="box" style="background:#fff9f6;">
-        <div style="color:#f97316;font-weight:600;">Expenses</div>
-        <div id="sumExpenses" style="font-weight:800;font-size:1.15rem;">£0.00</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Popup -->
-<div id="dlgBack" class="backdrop">
-  <div class="dialog">
-    <h3 id="dlgTitle">Edit</h3>
-    <div id="dlgBody" class="grid"></div>
-    <div class="rowbtns">
-      <button id="dlgCancel" class="btn btn-ghost">Cancel</button>
-      <button id="dlgSave" class="btn btn-primary">Save</button>
-    </div>
-  </div>
-</div>
-
-<script>
-const tabs=document.querySelectorAll('.tab-bar button');
-const contents=document.querySelectorAll('.tab-content');
-tabs.forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    tabs.forEach(b=>b.classList.remove('active'));
-    contents.forEach(c=>c.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById(btn.dataset.tab).classList.add('active');
-  });
-});
-</script>
-
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script><script>
-/* ---------- Firebase Config ---------- */
-const firebaseConfig = {
-  apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
-  authDomain: "budget-app-283de.firebaseapp.com",
-  projectId: "budget-app-283de",
-  storageBucket: "budget-app-283de.firebasestorage.app",
-  messagingSenderId: "162369707369",
-  appId: "1:162369707369:web:3faa7f002f8ba22dc0f1f8"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db   = firebase.firestore();
-
-/* ---------- Cache Helpers ---------- */
-function cacheKey(uid){ return "vb_budget_"+uid; }
-function saveCache(uid,data){ localStorage.setItem(cacheKey(uid), JSON.stringify(data)); }
-function loadCache(uid){ try{return JSON.parse(localStorage.getItem(cacheKey(uid))||"null");}catch(e){return null;} }
-
-/* ---------- UI Helpers ---------- */
-const $ = id => document.getElementById(id);
-const els = {
-  authWrap:$("authWrap"), authEmail:$("authEmail"), authPass:$("authPass"),
-  btnLogin:$("btnLogin"), btnRegister:$("btnRegister"), authMsg:$("authMsg"),
-  forgotLink:$("forgotLink"),
-  verifyWrap:$("verifyWrap"), verifyEmail:$("verifyEmail"), verifyMsg:$("verifyMsg"),
-  btnResendVerify:$("btnResendVerify"), btnLogoutFromVerify:$("btnLogoutFromVerify"),
-  appWrap:$("appWrap"), userEmail:$("userEmail"), btnLogout:$("btnLogout"),
-  incName:$("incName"), incAmt:$("incAmt"), incInclude:$("incInclude"),
-  addIncome:$("addIncome"), incomeList:$("incomeList"),
-  expName:$("expName"), expAmt:$("expAmt"), addExpense:$("addExpense"),
-  resetAll:$("resetAll"), expenseList:$("expenseList"),
-  sumTotalIncome:$("sumTotalIncome"), sumAvailIncome:$("sumAvailIncome"),
-  sumExpenses:$("sumExpenses"), sumPercent:$("sumPercent"),
-  dlgBack:$("dlgBack"), dlgTitle:$("dlgTitle"), dlgBody:$("dlgBody"),
-  dlgCancel:$("dlgCancel"), dlgSave:$("dlgSave")
-};
-function fmt(n){return Number(n||0).toLocaleString(undefined,{style:"currency",currency:"GBP"});}
-
-/* ---------- Dialog ---------- */
-function openDialog(title,item,hasInclude){
-  return new Promise(resolve=>{
-    els.dlgTitle.textContent = title;
-    els.dlgBody.innerHTML = "";
-    const n=document.createElement("input");
-    n.className="field"; n.value=item.name||"";
-    const a=document.createElement("input");
-    a.type="number"; a.step="0.01"; a.className="field"; a.value=item.amount||0;
-    els.dlgBody.append("Name",n,"Amount",a);
-    let c=null;
-    if(hasInclude){
-      const wrap=document.createElement("label");
-      wrap.style.cssText="display:flex;gap:8px;align-items:center;";
-      c=document.createElement("input"); c.type="checkbox"; c.checked=item.include;
-      const s=document.createElement("span"); s.textContent="Include in available income";
-      wrap.append(c,s); els.dlgBody.append(wrap);
-    }
-    els.dlgBack.style.display="flex";
-    const cancel=()=>finish(null);
-    const save=()=>{finish({name:n.value.trim(),amount:Number(a.value)||0,include:c?c.checked:item.include});};
-    function finish(v){ els.dlgBack.style.display="none"; els.dlgCancel.removeEventListener("click",cancel); els.dlgSave.removeEventListener("click",save); resolve(v);}
-    els.dlgCancel.addEventListener("click",cancel);
-    els.dlgSave.addEventListener("click",save);
-  });
-}
-
-/* ---------- Rendering ---------- */
-function render(uid,data){
-  const incomes=data.incomes||[],expenses=data.expenses||[];
-  els.incomeList.innerHTML=""; els.expenseList.innerHTML="";
-  let totalAll=0,totalIncl=0,totalExp=0;
-
-  // Incomes
-  incomes.forEach(inc=>{
-    totalAll+=Number(inc.amount)||0;
-    if(inc.include) totalIncl+=Number(inc.amount)||0;
-    const row=document.createElement("div"); row.className="row";
-    const line=document.createElement("div"); line.textContent=(inc.include?"✅ ":"")+inc.name+" - "+fmt(inc.amount);
-    row.appendChild(line);
-    const act=document.createElement("div"); act.className="actions";
-    const e=document.createElement("button"); e.className="btn btn-primary"; e.textContent="Edit";
-    const d=document.createElement("button"); d.className="btn btn-danger";  d.textContent="Delete";
-    e.onclick=async()=>{
-      const ed=await openDialog("Edit Income",inc,true); if(!ed)return;
-      await db.collection("users").doc(uid).collection("incomes").doc(inc.id).set(ed,{merge:true});
-      const data=await reload(uid); render(uid,data);
-    };
-    d.onclick=async()=>{
-      if(confirm(`Delete "${inc.name}" (${fmt(inc.amount)})?`)){
-        await db.collection("users").doc(uid).collection("incomes").doc(inc.id).delete();
-        const data=await reload(uid); render(uid,data);
-      }
-    };
-    act.append(e,d); row.appendChild(act); els.incomeList.appendChild(row);
-  });
-
-  // Expenses
-  expenses.forEach(ex=>{
-    totalExp+=Number(ex.amount)||0;
-    const row=document.createElement("div"); row.className="row";
-    const line=document.createElement("div"); line.textContent=ex.name+" - "+fmt(ex.amount);
-    row.appendChild(line);
-    const act=document.createElement("div"); act.className="actions";
-    const e=document.createElement("button"); e.className="btn btn-primary"; e.textContent="Edit";
-    const d=document.createElement("button"); d.className="btn btn-danger";  d.textContent="Delete";
-    e.onclick=async()=>{
-      const ed=await openDialog("Edit Expense",ex,false); if(!ed)return;
-      await db.collection("users").doc(uid).collection("expenses").doc(ex.id).set(ed,{merge:true});
-      const data=await reload(uid); render(uid,data);
-    };
-    d.onclick=async()=>{
-      if(confirm(`Delete "${ex.name}" (${fmt(ex.amount)})?`)){
-        await db.collection("users").doc(uid).collection("expenses").doc(ex.id).delete();
-        const data=await reload(uid); render(uid,data);
-      }
-    };
-    act.append(e,d); row.appendChild(act); els.expenseList.appendChild(row);
-  });
-
-  els.sumTotalIncome.textContent=fmt(totalAll);
-  els.sumAvailIncome.textContent=fmt(totalIncl-totalExp);
-  els.sumExpenses.textContent=fmt(totalExp);
-  els.sumPercent.textContent="Spent: "+(totalIncl>0?Math.round(totalExp/totalIncl*100):0)+"%";
-}
-
-/* ---------- Reload + Cache ---------- */
-async function reload(uid){
-  const incSnap=await db.collection("users").doc(uid).collection("incomes").get();
-  const expSnap=await db.collection("users").doc(uid).collection("expenses").get();
-  const data={
-    incomes:incSnap.docs.map(d=>({id:d.id,...d.data()})),
-    expenses:expSnap.docs.map(d=>({id:d.id,...d.data()}))
-  };
-  saveCache(uid,data); return data;
-}
-
-/* ---------- Auth Actions ---------- */
-els.btnLogin.onclick = () =>
-  auth.signInWithEmailAndPassword(els.authEmail.value.trim(), els.authPass.value)
-  .catch(e=>els.authMsg.textContent=e.message);
-
-els.btnRegister.onclick = () =>
-  auth.createUserWithEmailAndPassword(els.authEmail.value.trim(), els.authPass.value)
-  .then(cred=>{
-    return cred.user.sendEmailVerification().then(()=>{
-      els.authMsg.textContent = "Verification email sent. Please check your inbox (and spam/junk folder).";
-    });
-  })
-  .catch(e=>els.authMsg.textContent=e.message);
-
-els.forgotLink.onclick = () => {
-  const email = els.authEmail.value.trim();
-  if(!email){ els.authMsg.textContent="Enter your email above, then tap Forgot password."; return; }
-  auth.sendPasswordResetEmail(email)
-    .then(()=> els.authMsg.textContent="Password reset email sent. Check your inbox (and spam/junk folder).")
-    .catch(e => els.authMsg.textContent=e.message);
-};
-
-els.btnLogout.onclick = () => auth.signOut();
-els.btnLogoutFromVerify.onclick = () => auth.signOut();
-
-els.btnResendVerify.onclick = () => {
-  const u = auth.currentUser;
-  if(!u){ return; }
-  u.sendEmailVerification()
-   .then(()=> els.verifyMsg.textContent = "Verification email re-sent. Please check your inbox (and spam/junk folder).")
-   .catch(e => els.verifyMsg.textContent = e.message || "Could not resend email.");
-};
-
-/* ---------- Auth State ---------- */
-auth.onAuthStateChanged(async user=>{
-  els.authWrap.style.display="none";
-  els.verifyWrap.style.display="none";
-  els.appWrap.style.display="none";
-
-  if(user){
-    if(!user.emailVerified){
-      els.verifyEmail.textContent = user.email || "";
-      els.verifyWrap.style.display = "block";
-      return;
-    }
-
-    els.userEmail.textContent="Logged in as: "+(user.email||"");
-    els.appWrap.style.display="block";
-
-    let cached=loadCache(user.uid);
-    if(cached){ render(user.uid,cached); }
-    else { const fresh=await reload(user.uid); render(user.uid,fresh); }
-
-    els.addIncome.onclick=async()=>{
-      const n=els.incName.value.trim(),a=Number(els.incAmt.value||0),i=!!els.incInclude.checked;
-      if(!n)return;
-      await db.collection("users").doc(user.uid).collection("incomes").add({name:n,amount:a,include:i});
-      const data=await reload(user.uid); render(user.uid,data);
-      els.incName.value=""; els.incAmt.value=""; els.incInclude.checked=true;
-    };
-
-    els.addExpense.onclick=async()=>{
-      const n=els.expName.value.trim(),a=Number(els.expAmt.value||0);
-      if(!n)return;
-      await db.collection("users").doc(user.uid).collection("expenses").add({name:n,amount:a});
-      const data=await reload(user.uid); render(user.uid,data);
-      els.expName.value=""; els.expAmt.value="";
-    };
-
-    els.resetAll.onclick=async()=>{
-      if(!confirm("Reset all incomes and expenses?"))return;
-      const incs=await db.collection("users").doc(user.uid).collection("incomes").get();
-      const exps=await db.collection("users").doc(user.uid).collection("expenses").get();
-      const ops=[]; incs.forEach(d=>ops.push(d.ref.delete())); exps.forEach(d=>ops.push(d.ref.delete()));
-      await Promise.all(ops);
-      const data=await reload(user.uid); render(user.uid,data);
-    };
-
-  }else{
-    els.authWrap.style.display="block";
+    <div id="status">✅ Complete</div>
+    <div id="error"></div>
+    <div id="info"></div>
+    <div id="preview"></div>
+  </div><script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.js"></script>
+  <script>
+  if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.js";
   }
-});
-</script>
+
+  (function(){
+    const $ = s => document.querySelector(s);
+    const filesEl = $("#files"),
+          formatEl = $("#format"),
+          wEl = $("#width"),
+          hEl = $("#height"),
+          unitsEl = $("#units"),
+          preview = $("#preview"),
+          info = $("#info"),
+          error = $("#error"),
+          convertBtn = $("#convert"),
+          resetBtn = $("#reset"),
+          status = $("#status");
+
+    const MAX_SIZE = 8000;
+    const inchToPx = inch => inch * 96;       // normal image scaling
+    const cmToPx = cm => cm * 37.7953;
+    const inchToPdf = inch => inch * 72;      // correct jsPDF scale
+    const cmToPdf = cm => cm * 28.3465;
+    const toPx = (val,u)=>!val?undefined:u==="in"?inchToPx(val):u==="cm"?cmToPx(val):val;
+    const toPdfPx = (val,u)=>!val?undefined:u==="in"?inchToPdf(val):u==="cm"?cmToPdf(val):val;
+
+    let convertCount = 1;
+    let currentFile=null;
+
+    function clearStatus(){ status.style.display="none"; error.textContent=""; }
+    formatEl.addEventListener("change",clearStatus);
+    unitsEl.addEventListener("change",clearStatus);
+
+    filesEl.addEventListener("change", async e=>{
+      const file=e.target.files[0];
+      if(!file)return;
+      currentFile=file;
+      preview.innerHTML=""; info.textContent=""; error.textContent=""; status.style.display="none";
+
+      if(/pdf$/i.test(file.name)){
+        const buf=await file.arrayBuffer();
+        const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+        const page=await pdf.getPage(1);
+        const vp=page.getViewport({scale:1});
+        const cnv=document.createElement("canvas");
+        const ctx=cnv.getContext("2d");
+        cnv.width=vp.width; cnv.height=vp.height;
+        await page.render({canvasContext:ctx,viewport:vp}).promise;
+        const img=new Image();
+        img.src=cnv.toDataURL();
+        info.textContent=`Original size: ${Math.round(vp.width)} × ${Math.round(vp.height)}px (PDF preview)`;
+        preview.appendChild(img);
+      } else {
+        const url=URL.createObjectURL(file);
+        const img=new Image();
+        img.onload=()=>{
+          info.textContent=`Original size: ${img.width} × ${img.height}px`;
+          preview.appendChild(img);
+          URL.revokeObjectURL(url);
+        };
+        img.src=url;
+      }
+    });
+
+    resetBtn.addEventListener("click",()=>{
+      filesEl.value=""; preview.innerHTML=""; info.textContent="";
+      error.textContent=""; wEl.value=""; hEl.value="";
+      convertCount=1; status.style.display="none";
+    });
+
+    async function fileToImage(f){
+      const u=URL.createObjectURL(f); const i=new Image();
+      await new Promise(r=>{i.onload=r; i.src=u;}); URL.revokeObjectURL(u);
+      return i;
+    }
+
+    async function imageToCanvas(i,w,h){
+      const c=document.createElement("canvas");
+      c.width=w||i.width; c.height=h||i.height;
+      c.getContext("2d").drawImage(i,0,0,c.width,c.height);
+      return c;
+    }
+
+    function downloadBlob(blob,name){
+      const u=URL.createObjectURL(blob);
+      const a=document.createElement("a"); a.href=u; a.download=name; a.click();
+      setTimeout(()=>URL.revokeObjectURL(u),4000);
+    }
+
+    async function convert(){
+      error.textContent=""; status.style.display="none";
+      const files=Array.from(filesEl.files||[]);
+      if(!files.length){alert("Please choose a file.");return;}
+      const fmt=formatEl.value, unit=unitsEl.value;
+      const isPDFOutput = fmt === "pdf";
+      const convertFunc = isPDFOutput ? toPdfPx : toPx;
+
+      let w=convertFunc(parseFloat(wEl.value),unit),
+          h=convertFunc(parseFloat(hEl.value),unit);
+
+      if(w>MAX_SIZE||h>MAX_SIZE){
+        error.textContent="Size too large. Try smaller values.";
+        preview.insertAdjacentElement("beforebegin", error);
+        return;
+      }
+
+      const { jsPDF }=window.jspdf;
+
+      for(const f of files){
+        const isPDF=/pdf$/i.test(f.name), isIMG=/^image\//.test(f.type);
+        const base=f.name.replace(/\.[^.]+$/,"");
+        const suffix=`-conv${convertCount++}`;
+
+        if(isIMG && fmt==="pdf"){
+          const img=await fileToImage(f);
+          const W=w||img.width, H=h||img.height;
+          const doc=new jsPDF({unit:"px",format:[W,H]});
+          const cnv=await imageToCanvas(img,W,H);
+          doc.addImage(cnv.toDataURL("image/jpeg",0.92),"JPEG",0,0,W,H);
+          downloadBlob(doc.output("blob"),`${base}${suffix}.pdf`);
+
+        } else if(isPDF && fmt!=="pdf"){
+          const ab=await f.arrayBuffer();
+          const pdf=await pdfjsLib.getDocument({data:ab}).promise;
+          for(let p=1;p<=pdf.numPages;p++){
+            const page=await pdf.getPage(p);
+            const vp=page.getViewport({scale:1});
+            const cnv=document.createElement("canvas");
+            const ctx=cnv.getContext("2d");
+            cnv.width=vp.width; cnv.height=vp.height;
+            await page.render({canvasContext:ctx,viewport:vp}).promise;
+            const blob=await new Promise(r=>cnv.toBlob(r,"image/"+fmt,0.92));
+            downloadBlob(blob,`${base}${suffix}-p${p}.${fmt}`);
+          }
+
+        } else if(isIMG && fmt!=="pdf"){
+          const img=await fileToImage(f);
+          const W=w||img.width, H=h||img.height;
+          const cnv=await imageToCanvas(img,W,H);
+          const blob=await new Promise(r=>cnv.toBlob(r,"image/"+fmt,0.92));
+          downloadBlob(blob,`${base}${suffix}.${fmt}`);
+
+        } else {
+          error.textContent="Unsupported conversion.";
+        }
+      }
+      status.style.display="block";
+    }
+
+    convertBtn.addEventListener("click",convert);
+    if("serviceWorker" in navigator){ navigator.serviceWorker.register("service-worker.js"); }
+  })();
+  </script>
 </body>
 </html>
