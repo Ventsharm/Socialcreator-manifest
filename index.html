@@ -1,151 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Ventsharm Budget</title>
-<link rel="icon" href="Icon-192.png" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ventsharm Budget App</title>
+<link rel="icon" href="Icon-192.png">
 <style>
-  :root{
-    --bg:#f5f6f8;--card:#fff;--text:#111;--muted:#6b7280;
-    --blue:#0d6efd;--blue2:#00b2ff;--border:#e5e7eb;
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #f5f6f8;
+    color: #222;
+    margin: 0;
+    padding: 0;
   }
-  *{box-sizing:border-box} html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
-    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;}
-  .wrap{display:flex;justify-content:center;padding:28px 12px}
-  .card{width:100%;max-width:760px;background:var(--card);border-radius:22px;
-    box-shadow:0 10px 26px rgba(0,0,0,.08);padding:20px;position:relative}
-  .header{display:flex;gap:12px;align-items:center;margin-bottom:12px}
-  .logo{width:28px;height:28px;border-radius:6px}
-  .title{font-size:1.7rem;font-weight:800}
-  .spacer{flex:1}
-  .btn{appearance:none;border:0;border-radius:14px;padding:10px 16px;font-weight:700;cursor:pointer}
-  .btn-blue{background:linear-gradient(90deg,var(--blue),var(--blue2));color:#fff}
-  .btn-ghost{background:#f3f4f6;color:#111;border:1px solid #e5e7eb}
-  .tabs{display:flex;gap:10px;margin:8px 0 14px}
-  .tab{padding:10px 16px;border:1px solid var(--border);border-radius:12px;background:#fff;font-weight:700;cursor:pointer}
-  .tab.active{border-color:#cfe1ff;background:#f3f8ff;color:#0b57d0;box-shadow:0 0 0 3px rgba(13,110,253,.12)}
-  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .input,.select{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:16px}
-  .row{display:flex;gap:10px;align-items:center;margin-top:10px}
-  .pill{border:1px solid var(--border);border-radius:16px;padding:12px 14px;min-width:140px;text-align:center;background:#fff}
-  .pill h4{margin:0 0 6px 0;font-size:.95rem} .pill p{margin:0;font-size:1.15rem;font-weight:900}
-  .muted{color:var(--muted);font-size:.95rem;margin-top:12px;text-align:center}
-  hr{border:0;height:1px;background:var(--border);margin:16px 0}
-  .list{margin-top:10px}
-  .item{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:8px;background:#fff}
-  .chip{font-size:.85rem;color:#555;background:#f1f5f9;padding:4px 8px;border-radius:999px;border:1px solid #e5e7eb}
-  .actions{display:flex;gap:8px} .link{background:#fff;border:1px solid var(--border);padding:8px 10px;border-radius:10px;cursor:pointer}
-  @media(max-width:560px){.grid-2{grid-template-columns:1fr}}
-
-  /* Gate (hard login) */
-  .gate{position:fixed;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.35));
-    display:flex;align-items:center;justify-content:center;z-index:30}
-  .gate-box{width:100%;max-width:420px;background:#fff;border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,.3);padding:20px}
-  .gate-box h2{margin:8px 0 0 0}
-  .gate-box p{color:var(--muted);margin:8px 0 14px}
-  .err{color:#c30000;min-height:1.2em;margin-top:6px} .ok{color:#128a12;min-height:1.2em;margin-top:6px}
+  .container {
+    max-width: 420px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.1);
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+  .tabs {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 15px;
+  }
+  .tab {
+    padding: 10px;
+    flex: 1;
+    border: none;
+    background: #eee;
+    border-radius: 10px;
+    margin: 0 5px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .tab.active {
+    background: #0d6efd;
+    color: #fff;
+  }
+  .list {
+    margin-top: 15px;
+  }
+  .item {
+    display: flex;
+    justify-content: space-between;
+    background: #f7f7f7;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+  .actions button {
+    border: none;
+    background: #eee;
+    margin-left: 5px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .actions button:hover { opacity: 0.8; }
+  .add-form, .edit-modal, .auth-screen {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  input, select, button {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+  }
+  button.primary {
+    background: linear-gradient(90deg,#007bff,#00aaff);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  button.secondary {
+    background: #ccc;
+    border: none;
+    cursor: pointer;
+  }
+  .summary {
+    display: flex;
+    justify-content: space-around;
+    margin: 15px 0;
+    text-align: center;
+  }
+  .summary div {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 10px;
+    flex: 1;
+    margin: 0 5px;
+  }
+  .auth-screen {
+    max-width: 380px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.1);
+  }
+  .hidden { display: none; }
 </style>
 </head>
 <body>
-<!-- LOGIN GATE (blocks the app until signed in & verified) -->
-<div class="gate" id="gate">
-  <div class="gate-box">
-    <div style="display:flex;align-items:center;gap:10px">
-      <img src="Icon-192.png" class="logo" alt="">
-      <h2>Ventsharm Budget</h2>
-    </div>
-    <p>Please sign in to use your budget (cloud-synced).</p>
-    <input id="gEmail" class="input" placeholder="Email" autocomplete="email" />
-    <input id="gPass" class="input" placeholder="Password" type="password" autocomplete="current-password" style="margin-top:10px" />
-    <div class="row">
-      <button class="btn btn-blue" id="gLogin">Login</button>
-      <button class="btn btn-ghost" id="gRegister">Register</button>
-      <button class="btn" id="gClose" style="display:none">Close</button>
-    </div>
-    <div class="row" style="margin-top:6px">
-      <button class="link" id="gForgot">Forgot password?</button>
-      <button class="link" id="gResend" style="display:none">Resend verification</button>
-    </div>
-    <div id="gErr" class="err"></div>
-    <div id="gOk" class="ok"></div>
-  </div>
+
+<div id="authSection" class="auth-screen">
+  <h1>Ventsharm Budget Login</h1>
+  <input id="email" type="email" placeholder="Email" autocomplete="email">
+  <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+  <button id="loginBtn" class="primary">Login</button>
+  <button id="registerBtn" class="secondary">Register</button>
+  <button id="forgotBtn" class="secondary">Forgot Password</button>
+  <p id="authMsg"></p>
 </div>
 
-<div class="wrap">
-  <div class="card" id="app" aria-hidden="true">
-    <div class="header">
-      <img src="Icon-192.png" class="logo" alt="">
-      <div class="title">Ventsharm Budget</div>
-      <div class="spacer"></div>
-      <button class="btn btn-ghost" id="logoutBtn" title="Sign out">Logout</button>
-    </div>
+<div id="app" class="container hidden">
+  <h1>Ventsharm Budget</h1>
 
-    <div class="tabs">
-      <button class="tab active" data-tab="incomes">Incomes</button>
-      <button class="tab" data-tab="expenses">Expenses</button>
-      <button class="tab" data-tab="overview">Overview</button>
-    </div>
-
-    <div id="formArea">
-      <div class="grid-2">
-        <input class="input" id="titleInput" placeholder="Title (e.g. Salary, Rent)" />
-        <input class="input" id="amountInput" placeholder="Amount" inputmode="decimal" />
-      </div>
-      <div class="row">
-        <select class="select" id="typeSelect">
-          <option value="income">Income</option>
-          <option value="expense">Expense</option>
-        </select>
-        <button class="btn btn-blue" id="addBtn" style="min-width:100px">Add</button>
-        <button class="btn btn-ghost" id="resetLocalBtn">Reset (local)</button>
-      </div>
-    </div>
-
-    <div class="row" style="margin-top:14px">
-      <div class="pill"><h4>Income</h4><p id="sumIncome">£0.00</p></div>
-      <div class="pill"><h4>Expense</h4><p id="sumExpense">£0.00</p></div>
-      <div class="pill"><h4>Available</h4><p id="sumAvailable">£0.00</p></div>
-    </div>
-
-    <hr/>
-
-    <div id="tab-incomes" class="list"></div>
-    <div id="tab-expenses" class="list" style="display:none"></div>
-    <div id="tab-overview" style="display:none">
-      <p class="muted">Overview shows totals and lets you quickly toggle “include in available” on any item.</p>
-      <div id="overviewList" class="list"></div>
-    </div>
-
-    <p class="muted" id="footNote">Synced via Firebase. Cached offline; <b>0 reads</b> on refresh.</p>
+  <div class="tabs">
+    <button class="tab active" data-tab="incomes">Incomes</button>
+    <button class="tab" data-tab="expenses">Expenses</button>
+    <button class="tab" data-tab="overview">Overview</button>
   </div>
+
+  <div class="add-form">
+    <input id="titleInput" placeholder="Title (e.g. Salary, Rent)">
+    <input id="amountInput" type="number" placeholder="Amount">
+    <select id="typeSelect">
+      <option value="income">Income</option>
+      <option value="expense">Expense</option>
+    </select>
+    <button id="addBtn" class="primary">Add</button>
+  </div>
+
+  <div class="summary">
+    <div><b>Income</b><br><span id="sumIncome">£0.00</span></div>
+    <div><b>Expenses</b><br><span id="sumExpense">£0.00</span></div>
+    <div><b>Available</b><br><span id="sumAvailable">£0.00</span></div>
+  </div>
+
+  <div id="tab-incomes" class="list"></div>
+  <div id="tab-expenses" class="list hidden"></div>
+  <div id="tab-overview" class="list hidden"></div>
+
+  <button id="logoutBtn" class="secondary">Logout</button>
 </div>
 
-<!-- Edit modal -->
-<div class="gate" id="editBack" style="display:none;background:rgba(0,0,0,.35)">
-  <div class="gate-box" style="max-width:520px">
-    <h2>Edit item</h2>
-    <div class="grid-2">
-      <input class="input" id="editTitle" />
-      <input class="input" id="editAmount" inputmode="decimal" />
-    </div>
-    <div class="row" style="margin-top:8px">
-      <label class="chip"><input id="editInclude" type="checkbox" style="transform:translateY(2px);margin-right:6px"> Include in available</label>
-      <div class="spacer"></div>
-      <button class="btn btn-ghost" id="deleteBtn">Delete</button>
-      <button class="btn btn-blue" id="saveBtn">Save</button>
-      <button class="btn" id="cancelEdit">Cancel</button>
-    </div>
-  </div>
-</div>
-
+<!-- Firebase SDK -->
 <script type="module">
-/* ------------------------ Firebase v10 (modular) ------------------------ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-/* Your Firebase config (from your message) */
 const firebaseConfig = {
   apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
   authDomain: "budget-app-283de.firebaseapp.com",
@@ -154,250 +171,143 @@ const firebaseConfig = {
   messagingSenderId: "162369707369",
   appId: "1:162369707369:web:3faa7f002f8ba22dc0f1f8"
 };
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db   = getFirestore(app);
+const db = getFirestore(app);
 
-/* ------------------------------- Helpers -------------------------------- */
-const $ = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
-const money = v => "£" + (Number(v||0)).toFixed(2);
-const uid = () => Math.random().toString(36).slice(2,10);
+const authSection = document.getElementById("authSection");
+const appSection = document.getElementById("app");
+const msg = document.getElementById("authMsg");
 
-const LS_KEY="vb-budget-v2";
-const SS_HYDRATED="vb-hydrated";   // per tab/page — ensures 0 reads on refresh
-
-const state = {
-  user: null,
-  items: { incomes:[], expenses:[] }, // {id,title,amount,include}
-  tab: "incomes"
-};
-
-/* --------------------------- Local cache I/O ---------------------------- */
-function loadCache(){
-  try{
-    const raw = localStorage.getItem(LS_KEY);
-    if(raw){ const data=JSON.parse(raw); if(data?.items) state.items = data.items; }
-  }catch{}
-}
-function saveCache(){ localStorage.setItem(LS_KEY, JSON.stringify({items:state.items})); }
-
-/* ------------------------------- Gate UI -------------------------------- */
-function openGate(mode="login"){
-  $("#gate").style.display="flex";
-  $("#gErr").textContent=""; $("#gOk").textContent="";
-  $("#gResend").style.display = (auth.currentUser && !auth.currentUser.emailVerified) ? "" : "none";
-  $("#gClose").style.display = "none";
-  $("#gLogin").textContent = "Login"; $("#gRegister").textContent = "Register";
-}
-function closeGate(){ $("#gate").style.display="none"; }
-
-/* ------------------------------ App UI --------------------------------- */
-function setTab(name){
-  state.tab=name;
-  $$(".tab").forEach(t=>t.classList.toggle("active", t.dataset.tab===name));
-  $("#tab-incomes").style.display  = name==="incomes" ? "" : "none";
-  $("#tab-expenses").style.display = name==="expenses"? "" : "none";
-  $("#tab-overview").style.display = name==="overview"? "" : "none";
-}
-$$(".tab").forEach(t=>t.onclick=()=>setTab(t.dataset.tab));
-
-function totals(){
-  const inc = state.items.incomes.filter(x=>x.include!==false).reduce((s,x)=>s+Number(x.amount||0),0);
-  const exp = state.items.expenses.filter(x=>x.include!==false).reduce((s,x)=>s+Number(x.amount||0),0);
-  $("#sumIncome").textContent=money(inc);
-  $("#sumExpense").textContent=money(exp);
-  $("#sumAvailable").textContent=money(inc-exp);
+function toggleView(authMode) {
+  authSection.classList.toggle("hidden", !authMode);
+  appSection.classList.toggle("hidden", authMode);
 }
 
-function paintLists(){
-  const incWrap=$("#tab-incomes"), expWrap=$("#tab-expenses"), ovWrap=$("#overviewList");
-  incWrap.innerHTML=""; expWrap.innerHTML=""; ovWrap.innerHTML="";
-  const paint=(wrap,arr,type,emptyText)=>{
-    if(!arr.length){ wrap.innerHTML=`<p class="muted">${emptyText}</p>`; return; }
-    arr.forEach(x=>{
-      const row=document.createElement("div");
-      row.className="item";
-      row.innerHTML=`
-        <div>
-          <div style="font-weight:700">${x.title}</div>
-          <div class="muted" style="margin-top:4px">
-            <span class="chip">${type}</span>
-            <span class="chip">${x.include===false?"Excluded":"Included"}</span>
-          </div>
-        </div>
-        <div style="font-weight:800">${money(x.amount)}</div>
-        <div class="actions"><button class="link edit" data-id="${x.id}" data-type="${type}">Edit</button></div>`;
-      wrap.appendChild(row);
-
-      // overview mirror row
-      const o=row.cloneNode(true);
-      ovWrap.appendChild(o);
-    });
-  };
-  paint(incWrap,state.items.incomes,"income","No income yet.");
-  paint(expWrap,state.items.expenses,"expense","No expense yet.");
-  totals();
-}
-function bootUI(){
-  $("#app").ariaHidden="false";
-  setTab("incomes"); paintLists();
-  $("#footNote").innerHTML = "Synced via Firebase. Cached offline; <b>0 reads</b> on refresh.";
-}
-
-/* --------------------------- Edit modal logic -------------------------- */
-let editCtx=null;
-function openEdit(type,id){
-  const arr = type==="income"? state.items.incomes : state.items.expenses;
-  const it  = arr.find(a=>a.id===id); if(!it) return;
-  editCtx={type,id};
-  $("#editTitle").value=it.title;
-  $("#editAmount").value=it.amount;
-  $("#editInclude").checked=(it.include!==false);
-  $("#editBack").style.display="flex";
-}
-function closeEdit(){ $("#editBack").style.display="none"; editCtx=null; }
-$("#cancelEdit").onclick=closeEdit;
-$("#saveBtn").onclick=()=>{
-  if(!editCtx) return;
-  const arr = editCtx.type==="income"? state.items.incomes : state.items.expenses;
-  const it  = arr.find(a=>a.id===editCtx.id); if(!it) return;
-  it.title   = $("#editTitle").value.trim() || it.title;
-  it.amount  = parseFloat($("#editAmount").value)||0;
-  it.include = $("#editInclude").checked;
-  saveCache(); paintLists(); syncLazy();
-  closeEdit();
-};
-$("#deleteBtn").onclick=()=>{
-  if(!editCtx) return;
-  const arr = editCtx.type==="income"? state.items.incomes : state.items.expenses;
-  const i = arr.findIndex(a=>a.id===editCtx.id);
-  if(i>-1) arr.splice(i,1);
-  saveCache(); paintLists(); syncLazy();
-  closeEdit();
-};
-$("#tab-incomes").addEventListener("click",e=>{
-  const b=e.target.closest(".edit"); if(b) openEdit(b.dataset.type,b.dataset.id);
-});
-$("#tab-expenses").addEventListener("click",e=>{
-  const b=e.target.closest(".edit"); if(b) openEdit(b.dataset.type,b.dataset.id);
-});
-$("#overviewList").addEventListener("click",e=>{
-  const b=e.target.closest(".edit"); if(b) openEdit(b.dataset.type,b.dataset.id);
-});
-
-/* ------------------------- Add / Reset handlers ------------------------ */
-$("#addBtn").onclick=async ()=>{
-  if(!(await ensureHydrated())) return; // lazy 1st read here
-  const title=$("#titleInput").value.trim();
-  const amt=parseFloat($("#amountInput").value);
-  const type=$("#typeSelect").value;
-  if(!title || isNaN(amt)) return;
-  const entry={ id:uid(), title, amount:amt, include:true };
-  (type==="income"?state.items.incomes:state.items.expenses).push(entry);
-  $("#titleInput").value=""; $("#amountInput").value="";
-  saveCache(); paintLists(); syncLazy();
-};
-$("#resetLocalBtn").onclick=async ()=>{
-  if(!(await ensureHydrated())) return; // lazy hydrate before destructive sync
-  state.items={ incomes:[], expenses:[] };
-  saveCache(); paintLists(); syncLazy();
-};
-
-/* ----------------------- Lazy hydrate & cloud sync --------------------- */
-// Guarantees: 0 reads on refresh. Only first real action calls getDoc once.
-async function ensureHydrated(){
-  if(!state.user){ openGate(); return false; }
-  if(sessionStorage.getItem(SS_HYDRATED)) return true;
-  try{
-    const ref = doc(db,"budgets",state.user.uid);
-    const snap = await getDoc(ref); // ← exactly ONE read on first need
-    if(snap.exists()){
-      // If local is empty, use server; otherwise keep local (user’s current edits)
-      const localEmpty = !state.items.incomes.length && !state.items.expenses.length;
-      if(localEmpty) state.items = snap.data();
-      saveCache(); paintLists();
-    }else{
-      await setDoc(ref, state.items, {merge:false});
-    }
-  }catch(e){ /* offline: skip */ }
-  sessionStorage.setItem(SS_HYDRATED,"1");
-  return true;
-}
-async function syncLazy(){
-  if(!state.user) return;
-  try{
-    const ref = doc(db,"budgets",state.user.uid);
-    await setDoc(ref, state.items, { merge:false });
-  }catch(e){ /* offline; next time will sync */ }
-}
-
-/* ----------------------------- Auth flows ------------------------------ */
-function showResendIfNeeded(){
-  $("#gResend").style.display = (auth.currentUser && !auth.currentUser.emailVerified) ? "" : "none";
-}
-$("#gLogin").onclick=async ()=>{
-  $("#gErr").textContent=""; $("#gOk").textContent="";
-  try{
-    const cred=await signInWithEmailAndPassword(auth,$("#gEmail").value.trim(),$("#gPass").value);
-    // Require verified email to proceed (you asked for confirm email flow)
-    if(!cred.user.emailVerified){
-      $("#gOk").textContent="Check your inbox and verify your email, then log in again.";
-      $("#gResend").style.display="";
-      return;
-    }
-    closeGate();
-  }catch(e){ $("#gErr").textContent=e.message; }
-};
-$("#gRegister").onclick=async ()=>{
-  $("#gErr").textContent=""; $("#gOk").textContent="";
-  try{
-    const cred=await createUserWithEmailAndPassword(auth,$("#gEmail").value.trim(),$("#gPass").value);
-    await sendEmailVerification(cred.user);
-    $("#gOk").textContent="Account created. Verification email sent.";
-    $("#gResend").style.display="";
-  }catch(e){ $("#gErr").textContent=e.message; }
-};
-$("#gForgot").onclick=async ()=>{
-  $("#gErr").textContent=""; $("#gOk").textContent="";
-  const email=$("#gEmail").value.trim(); if(!email){ $("#gErr").textContent="Enter your email first."; return; }
-  try{ await sendPasswordResetEmail(auth,email); $("#gOk").textContent="Password reset email sent."; }
-  catch(e){ $("#gErr").textContent=e.message; }
-};
-$("#gResend").onclick=async ()=>{
-  try{ if(auth.currentUser) await sendEmailVerification(auth.currentUser); $("#gOk").textContent="Verification email re-sent."; }
-  catch(e){ $("#gErr").textContent=e.message; }
-};
-
-$("#logoutBtn").onclick=()=>signOut(auth);
-
-/* -------------------------- Auth state watch --------------------------- */
-onAuthStateChanged(auth, (u)=>{
-  state.user = u || null;
-  showResendIfNeeded();
-  if(!u){ // lock the app
-    openGate();
-    $("#app").ariaHidden="true";
-    sessionStorage.removeItem(SS_HYDRATED);
-  }else{
-    if(u.emailVerified){
-      closeGate();
-      $("#app").ariaHidden="false";
-      // stay at 0 reads until user acts
-    }else{
-      openGate();
-    }
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    toggleView(false);
+    loadBudget();
+  } else {
+    toggleView(true);
   }
 });
 
-/* ---------------------------- SW registration -------------------------- */
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("./service-worker.js").catch(()=>{});
+document.getElementById("registerBtn").onclick = async () => {
+  try {
+    await createUserWithEmailAndPassword(auth, email.value, password.value);
+    msg.textContent = "Account created! Please login.";
+  } catch (e) {
+    msg.textContent = e.message;
+  }
+};
+document.getElementById("loginBtn").onclick = async () => {
+  try {
+    await signInWithEmailAndPassword(auth, email.value, password.value);
+  } catch (e) {
+    msg.textContent = e.message;
+  }
+};
+document.getElementById("forgotBtn").onclick = async () => {
+  try {
+    await sendPasswordResetEmail(auth, email.value);
+    msg.textContent = "Password reset email sent.";
+  } catch (e) {
+    msg.textContent = e.message;
+  }
+};
+document.getElementById("logoutBtn").onclick = () => signOut(auth);
+
+const data = { incomes: [], expenses: [] };
+
+function render() {
+  const inc = document.getElementById("tab-incomes");
+  const exp = document.getElementById("tab-expenses");
+  const ov = document.getElementById("tab-overview");
+  inc.innerHTML = exp.innerHTML = ov.innerHTML = "";
+
+  data.incomes.forEach((x) => addItem(x, inc, "income"));
+  data.expenses.forEach((x) => addItem(x, exp, "expense"));
+
+  const incSum = data.incomes.reduce((s, x) => s + x.amount, 0);
+  const expSum = data.expenses.reduce((s, x) => s + x.amount, 0);
+  document.getElementById("sumIncome").textContent = "£" + incSum.toFixed(2);
+  document.getElementById("sumExpense").textContent = "£" + expSum.toFixed(2);
+  document.getElementById("sumAvailable").textContent = "£" + (incSum - expSum).toFixed(2);
 }
 
-/* ------------------------------- Boot ---------------------------------- */
-loadCache();
-bootUI();
+function addItem(x, el, type) {
+  const div = document.createElement("div");
+  div.className = "item";
+  div.innerHTML = `<div>${x.title}</div><div>£${x.amount.toFixed(2)}</div>
+  <div class="actions">
+    <button onclick="editItem('${type}','${x.id}')">✏️</button>
+    <button onclick="deleteItem('${type}','${x.id}')">🗑️</button>
+  </div>`;
+  el.appendChild(div);
+}
+
+window.editItem = (type, id) => {
+  const arr = data[type + "s"];
+  const item = arr.find((x) => x.id === id);
+  const newTitle = prompt("Edit title:", item.title);
+  const newAmount = parseFloat(prompt("Edit amount:", item.amount));
+  if (newTitle && !isNaN(newAmount)) {
+    item.title = newTitle;
+    item.amount = newAmount;
+    saveBudget();
+    render();
+  }
+};
+
+window.deleteItem = (type, id) => {
+  const arr = data[type + "s"];
+  const i = arr.findIndex((x) => x.id === id);
+  if (i > -1) arr.splice(i, 1);
+  saveBudget();
+  render();
+};
+
+document.getElementById("addBtn").onclick = () => {
+  const title = titleInput.value.trim();
+  const amt = parseFloat(amountInput.value);
+  const type = typeSelect.value;
+  if (!title || isNaN(amt)) return;
+  const item = { id: Date.now().toString(), title, amount: amt };
+  data[type + "s"].push(item);
+  titleInput.value = amountInput.value = "";
+  saveBudget();
+  render();
+};
+
+async function saveBudget() {
+  const user = auth.currentUser;
+  if (!user) return;
+  localStorage.setItem("budgetData", JSON.stringify(data));
+  await setDoc(doc(db, "budgets", user.uid), data);
+}
+
+async function loadBudget() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const local = localStorage.getItem("budgetData");
+  if (local) Object.assign(data, JSON.parse(local));
+  try {
+    const snap = await getDoc(doc(db, "budgets", user.uid));
+    if (snap.exists()) Object.assign(data, snap.data());
+  } catch {}
+  render();
+}
+
+document.querySelectorAll(".tab").forEach((b) =>
+  b.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+    b.classList.add("active");
+    document.querySelectorAll(".list").forEach((l) => l.classList.add("hidden"));
+    document.getElementById("tab-" + b.dataset.tab).classList.remove("hidden");
+  })
+);
 </script>
 </body>
 </html>
