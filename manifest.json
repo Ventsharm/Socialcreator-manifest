@@ -1,10 +1,10 @@
 {
+  "id": "https://ventsharm.github.io/Budget-app/",
   "name": "Ventsharm Budget",
   "short_name": "Budget",
   "description": "Track income, expenses, and available balance with Firebase sync across devices.",
-  "id": "https://ventsharm.github.io/Socialcreator-manifest/",
-  "start_url": "./index.html",
-  "scope": "./",
+  "start_url": "/Budget-app/",
+  "scope": "/Budget-app/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
