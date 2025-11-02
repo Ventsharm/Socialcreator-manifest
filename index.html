@@ -1,199 +1,321 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ventsharm Budget</title>
-<link rel="icon" href="Icon-192.png">
-<style>
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f5f6f8;margin:0;padding:0;color:#222;}
-  .card{max-width:420px;margin:40px auto;background:#fff;padding:20px;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,.1);}
-  h1{text-align:center;font-size:1.6rem;margin-bottom:20px;}
-  input,select,button{width:100%;padding:10px;border:1px solid #ccc;border-radius:10px;font-size:1rem;box-sizing:border-box;}
-  button.primary{background:linear-gradient(90deg,#007bff,#00aaff);color:#fff;font-weight:600;border:none;cursor:pointer;}
-  button.secondary{background:#ccc;border:none;cursor:pointer;}
-  .tabs{display:flex;justify-content:space-between;margin-bottom:15px;}
-  .tabs button{flex:1;padding:10px;border:none;border-radius:10px;margin:0 5px;background:#eee;cursor:pointer;font-weight:600;}
-  .tabs button.active{background:#007bff;color:#fff;}
-  .hidden{display:none;}
-  .summary{display:flex;justify-content:space-between;margin:15px 0;text-align:center;}
-  .summary div{flex:1;background:#f1f3f5;margin:0 5px;padding:10px;border-radius:10px;}
-  .item{display:flex;justify-content:space-between;background:#f8f9fa;padding:8px 12px;margin-bottom:8px;border-radius:10px;}
-  .actions button{border:none;background:#eee;margin-left:5px;padding:5px 8px;border-radius:6px;cursor:pointer;}
-  .auth{max-width:380px;margin:60px auto;background:#fff;padding:25px;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,.1);}
-  footer{text-align:center;font-size:0.9rem;margin-top:10px;color:#666;}
-  .modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);display:none;justify-content:center;align-items:center;}
-  .modal-bg.show{display:flex;}
-  .modal{background:#fff;border-radius:12px;padding:20px;max-width:300px;width:90%;}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budget Planner</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f5f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .app {
+      background: white;
+      width: 95%;
+      max-width: 400px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+      margin-top: 0;
+      font-weight: 700;
+      font-size: 1.5em;
+    }
+    .tabs {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 15px;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: #eee;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .tab.active {
+      background: #007bff;
+      color: white;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    .add-btn {
+      background: black;
+      color: white;
+    }
+    .reset-btn {
+      background: #e5e5e5;
+      color: black;
+    }
+    .logout-btn {
+      background: #ccc;
+      color: black;
+      margin-top: 10px;
+    }
+    .item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f9f9f9;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .edit-btn {
+      background: #007bff;
+      color: white;
+      width: 48%;
+    }
+    .delete-btn {
+      background: #ff3b30;
+      color: white;
+      width: 48%;
+    }
+    .overview-card {
+      background: #fdfdfd;
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .overview-card:nth-child(1) { color: #007bff; }
+    .overview-card:nth-child(2) { color: #7e3ff2; }
+    .overview-card:nth-child(3) { color: #ff3b30; }
+    .login-box {
+      text-align: center;
+    }
+    .login-box input {
+      width: 100%;
+      margin: 5px 0;
+    }
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      width: 85%;
+      max-width: 350px;
+    }
+  </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="authScreen" class="auth">
-  <h1>Ventsharm Budget Login</h1>
-  <input id="email" type="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button id="loginBtn" class="primary">Login</button>
-  <button id="registerBtn" class="secondary">Register</button>
-  <button id="forgotBtn" class="secondary">Forgot Password</button>
-  <p id="authMsg"></p>
-</div>
+  <div class="app" id="app">
+    <h2>Budget Planner</h2>
+    <p id="userEmail" style="text-align:center;font-size:0.9em;color:#555;"></p>
 
-<!-- APP -->
-<div id="app" class="card hidden">
-  <h1>Ventsharm Budget</h1>
-
-  <div class="tabs">
-    <button class="tab active" data-tab="incomes">Incomes</button>
-    <button class="tab" data-tab="expenses">Expenses</button>
-    <button class="tab" data-tab="overview">Overview</button>
-  </div>
-
-  <div id="tab-incomes">
-    <input id="titleInput" placeholder="Title (e.g. Salary, Rent)">
-    <input id="amountInput" type="number" placeholder="Amount">
-    <select id="typeSelect">
-      <option value="income">Income</option>
-      <option value="expense">Expense</option>
-    </select>
-    <button id="addBtn" class="primary">Add</button>
-    <div id="incomeList"></div>
-  </div>
-
-  <div id="tab-expenses" class="hidden">
-    <div id="expenseList"></div>
-  </div>
-
-  <div id="tab-overview" class="hidden">
-    <div class="summary">
-      <div><b>Income</b><br><span id="sumIncome">£0.00</span></div>
-      <div><b>Expenses</b><br><span id="sumExpense">£0.00</span></div>
-      <div><b>Available</b><br><span id="sumAvailable">£0.00</span></div>
+    <div class="tabs">
+      <button class="tab active" id="incomesTab">Incomes</button>
+      <button class="tab" id="expensesTab">Expenses</button>
+      <button class="tab" id="overviewTab">Overview</button>
     </div>
-    <p style="text-align:center;">Overview shows totals and lets you toggle “include in available” on any item.</p>
+
+    <div id="incomesSection" class="section">
+      <h3>Income Sources</h3>
+      <input id="incomeTitle" placeholder="Income name e.g. Cashier or Benefit">
+      <input id="incomeAmount" type="number" placeholder="Amount e.g. 1200">
+      <label><input type="checkbox" id="incomeInclude"> Include in available income</label>
+      <button class="add-btn" id="addIncomeBtn">Add Income</button>
+      <div id="incomesList"></div>
+    </div>
+
+    <div id="expensesSection" class="section" style="display:none;">
+      <h3>Expenses</h3>
+      <input id="expenseTitle" placeholder="Bill / Subscription e.g. Rent or Spotify">
+      <input id="expenseAmount" type="number" placeholder="Amount e.g. 500">
+      <button class="add-btn" id="addExpenseBtn">Add Bill</button>
+      <div id="expensesList"></div>
+    </div>
+
+    <div id="overviewSection" class="section" style="display:none;">
+      <div class="overview-card"><h4>Total Income (All)</h4><p id="totalIncome">£0.00</p></div>
+      <div class="overview-card"><h4>Available Income (Included - Expenses)</h4><p id="availableIncome">£0.00</p></div>
+      <div class="overview-card"><h4>Expenses</h4><p id="totalExpenses">£0.00</p></div>
+    </div>
+
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+    <p style="text-align:center;font-size:0.8em;color:#777;">Synced via Firebase. Cached offline; 0 reads on refresh.</p>
   </div>
 
-  <button id="logoutBtn" class="secondary">Logout</button>
-  <footer>Synced via Firebase. Cached offline; 0 reads on refresh.</footer>
-</div>
-
-<!-- EDIT MODAL -->
-<div id="editModal" class="modal-bg">
-  <div class="modal">
-    <h3>Edit Item</h3>
-    <input id="editTitle">
-    <input id="editAmount" type="number">
-    <label><input type="checkbox" id="editInclude"> Include in available</label>
-    <button id="saveEdit" class="primary">Save</button>
-    <button id="cancelEdit" class="secondary">Cancel</button>
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <h3 id="editTitle">Edit Item</h3>
+      <input id="editName">
+      <input id="editValue" type="number">
+      <label><input type="checkbox" id="editInclude"> Include in available</label>
+      <button class="add-btn" id="saveEdit">Save</button>
+      <button class="reset-btn" id="cancelEdit">Cancel</button>
+    </div>
   </div>
-</div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
-  authDomain: "budget-app-283de.firebaseapp.com",
-  projectId: "budget-app-283de",
-  storageBucket: "budget-app-283de.firebasestorage.app",
-  messagingSenderId: "162369707369",
-  appId: "1:162369707369:web:3faa7f002f8ba22dc0f1f8"
-};
-const appFB = initializeApp(firebaseConfig);
-const auth = getAuth(appFB);
-getFirestore(appFB);
+    const firebaseConfig = {
+      apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
+      authDomain: "budget-app-283de.firebaseapp.com",
+      projectId: "budget-app-283de",
+      storageBucket: "budget-app-283de.appspot.com",
+      messagingSenderId: "162369707369",
+      appId: "1:162369707369:web:3faa7f002f8ba22dc0f1f8"
+    };
 
-const authScreen=document.getElementById("authScreen");
-const appDiv=document.getElementById("app");
-const msg=document.getElementById("authMsg");
-const data={incomes:[],expenses:[]};
-let editItemObj=null;
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-onAuthStateChanged(auth,user=>{
-  if(user){authScreen.classList.add("hidden");appDiv.classList.remove("hidden");load();}
-  else{appDiv.classList.add("hidden");authScreen.classList.remove("hidden");}
-});
+    // Sections toggle
+    const sections = {
+      incomes: document.getElementById('incomesSection'),
+      expenses: document.getElementById('expensesSection'),
+      overview: document.getElementById('overviewSection'),
+    };
 
-document.getElementById("loginBtn").onclick=async()=>{try{await signInWithEmailAndPassword(auth,email.value,password.value);}catch(e){msg.textContent=e.message;}};
-document.getElementById("registerBtn").onclick=async()=>{try{await createUserWithEmailAndPassword(auth,email.value,password.value);msg.textContent="Registered! Login now.";}catch(e){msg.textContent=e.message;}};
-document.getElementById("forgotBtn").onclick=async()=>{try{await sendPasswordResetEmail(auth,email.value);msg.textContent="Reset email sent.";}catch(e){msg.textContent=e.message;}};
-document.getElementById("logoutBtn").onclick=()=>signOut(auth);
+    const tabs = {
+      incomes: document.getElementById('incomesTab'),
+      expenses: document.getElementById('expensesTab'),
+      overview: document.getElementById('overviewTab'),
+    };
 
-function save(){localStorage.setItem("budgetData",JSON.stringify(data));render();}
-function load(){
-  const saved=localStorage.getItem("budgetData");
-  if(saved)Object.assign(data,JSON.parse(saved));
-  render();
-}
+    Object.keys(tabs).forEach(tab => {
+      tabs[tab].addEventListener('click', () => {
+        Object.keys(sections).forEach(s => {
+          sections[s].style.display = (s === tab) ? 'block' : 'none';
+          tabs[s].classList.toggle('active', s === tab);
+        });
+      });
+    });
 
-document.getElementById("addBtn").onclick=()=>{
-  const t=titleInput.value.trim();const a=parseFloat(amountInput.value);
-  const type=typeSelect.value;if(!t||isNaN(a))return;
-  data[type+"s"].push({id:Date.now(),title:t,amount:a,include:true});
-  titleInput.value=amountInput.value="";
-  save();
-};
+    // Dummy offline demo (localStorage-based)
+    let incomes = JSON.parse(localStorage.getItem('incomes') || '[]');
+    let expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
 
-function render(){
-  const incDiv=document.getElementById("incomeList");
-  const expDiv=document.getElementById("expenseList");
-  incDiv.innerHTML=expDiv.innerHTML="";
-  data.incomes.forEach(i=>incDiv.appendChild(makeItem(i,"income")));
-  data.expenses.forEach(i=>expDiv.appendChild(makeItem(i,"expense")));
-  const inc=data.incomes.reduce((s,x)=>s+(x.include?x.amount:0),0);
-  const exp=data.expenses.reduce((s,x)=>s+(x.include?x.amount:0),0);
-  document.getElementById("sumIncome").textContent="£"+inc.toFixed(2);
-  document.getElementById("sumExpense").textContent="£"+exp.toFixed(2);
-  document.getElementById("sumAvailable").textContent="£"+(inc-exp).toFixed(2);
-}
-function makeItem(i,type){
-  const div=document.createElement("div");
-  div.className="item";
-  div.innerHTML=`<span>${i.title}</span><span>£${i.amount.toFixed(2)}</span>
-  <div class="actions">
-    <button onclick="edit('${type}',${i.id})">✏️</button>
-    <button onclick="remove('${type}',${i.id})">🗑️</button>
-  </div>`;
-  return div;
-}
-window.edit=(type,id)=>{
-  const arr=data[type+"s"];
-  editItemObj=arr.find(x=>x.id===id);
-  if(!editItemObj)return;
-  editTitle.value=editItemObj.title;
-  editAmount.value=editItemObj.amount;
-  editInclude.checked=editItemObj.include;
-  document.getElementById("editModal").classList.add("show");
-};
-window.remove=(type,id)=>{
-  const arr=data[type+"s"];
-  const i=arr.findIndex(x=>x.id===id);
-  if(i>-1)arr.splice(i,1);
-  save();
-};
-document.getElementById("cancelEdit").onclick=()=>document.getElementById("editModal").classList.remove("show");
-document.getElementById("saveEdit").onclick=()=>{
-  if(!editItemObj)return;
-  editItemObj.title=editTitle.value;
-  editItemObj.amount=parseFloat(editAmount.value);
-  editItemObj.include=editInclude.checked;
-  document.getElementById("editModal").classList.remove("show");
-  save();
-};
+    const incomeList = document.getElementById('incomesList');
+    const expenseList = document.getElementById('expensesList');
 
-// Tabs
-document.querySelectorAll(".tab").forEach(tab=>{
-  tab.onclick=()=>{
-    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-    tab.classList.add("active");
-    document.querySelectorAll("#app > div[id^='tab-']").forEach(div=>div.classList.add("hidden"));
-    document.getElementById("tab-"+tab.dataset.tab).classList.remove("hidden");
-  };
-});
-</script>
+    function renderLists() {
+      incomeList.innerHTML = '';
+      expenseList.innerHTML = '';
+      incomes.forEach((i, idx) => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `
+          <span>${i.include ? '✅ ' : ''}${i.title} - £${i.amount.toFixed(2)}</span>
+          <div style="display:flex;gap:4px;">
+            <button class="edit-btn" onclick="editItem('income',${idx})">Edit</button>
+            <button class="delete-btn" onclick="deleteItem('income',${idx})">Delete</button>
+          </div>`;
+        incomeList.appendChild(div);
+      });
+      expenses.forEach((e, idx) => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `
+          <span>${e.title} - £${e.amount.toFixed(2)}</span>
+          <div style="display:flex;gap:4px;">
+            <button class="edit-btn" onclick="editItem('expense',${idx})">Edit</button>
+            <button class="delete-btn" onclick="deleteItem('expense',${idx})">Delete</button>
+          </div>`;
+        expenseList.appendChild(div);
+      });
+      updateOverview();
+    }
+
+    function updateOverview() {
+      const totalIncome = incomes.reduce((sum, i) => sum + i.amount, 0);
+      const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+      const available = incomes.filter(i => i.include).reduce((sum, i) => sum + i.amount, 0) - totalExpenses;
+      document.getElementById('totalIncome').textContent = `£${totalIncome.toFixed(2)}`;
+      document.getElementById('totalExpenses').textContent = `£${totalExpenses.toFixed(2)}`;
+      document.getElementById('availableIncome').textContent = `£${available.toFixed(2)}`;
+    }
+
+    window.editItem = function(type, index) {
+      const modal = document.getElementById('editModal');
+      modal.style.display = 'flex';
+      const editTitle = document.getElementById('editTitle');
+      const editName = document.getElementById('editName');
+      const editValue = document.getElementById('editValue');
+      const editInclude = document.getElementById('editInclude');
+      let data = type === 'income' ? incomes[index] : expenses[index];
+      editTitle.textContent = type === 'income' ? 'Edit Income' : 'Edit Expense';
+      editName.value = data.title;
+      editValue.value = data.amount;
+      editInclude.checked = !!data.include;
+      document.getElementById('saveEdit').onclick = () => {
+        data.title = editName.value;
+        data.amount = parseFloat(editValue.value);
+        if (type === 'income') data.include = editInclude.checked;
+        localStorage.setItem(type+'s', JSON.stringify(type==='income'?incomes:expenses));
+        modal.style.display = 'none';
+        renderLists();
+      };
+      document.getElementById('cancelEdit').onclick = () => modal.style.display = 'none';
+    };
+
+    window.deleteItem = function(type, index) {
+      const arr = type === 'income' ? incomes : expenses;
+      if (confirm(`Delete "${arr[index].title}" (£${arr[index].amount.toFixed(2)})?`)) {
+        arr.splice(index, 1);
+        localStorage.setItem(type+'s', JSON.stringify(arr));
+        renderLists();
+      }
+    };
+
+    document.getElementById('addIncomeBtn').onclick = () => {
+      const title = document.getElementById('incomeTitle').value.trim();
+      const amount = parseFloat(document.getElementById('incomeAmount').value);
+      if (!title || isNaN(amount)) return alert('Enter valid income');
+      incomes.push({ title, amount, include: document.getElementById('incomeInclude').checked });
+      localStorage.setItem('incomes', JSON.stringify(incomes));
+      renderLists();
+    };
+
+    document.getElementById('addExpenseBtn').onclick = () => {
+      const title = document.getElementById('expenseTitle').value.trim();
+      const amount = parseFloat(document.getElementById('expenseAmount').value);
+      if (!title || isNaN(amount)) return alert('Enter valid expense');
+      expenses.push({ title, amount });
+      localStorage.setItem('expenses', JSON.stringify(expenses));
+      renderLists();
+    };
+
+    renderLists();
+  </script>
 </body>
 </html>
