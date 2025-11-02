@@ -15,6 +15,7 @@
   html,body{height:100%}
   body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
 
+  /* ---------- Buttons (white + black border) ---------- */
   .btn{
     background:#fff; color:#000; border:1.6px solid #000; border-radius:var(--btnr);
     padding:10px 14px; font-weight:800; cursor:pointer; transition:transform .06s ease;
@@ -22,6 +23,7 @@
   .btn:active{transform:translateY(1px)}
   .btn.sm{padding:8px 12px; font-weight:700}
 
+  /* ---------- Auth full-screen ---------- */
   .auth-screen{
     position:fixed; inset:0; background:#fff; display:flex; align-items:center; justify-content:center; padding:20px; z-index:50;
   }
@@ -39,20 +41,24 @@
   }
   input:focus{box-shadow:0 0 0 4px rgba(0,0,0,.06)}
 
+  /* ---------- App shell (hidden until login) ---------- */
   .app{display:none; width:min(950px,96vw); margin:24px auto; background:#fff; border:1px solid var(--ring); border-radius:22px; box-shadow:var(--shadow); overflow:hidden}
   .topbar{display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--ring); background:#fff}
   .brand{font-size:20px; font-weight:900}
   .userbox{display:flex; flex-direction:column; align-items:flex-end; gap:6px; color:#555}
 
+  /* Tabs at top */
   .tabs{display:flex; gap:10px; padding:12px 14px; border-bottom:1px solid var(--ring); background:#fff}
   .tab{flex:1; text-align:center; padding:10px 12px; border-radius:999px; border:1.6px solid #000; background:#fff; font-weight:800; cursor:pointer}
   .tab[aria-selected="true"]{box-shadow:0 0 0 2px #000 inset}
 
+  /* Content cards */
   .content{padding:16px; display:grid; gap:14px}
   .card{background:#fff; border:1px solid var(--ring); border-radius:var(--radius); padding:16px}
   h2.section{margin:2px 0 12px; font-size:1.1rem; font-weight:900}
   .btnrow{display:grid; grid-template-columns:1fr 1fr; gap:10px}
 
+  /* Lists */
   .list{display:flex; flex-direction:column; gap:10px; margin-top:12px}
   .item{border:1px solid var(--ring); border-radius:14px; background:#fff; padding:12px}
   .item_head{display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center; cursor:pointer}
@@ -62,16 +68,20 @@
   .item.show .item_actions{display:flex}
   @keyframes reveal{from{opacity:0; transform:translateY(-4px)} to{opacity:1; transform:none}}
 
+  /* Include badge: ✅ or blank */
   .include-pill{font-weight:900; color:#16a34a}
 
+  /* Overview soft colours */
   .kpi{border:1px solid var(--ring); border-radius:16px; padding:16px; margin-bottom:12px; background:#fff}
   .kpi.blue{background:var(--soft-blue)}
   .kpi.purple{background:var(--soft-purple)}
   .kpi.orange{background:var(--soft-orange)}
   .kpi .k{font-size:.92rem; color:#555; font-weight:800; margin-bottom:6px}
   .kpi .v{font-size:1.6rem; font-weight:900}
+
   .footer{padding:10px 16px; color:#777; border-top:1px solid var(--ring); text-align:center}
 
+  /* Edit modal (plain white) */
   dialog::backdrop{background:rgba(0,0,0,.35)}
   dialog{border:0; border-radius:18px; padding:0; width:min(520px,92vw); box-shadow:var(--shadow); background:#fff}
   .modal{padding:18px}
@@ -79,13 +89,15 @@
   .modal .actions{display:flex; gap:10px; margin-top:12px}
   .center-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
 
+  /* Offline popup */
   .offline-pop{position:fixed; left:50%; bottom:16px; transform:translateX(-50%); background:#fff; border:1px solid #000;
     border-radius:12px; padding:12px 14px; box-shadow:var(--shadow); display:none; z-index:60}
 </style>
 </head>
 <body>
 
-<section id="authPage" class="auth-screen">
+<!-- ==================== AUTH FULL PAGE ==================== -->
+<section id="authPage" class="auth-screen" aria-label="Authentication">
   <div class="auth-card">
     <div class="auth-title">Budget Planner</div>
     <div class="auth-tabs">
@@ -93,82 +105,411 @@
       <button class="btn sm" data-auth="register">Register</button>
       <button class="btn sm" data-auth="forgot">Forgot</button>
     </div>
+
+    <!-- Login -->
     <div id="auth-login" class="auth-view active">
       <div class="row">
-        <div><label>Email</label><input id="login-email" type="email" /></div>
-        <div><label>Password</label><input id="login-pass" type="password" /></div>
+        <div>
+          <label for="login-email">Email</label>
+          <input id="login-email" type="email" autocomplete="email" />
+        </div>
+        <div>
+          <label for="login-pass">Password</label>
+          <input id="login-pass" type="password" autocomplete="current-password" />
+        </div>
       </div>
-      <div style="margin-top:12px"><button id="do-login" class="btn">Login</button></div>
+      <div style="display:flex; gap:10px; margin-top:12px">
+        <button id="do-login" class="btn">Login</button>
+      </div>
     </div>
+
+    <!-- Register -->
     <div id="auth-register" class="auth-view">
       <div class="row">
-        <div><label>Email</label><input id="reg-email" type="email" /></div>
-        <div><label>Password (min 6)</label><input id="reg-pass" type="password" /></div>
+        <div>
+          <label for="reg-email">Email</label>
+          <input id="reg-email" type="email" autocomplete="email" />
+        </div>
+        <div>
+          <label for="reg-pass">Password (min 6)</label>
+          <input id="reg-pass" type="password" autocomplete="new-password" />
+        </div>
       </div>
-      <div style="margin-top:12px"><button id="do-register" class="btn">Create Account</button></div>
+      <div style="display:flex; gap:10px; margin-top:12px">
+        <button id="do-register" class="btn">Create Account</button>
+      </div>
     </div>
+
+    <!-- Forgot -->
     <div id="auth-forgot" class="auth-view">
-      <label>Email for reset link</label>
-      <input id="rst-email" type="email" />
-      <div style="margin-top:12px"><button id="do-reset" class="btn">Send Reset</button></div>
+      <div class="row">
+        <div>
+          <label for="rst-email">Email for reset link</label>
+          <input id="rst-email" type="email" autocomplete="email" />
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:12px">
+        <button id="do-reset" class="btn">Send Reset</button>
+      </div>
     </div>
   </div>
 </section>
 
+<!-- ==================== APP (HIDDEN UNTIL LOGIN) ==================== -->
 <div class="app" id="app">
+  <!-- Top bar -->
   <div class="topbar">
     <div class="brand">Budget Planner</div>
     <div class="userbox">
       <span id="userEmail">Signed out</span>
-      <!-- ✅ logout under email -->
-      <button id="btnLogout" class="btn sm">Logout</button>
+      <!-- ✅ Added logout button under email -->
+      <button id="btnLogout" class="btn sm" style="display:none; margin-top:6px;">Logout</button>
     </div>
-  </div>
-  <div class="tabs">
-    <button class="tab" id="tab-inc" aria-selected="true">Incomes</button>
-    <button class="tab" id="tab-exp">Expenses</button>
-    <button class="tab" id="tab-ovw">Overview</button>
-  </div>
-  <div class="content">
-    <section class="card" id="view-incomes">
-      <h2 class="section">Income Sources</h2>
-      <div class="row"><input id="inc-name" placeholder="Income name"><input id="inc-amt" type="number" placeholder="Amount"></div>
-      <div class="center-row"><span>Include in available income:</span><input id="inc-include" type="checkbox"></div>
-      <div class="btnrow"><button id="add-inc" class="btn">Add Income</button><button id="reset-inc" class="btn">Reset</button></div>
-      <div id="inc-list" class="list"></div>
-    </section>
-    <section class="card" id="view-expenses" style="display:none">
-      <h2 class="section">Expenses</h2>
-      <div class="row"><input id="exp-name" placeholder="Bill"><input id="exp-amt" type="number" placeholder="Amount"></div>
-      <div class="btnrow"><button id="add-exp" class="btn">Add Bill</button><button id="reset-exp" class="btn">Reset</button></div>
-      <div id="exp-list" class="list"></div>
-    </section>
-    <section class="card" id="view-overview" style="display:none">
-      <h2 class="section">Overview</h2>
-      <div class="kpi blue"><div class="k">Total Income</div><div id="ovw-total" class="v">£0.00</div></div>
-      <div class="kpi purple"><div class="k">Available Income</div><div id="ovw-available" class="v">£0.00</div></div>
-      <div class="kpi orange"><div class="k">Expenses</div><div id="ovw-exp" class="v">£0.00</div></div>
-      <div><button id="btnDeleteAccount" class="btn">Delete Account</button></div>
-    </section>
-  </div>
-  <div class="footer">Budget Planner</div>
-</div>
-
-<dialog id="editModal">
-  <div class="modal">
-    <h3 id="editTitle">Edit Item</h3>
-    <div class="row"><div><label>Name</label><input id="edit-name"></div><div><label>Amount</label><input id="edit-amt" type="number"></div></div>
-    <div id="edit-include-wrap" class="center-row"><label>Include in available income</label><input id="edit-include" type="checkbox"></div>
-    <div class="actions"><button id="edit-save" class="btn">Save</button><button id="edit-cancel" class="btn">Cancel</button></div>
-  </div>
-</dialog>
-<div id="offlinePop" class="offline-pop"><span>You're offline — changes save locally.</span><button id="offlineOk" class="btn sm">OK</button></div>
-
+  </div><!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+
 <script>
-/* ✅ Your full Firebase + app logic remains unchanged */
+/* ============== Helpers & Shortcuts ============== */
+const $ = s => document.querySelector(s);
+const fmt = n => "£" + (Number(n||0)).toFixed(2);
+
+/* ============== Firebase Init (your keys) ============== */
+const firebaseConfig = {
+  apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
+  authDomain: "budget-app-283de.firebaseapp.com",
+  projectId: "budget-app-283de",
+  storageBucket: "budget-app-283de.firebasestorage.app",
+  messagingSenderId: "162369707369",
+  appId: "1:162369707369:web:3faa7f002f8ba22dc0f1f8"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+firebase.firestore().enablePersistence({ synchronizeTabs:true }).catch(()=>{});
+
+/* ============== Elements ============== */
+/* Auth page */
+const authPage   = $("#authPage");
+const authTabs   = document.querySelectorAll("[data-auth]");
+const vLogin     = $("#auth-login");
+const vRegister  = $("#auth-register");
+const vForgot    = $("#auth-forgot");
+const loginEmail = $("#login-email");
+const loginPass  = $("#login-pass");
+const regEmail   = $("#reg-email");
+const regPass    = $("#reg-pass");
+const rstEmail   = $("#rst-email");
+const btnDoLogin = $("#do-login");
+const btnDoReg   = $("#do-register");
+const btnDoReset = $("#do-reset");
+
+/* App shell */
+const appShell   = $("#app");
+const userEmail  = $("#userEmail");
+const btnLogout  = $("#btnLogout");
+
+/* Tabs & views */
+const tabInc = $("#tab-inc"), tabExp = $("#tab-exp"), tabOvw = $("#tab-ovw");
+const viewIncomes  = $("#view-incomes");
+const viewExpenses = $("#view-expenses");
+const viewOverview = $("#view-overview");
+
+/* Incomes */
+const incName = $("#inc-name");
+const incAmt  = $("#inc-amt");
+const incInc  = $("#inc-include");
+const addInc  = $("#add-inc");
+const resetInc= $("#reset-inc");
+const incList = $("#inc-list");
+
+/* Expenses */
+const expName = $("#exp-name");
+const expAmt  = $("#exp-amt");
+const addExp  = $("#add-exp");
+const resetExp= $("#reset-exp");
+const expList = $("#exp-list");
+
+/* Overview */
+const ovwTotal = $("#ovw-total");
+const ovwAvail = $("#ovw-available");
+const ovwExp   = $("#ovw-exp");
+const btnDeleteAccount = $("#btnDeleteAccount");
+
+/* Edit modal */
+const editModal   = $("#editModal");
+const editTitle   = $("#editTitle");
+const editName    = $("#edit-name");
+const editAmount  = $("#edit-amt");
+const editInclude = $("#edit-include");
+const editIncWrap = $("#edit-include-wrap");
+const editSave    = $("#edit-save");
+const editCancel  = $("#edit-cancel");
+
+/* Offline popup */
+const offlinePop = $("#offlinePop");
+const offlineOk  = $("#offlineOk");
+
+/* ============== State & Cache ============== */
+let user = null;
+let state = { incomes: [], expenses: [] };
+const LCKEY = uid => `bp-cache:${uid}`;
+const readCache = uid => {
+  try { return JSON.parse(localStorage.getItem(LCKEY(uid)) || '{"incomes":[],"expenses":[]}'); }
+  catch { return { incomes:[], expenses:[] }; }
+};
+const writeCache = (uid, data) => localStorage.setItem(LCKEY(uid), JSON.stringify(data));
+
+/* ============== Tabs Logic (top) ============== */
+function showTab(which){
+  tabInc.setAttribute("aria-selected", which==="incomes");
+  tabExp.setAttribute("aria-selected", which==="expenses");
+  tabOvw.setAttribute("aria-selected", which==="overview");
+  viewIncomes.style.display  = which==="incomes"  ? "" : "none";
+  viewExpenses.style.display = which==="expenses" ? "" : "none";
+  viewOverview.style.display = which==="overview" ? "" : "none";
+}
+tabInc.onclick = ()=>showTab("incomes");
+tabExp.onclick = ()=>showTab("expenses");
+tabOvw.onclick = ()=>showTab("overview");
+
+/* ============== Auth Screen (full page) ============== */
+function showAuthView(which){
+  vLogin.classList.remove("active");
+  vRegister.classList.remove("active");
+  vForgot.classList.remove("active");
+  (which==="login"    ? vLogin :
+   which==="register" ? vRegister : vForgot).classList.add("active");
+}
+authTabs.forEach(btn=>{
+  btn.addEventListener("click", ()=>showAuthView(btn.dataset.auth));
+});
+
+/* Register */
+btnDoReg.addEventListener("click", async ()=>{
+  try{
+    const e = regEmail.value.trim(), p = regPass.value;
+    if(!e || !p) return alert("Enter email and password.");
+    const cred = await auth.createUserWithEmailAndPassword(e,p);
+    await cred.user.sendEmailVerification();
+    alert("✅ Please verify your email before logging in.");
+    showAuthView("login");
+  }catch(err){ alert(err.message); }
+});
+
+/* Login */
+btnDoLogin.addEventListener("click", async ()=>{
+  try{
+    const e = loginEmail.value.trim(), p = loginPass.value;
+    if(!e || !p) return alert("Enter email and password.");
+    const cred = await auth.signInWithEmailAndPassword(e,p);
+    if(!cred.user.emailVerified){
+      alert("Please verify your email first, then log in.");
+      await auth.signOut();
+      return;
+    }
+  }catch(err){ alert(err.message); }
+});
+
+/* Forgot */
+btnDoReset.addEventListener("click", async ()=>{
+  try{
+    const e = rstEmail.value.trim();
+    if(!e) return alert("Enter your email.");
+    await auth.sendPasswordResetEmail(e);
+    alert("Password reset email sent.");
+  }catch(err){ alert(err.message); }
+});
+
+/* Logout */
+btnLogout.addEventListener("click", async ()=>{ await auth.signOut(); });
+
+/* ============== Firestore Helpers ============== */
+const base = uid => db.collection("users").doc(uid);
+async function pullOnce(){
+  if(!user) return;
+  const incSnap = await base(user.uid).collection("incomes").get();
+  const expSnap = await base(user.uid).collection("expenses").get();
+  state.incomes  = incSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+  state.expenses = expSnap.docs.map(d=>({ id:d.id, ...d.data() }));
+  writeCache(user.uid, state);
+  renderAll();
+}
+function addDocFS(type, data){
+  const id = db.collection("_").doc().id;
+  state[type].push({ id, ...data });
+  renderAll(); writeCache(user.uid, state);
+  base(user.uid).collection(type).doc(id).set(data).catch(console.warn);
+}
+function updateDocFS(type, id, patch){
+  const i = state[type].findIndex(x=>x.id===id);
+  if(i>-1) state[type][i] = { ...state[type][i], ...patch };
+  renderAll(); writeCache(user.uid, state);
+  base(user.uid).collection(type).doc(id).update(patch).catch(console.warn);
+}
+function deleteDocFS(type, id){
+  state[type] = state[type].filter(x=>x.id!==id);
+  renderAll(); writeCache(user.uid, state);
+  base(user.uid).collection(type).doc(id).delete().catch(console.warn);
+}
+
+/* ============== Renderers ============== */
+function renderAll(){
+  incList.innerHTML = "";
+  state.incomes.forEach(doc=>{
+    const el = document.createElement("div");
+    el.className = "item";
+    el.innerHTML = `
+      <div class="item_head" data-type="incomes" data-id="${doc.id}">
+        <div class="include-pill">${doc.include ? "✅" : ""}</div>
+        <div class="item_title">${doc.title}</div>
+        <div class="item_amount">${fmt(doc.amount)}</div>
+      </div>
+      <div class="item_actions">
+        <button class="btn" data-act="edit" data-type="incomes" data-id="${doc.id}">Edit</button>
+        <button class="btn" data-act="del"  data-type="incomes" data-id="${doc.id}">Delete</button>
+      </div>`;
+    incList.appendChild(el);
+  });
+
+  expList.innerHTML = "";
+  state.expenses.forEach(doc=>{
+    const el = document.createElement("div");
+    el.className = "item";
+    el.innerHTML = `
+      <div class="item_head" data-type="expenses" data-id="${doc.id}">
+        <div class="include-pill" style="visibility:hidden">.</div>
+        <div class="item_title">${doc.title}</div>
+        <div class="item_amount">${fmt(doc.amount)}</div>
+      </div>
+      <div class="item_actions">
+        <button class="btn" data-act="edit" data-type="expenses" data-id="${doc.id}">Edit</button>
+        <button class="btn" data-act="del"  data-type="expenses" data-id="${doc.id}">Delete</button>
+      </div>`;
+    expList.appendChild(el);
+  });
+
+  document.querySelectorAll(".item").forEach(row=>{
+    const head = row.querySelector(".item_head");
+    head.onclick = ()=> row.classList.toggle("show");
+  });
+  document.querySelectorAll(".item_actions .btn").forEach(b=>{
+    b.onclick = ()=>{
+      const act=b.dataset.act, type=b.dataset.type, id=b.dataset.id;
+      if(act==="edit") openEdit(type,id);
+      if(act==="del" && confirm("Delete this item?")) deleteDocFS(type,id);
+    };
+  });
+
+  const totalAll  = state.incomes.reduce((s,x)=>s+Number(x.amount||0),0);
+  const totalInc  = state.incomes.filter(x=>x.include).reduce((s,x)=>s+Number(x.amount||0),0);
+  const totalExpn = state.expenses.reduce((s,x)=>s+Number(x.amount||0),0);
+  ovwTotal.textContent = fmt(totalAll);
+  ovwAvail.textContent = fmt(totalInc - totalExpn);
+  ovwExp.textContent   = fmt(totalExpn);
+}
+
+/* ============== Edit Modal ============== */
+let editing = { type:null, id:null };
+function openEdit(type,id){
+  const src = state[type].find(x=>x.id===id); if(!src) return;
+  editing = { type, id };
+  editTitle.textContent = type==="incomes" ? "Edit Income" : "Edit Expense";
+  editName.value   = src.title;
+  editAmount.value = src.amount;
+  if(type==="incomes"){ editIncWrap.style.display="flex"; editInclude.checked=!!src.include; }
+  else { editIncWrap.style.display="none"; }
+  editModal.showModal();
+}
+editCancel.onclick = ()=>editModal.close();
+editSave.onclick = ()=>{
+  const name = editName.value.trim();
+  const amt  = parseFloat(editAmount.value);
+  if(!name || !isFinite(amt)) return alert("Enter a valid name and amount.");
+  const patch = { title:name, amount:amt };
+  if(editing.type==="incomes") patch.include = !!editInclude.checked;
+  updateDocFS(editing.type, editing.id, patch);
+  editModal.close();
+};
+
+/* ============== Add / Reset ============== */
+addInc.onclick = ()=>{
+  const title = incName.value.trim();
+  const amount= parseFloat(incAmt.value);
+  const include = !!incInc.checked;
+  if(!title || !isFinite(amount)) return alert("Enter a valid name and amount.");
+  addDocFS("incomes", { title, amount, include });
+  incName.value=""; incAmt.value=""; incInc.checked=false;
+};
+resetInc.onclick = ()=>{ incName.value=""; incAmt.value=""; incInc.checked=false; };
+
+addExp.onclick = ()=>{
+  const title = expName.value.trim();
+  const amount= parseFloat(expAmt.value);
+  if(!title || !isFinite(amount)) return alert("Enter a valid name and amount.");
+  addDocFS("expenses", { title, amount });
+  expName.value=""; expAmt.value="";
+};
+resetExp.onclick = ()=>{ expName.value=""; expAmt.value=""; };
+
+/* ============== Delete Account ============== */
+btnDeleteAccount.addEventListener("click", async ()=>{
+  if(!user) return;
+  if(!confirm("Delete your account and all your data? This cannot be undone.")) return;
+  try{
+    const uref = base(user.uid);
+    const delCol = async (name)=>{
+      const snap = await uref.collection(name).get();
+      const batch = db.batch();
+      snap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+    };
+    await delCol("incomes");
+    await delCol("expenses");
+    await uref.delete().catch(()=>{});
+    await user.delete();
+    alert("Account deleted.");
+  }catch(err){
+    alert("Could not delete account. You may need to log in again: " + err.message);
+  }
+});
+
+/* ============== Online/Offline Popup ============== */
+function showOfflinePop(){ offlinePop.style.display = "flex"; }
+function hideOfflinePop(){ offlinePop.style.display = "none"; }
+window.addEventListener("offline", showOfflinePop);
+window.addEventListener("online",  hideOfflinePop);
+offlineOk.addEventListener("click", hideOfflinePop);
+if(!navigator.onLine) showOfflinePop();
+
+/* ============== Auth State ============== */
+auth.onAuthStateChanged(async (u)=>{
+  user = u;
+  if(!u){
+    authPage.style.display = "flex";
+    appShell.style.display = "none";
+    userEmail.textContent = "Signed out";
+    btnLogout.style.display = "none";
+    return;
+  }
+  if(!u.emailVerified){
+    authPage.style.display = "flex";
+    appShell.style.display = "none";
+    userEmail.textContent = `${u.email} (verify)`;
+    btnLogout.style.display = "none";
+    return;
+  }
+  authPage.style.display = "none";
+  appShell.style.display = "block";
+  userEmail.textContent = u.email || "Account";
+  btnLogout.style.display = "inline-block";
+
+  state = readCache(u.uid);
+  if(!state.incomes) state = { incomes:[], expenses:[] };
+  renderAll();
+  if(!localStorage.getItem(LCKEY(u.uid))) await pullOnce();
+});
 </script>
 </body>
 </html>
