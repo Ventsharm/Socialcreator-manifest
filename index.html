@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Ventsharm Budget</title>
-<link rel="manifest" href="manifest.webmanifest" />
-<meta name="theme-color" content="#000000" />
-<link rel="icon" href="Icon-192.png" />
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0d6efd">
+<link rel="icon" href="Icon-192.png">
 <style>
 :root{
   --bg:#f5f6f8;--card:#fff;--text:#111;--muted:#6b7280;
@@ -37,7 +37,7 @@ button{cursor:pointer;font-weight:600}
 .hidden{display:none}
 .note{text-align:center;color:var(--muted);font-size:.9rem;margin-top:12px}
 .tabs{display:flex;gap:8px;margin-top:18px}
-.tab{flex:1;text-align:center;padding:10px;border:1px solid var(--b2);border-radius:12px;cursor:pointer;user-select:none;touch-action:manipulation;}
+.tab{flex:1;text-align:center;padding:10px;border:1px solid var(--b2);border-radius:12px;cursor:pointer;user-select:none;}
 .tab.active{background:#eef6ff;border-color:#b6dbff;color:#064d96}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .row{display:flex;gap:10px;margin-top:10px}
@@ -52,6 +52,7 @@ button{cursor:pointer;font-weight:600}
 </head>
 <body>
 
+<!-- LOGIN CARD -->
 <div class="card" id="loginCard">
   <h1><img src="Icon-192.png"> Ventsharm Budget</h1>
   <input id="email" type="email" placeholder="Email">
@@ -62,6 +63,7 @@ button{cursor:pointer;font-weight:600}
   <p class="note">Sign in or create an account to access your budget.</p>
 </div>
 
+<!-- MAIN APP CARD -->
 <div class="card hidden" id="appCard">
   <div class="header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
     <h1 style="margin:0;display:flex;align-items:center;gap:8px"><img src="Icon-192.png"> Ventsharm Budget</h1>
@@ -100,7 +102,7 @@ button{cursor:pointer;font-weight:600}
   <p class="note">Synced via Firebase. Cached offline; 0 reads on refresh.</p>
 </div>
 
-<!-- Modal for editing -->
+<!-- MODAL -->
 <div id="modalBack" class="modal-back">
   <div class="modal">
     <h3>Edit Entry</h3>
@@ -112,9 +114,7 @@ button{cursor:pointer;font-weight:600}
       <button id="mClose" class="gray">Close</button>
     </div>
   </div>
-</div>
-
-<script type="module">
+</div><script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
 import { getAuth, setPersistence, browserLocalPersistence, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
@@ -127,6 +127,7 @@ const app = initializeApp({
   messagingSenderId:"162369707369",
   appId:"1:162369707369:web:3faa7f002f8ba22dc0f1f8"
 });
+
 const auth=getAuth(app); const db=getFirestore(app);
 await setPersistence(auth,browserLocalPersistence);
 
@@ -138,7 +139,7 @@ const loginBtn=document.getElementById("loginBtn");
 const forgotBtn=document.getElementById("forgotBtn");
 const verifyBtn=document.getElementById("verifyBtn");
 const logoutBtn=document.getElementById("logoutBtn");
-const LS="vb_cache_v5";
+const LS="vb_cache_final";
 let cache=JSON.parse(localStorage.getItem(LS)||'{"entries":[],"uid":null}');
 let UID=cache.uid;function save(){localStorage.setItem(LS,JSON.stringify(cache));}
 function fmt(n){return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
@@ -153,17 +154,14 @@ loginBtn.onclick=async()=>{
     alert("Account created! Check your email for verification.");
   }
 };
-
 forgotBtn.onclick=async()=>{
   if(!email.value)return alert("Enter your email first");
   await sendPasswordResetEmail(auth,email.value);
   alert("Password reset email sent!");
 };
-
 verifyBtn.onclick=async()=>{
   if(auth.currentUser){await sendEmailVerification(auth.currentUser);alert("Verification email sent again!");}
 };
-
 logoutBtn.onclick=()=>signOut(auth);
 
 onAuthStateChanged(auth,async u=>{
@@ -181,22 +179,14 @@ onAuthStateChanged(auth,async u=>{
   }
 });
 
-/* --- FIXED TAB SYSTEM --- */
 const panes={inc:document.getElementById("pane-inc"),exp:document.getElementById("pane-exp"),ov:document.getElementById("pane-ov")};
 function setTab(id){
-  document.querySelectorAll(".tab").forEach(t=>{
-    t.classList.toggle("active",t.dataset.tab===id);
-  });
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===id));
   Object.values(panes).forEach(p=>p.classList.add("hidden"));
-  (panes[id]||panes.inc).classList.remove("hidden");
+  panes[id].classList.remove("hidden");
 }
-document.querySelectorAll(".tab").forEach(t=>{
-  t.addEventListener("click",e=>{
-    e.preventDefault();e.stopPropagation();setTab(t.dataset.tab);
-  },{passive:true});
-});
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>setTab(t.dataset.tab));
 setTab("inc");
-/* --- END FIXED TAB SYSTEM --- */
 
 const tInc=document.getElementById("tInc"),tExp=document.getElementById("tExp"),tAvail=document.getElementById("tAvail");
 function render(){
