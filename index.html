@@ -3,129 +3,41 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ventsharm Budget App</title>
+<title>Ventsharm Budget</title>
 <link rel="icon" href="Icon-192.png">
 <style>
-  body {
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    background: #f5f6f8;
-    color: #222;
-    margin: 0;
-    padding: 0;
-  }
-  .container {
-    max-width: 420px;
-    margin: 40px auto;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,.1);
-    padding: 20px;
-  }
-  h1 {
-    text-align: center;
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-  }
-  .tabs {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 15px;
-  }
-  .tab {
-    padding: 10px;
-    flex: 1;
-    border: none;
-    background: #eee;
-    border-radius: 10px;
-    margin: 0 5px;
-    cursor: pointer;
-    font-weight: 600;
-  }
-  .tab.active {
-    background: #0d6efd;
-    color: #fff;
-  }
-  .list {
-    margin-top: 15px;
-  }
-  .item {
-    display: flex;
-    justify-content: space-between;
-    background: #f7f7f7;
-    padding: 8px 12px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    align-items: center;
-  }
-  .actions button {
-    border: none;
-    background: #eee;
-    margin-left: 5px;
-    padding: 6px 8px;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-  .actions button:hover { opacity: 0.8; }
-  .add-form, .edit-modal, .auth-screen {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  input, select, button {
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-  }
-  button.primary {
-    background: linear-gradient(90deg,#007bff,#00aaff);
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-  }
-  button.secondary {
-    background: #ccc;
-    border: none;
-    cursor: pointer;
-  }
-  .summary {
-    display: flex;
-    justify-content: space-around;
-    margin: 15px 0;
-    text-align: center;
-  }
-  .summary div {
-    background: #f8f9fa;
-    border-radius: 10px;
-    padding: 10px;
-    flex: 1;
-    margin: 0 5px;
-  }
-  .auth-screen {
-    max-width: 380px;
-    margin: 40px auto;
-    background: #fff;
-    padding: 25px;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,.1);
-  }
-  .hidden { display: none; }
+  body {font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f5f6f8;margin:0;padding:0;color:#222;}
+  .card {max-width:420px;margin:40px auto;background:#fff;padding:20px;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,.1);}
+  h1 {text-align:center;font-size:1.6rem;margin-bottom:20px;}
+  input,select,button {width:100%;padding:10px;border:1px solid #ccc;border-radius:10px;font-size:1rem;box-sizing:border-box;}
+  button.primary {background:linear-gradient(90deg,#007bff,#00aaff);color:#fff;font-weight:600;border:none;cursor:pointer;}
+  button.secondary {background:#ccc;border:none;cursor:pointer;}
+  .tabs {display:flex;justify-content:space-between;margin-bottom:15px;}
+  .tabs button {flex:1;padding:10px;border:none;border-radius:10px;margin:0 5px;background:#eee;cursor:pointer;font-weight:600;}
+  .tabs button.active {background:#007bff;color:#fff;}
+  .hidden{display:none;}
+  .summary{display:flex;justify-content:space-between;margin:15px 0;text-align:center;}
+  .summary div{flex:1;background:#f1f3f5;margin:0 5px;padding:10px;border-radius:10px;}
+  .item{display:flex;justify-content:space-between;background:#f8f9fa;padding:8px 12px;margin-bottom:8px;border-radius:10px;}
+  .actions button{border:none;background:#eee;margin-left:5px;padding:5px 8px;border-radius:6px;cursor:pointer;}
+  .auth{max-width:380px;margin:60px auto;background:#fff;padding:25px;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,.1);}
 </style>
 </head>
 <body>
 
-<div id="authSection" class="auth-screen">
+<!-- LOGIN SCREEN -->
+<div id="authScreen" class="auth">
   <h1>Ventsharm Budget Login</h1>
-  <input id="email" type="email" placeholder="Email" autocomplete="email">
-  <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
   <button id="loginBtn" class="primary">Login</button>
   <button id="registerBtn" class="secondary">Register</button>
   <button id="forgotBtn" class="secondary">Forgot Password</button>
   <p id="authMsg"></p>
 </div>
 
-<div id="app" class="container hidden">
+<!-- MAIN APP -->
+<div id="app" class="card hidden">
   <h1>Ventsharm Budget</h1>
 
   <div class="tabs">
@@ -134,7 +46,7 @@
     <button class="tab" data-tab="overview">Overview</button>
   </div>
 
-  <div class="add-form">
+  <div id="tab-incomes">
     <input id="titleInput" placeholder="Title (e.g. Salary, Rent)">
     <input id="amountInput" type="number" placeholder="Amount">
     <select id="typeSelect">
@@ -142,22 +54,26 @@
       <option value="expense">Expense</option>
     </select>
     <button id="addBtn" class="primary">Add</button>
+    <div id="incomeList"></div>
   </div>
 
-  <div class="summary">
-    <div><b>Income</b><br><span id="sumIncome">£0.00</span></div>
-    <div><b>Expenses</b><br><span id="sumExpense">£0.00</span></div>
-    <div><b>Available</b><br><span id="sumAvailable">£0.00</span></div>
+  <div id="tab-expenses" class="hidden">
+    <p>No expenses yet.</p>
+    <div id="expenseList"></div>
   </div>
 
-  <div id="tab-incomes" class="list"></div>
-  <div id="tab-expenses" class="list hidden"></div>
-  <div id="tab-overview" class="list hidden"></div>
+  <div id="tab-overview" class="hidden">
+    <p>Overview shows totals and quick stats.</p>
+    <div class="summary">
+      <div><b>Income</b><br><span id="sumIncome">£0.00</span></div>
+      <div><b>Expenses</b><br><span id="sumExpense">£0.00</span></div>
+      <div><b>Available</b><br><span id="sumAvailable">£0.00</span></div>
+    </div>
+  </div>
 
   <button id="logoutBtn" class="secondary">Logout</button>
 </div>
 
-<!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
@@ -171,143 +87,78 @@ const firebaseConfig = {
   messagingSenderId: "162369707369",
   appId: "1:162369707369:web:3faa7f002f8ba22dc0f1f8"
 };
+const appFB = initializeApp(firebaseConfig);
+const auth = getAuth(appFB);
+const db = getFirestore(appFB);
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+const authScreen=document.getElementById("authScreen");
+const appDiv=document.getElementById("app");
+const msg=document.getElementById("authMsg");
+const data={incomes:[],expenses:[]};
 
-const authSection = document.getElementById("authSection");
-const appSection = document.getElementById("app");
-const msg = document.getElementById("authMsg");
-
-function toggleView(authMode) {
-  authSection.classList.toggle("hidden", !authMode);
-  appSection.classList.toggle("hidden", authMode);
-}
-
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    toggleView(false);
-    loadBudget();
-  } else {
-    toggleView(true);
-  }
+onAuthStateChanged(auth,user=>{
+  if(user){authScreen.classList.add("hidden");appDiv.classList.remove("hidden");load();}
+  else{appDiv.classList.add("hidden");authScreen.classList.remove("hidden");}
 });
 
-document.getElementById("registerBtn").onclick = async () => {
-  try {
-    await createUserWithEmailAndPassword(auth, email.value, password.value);
-    msg.textContent = "Account created! Please login.";
-  } catch (e) {
-    msg.textContent = e.message;
-  }
+document.getElementById("loginBtn").onclick=async()=>{
+  try{await signInWithEmailAndPassword(auth,email.value,password.value);}catch(e){msg.textContent=e.message;}
 };
-document.getElementById("loginBtn").onclick = async () => {
-  try {
-    await signInWithEmailAndPassword(auth, email.value, password.value);
-  } catch (e) {
-    msg.textContent = e.message;
-  }
+document.getElementById("registerBtn").onclick=async()=>{
+  try{await createUserWithEmailAndPassword(auth,email.value,password.value);msg.textContent="Registered! Login now.";}catch(e){msg.textContent=e.message;}
 };
-document.getElementById("forgotBtn").onclick = async () => {
-  try {
-    await sendPasswordResetEmail(auth, email.value);
-    msg.textContent = "Password reset email sent.";
-  } catch (e) {
-    msg.textContent = e.message;
-  }
+document.getElementById("forgotBtn").onclick=async()=>{
+  try{await sendPasswordResetEmail(auth,email.value);msg.textContent="Reset email sent.";}catch(e){msg.textContent=e.message;}
 };
-document.getElementById("logoutBtn").onclick = () => signOut(auth);
+document.getElementById("logoutBtn").onclick=()=>signOut(auth);
 
-const data = { incomes: [], expenses: [] };
-
-function render() {
-  const inc = document.getElementById("tab-incomes");
-  const exp = document.getElementById("tab-expenses");
-  const ov = document.getElementById("tab-overview");
-  inc.innerHTML = exp.innerHTML = ov.innerHTML = "";
-
-  data.incomes.forEach((x) => addItem(x, inc, "income"));
-  data.expenses.forEach((x) => addItem(x, exp, "expense"));
-
-  const incSum = data.incomes.reduce((s, x) => s + x.amount, 0);
-  const expSum = data.expenses.reduce((s, x) => s + x.amount, 0);
-  document.getElementById("sumIncome").textContent = "£" + incSum.toFixed(2);
-  document.getElementById("sumExpense").textContent = "£" + expSum.toFixed(2);
-  document.getElementById("sumAvailable").textContent = "£" + (incSum - expSum).toFixed(2);
-}
-
-function addItem(x, el, type) {
-  const div = document.createElement("div");
-  div.className = "item";
-  div.innerHTML = `<div>${x.title}</div><div>£${x.amount.toFixed(2)}</div>
-  <div class="actions">
-    <button onclick="editItem('${type}','${x.id}')">✏️</button>
-    <button onclick="deleteItem('${type}','${x.id}')">🗑️</button>
-  </div>`;
-  el.appendChild(div);
-}
-
-window.editItem = (type, id) => {
-  const arr = data[type + "s"];
-  const item = arr.find((x) => x.id === id);
-  const newTitle = prompt("Edit title:", item.title);
-  const newAmount = parseFloat(prompt("Edit amount:", item.amount));
-  if (newTitle && !isNaN(newAmount)) {
-    item.title = newTitle;
-    item.amount = newAmount;
-    saveBudget();
-    render();
-  }
-};
-
-window.deleteItem = (type, id) => {
-  const arr = data[type + "s"];
-  const i = arr.findIndex((x) => x.id === id);
-  if (i > -1) arr.splice(i, 1);
-  saveBudget();
-  render();
-};
-
-document.getElementById("addBtn").onclick = () => {
-  const title = titleInput.value.trim();
-  const amt = parseFloat(amountInput.value);
-  const type = typeSelect.value;
-  if (!title || isNaN(amt)) return;
-  const item = { id: Date.now().toString(), title, amount: amt };
-  data[type + "s"].push(item);
-  titleInput.value = amountInput.value = "";
-  saveBudget();
-  render();
-};
-
-async function saveBudget() {
-  const user = auth.currentUser;
-  if (!user) return;
-  localStorage.setItem("budgetData", JSON.stringify(data));
-  await setDoc(doc(db, "budgets", user.uid), data);
-}
-
-async function loadBudget() {
-  const user = auth.currentUser;
-  if (!user) return;
-  const local = localStorage.getItem("budgetData");
-  if (local) Object.assign(data, JSON.parse(local));
-  try {
-    const snap = await getDoc(doc(db, "budgets", user.uid));
-    if (snap.exists()) Object.assign(data, snap.data());
-  } catch {}
+function save(){localStorage.setItem("budgetData",JSON.stringify(data));render();}
+function load(){
+  const saved=localStorage.getItem("budgetData");
+  if(saved)Object.assign(data,JSON.parse(saved));
   render();
 }
 
-document.querySelectorAll(".tab").forEach((b) =>
-  b.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
-    b.classList.add("active");
-    document.querySelectorAll(".list").forEach((l) => l.classList.add("hidden"));
-    document.getElementById("tab-" + b.dataset.tab).classList.remove("hidden");
-  })
-);
+document.getElementById("addBtn").onclick=()=>{
+  const t=titleInput.value.trim();const a=parseFloat(amountInput.value);
+  const type=typeSelect.value;if(!t||isNaN(a))return;
+  data[type+"s"].push({id:Date.now(),title:t,amount:a});
+  titleInput.value=amountInput.value="";
+  save();
+};
+
+function render(){
+  const incDiv=document.getElementById("incomeList");
+  const expDiv=document.getElementById("expenseList");
+  incDiv.innerHTML=expDiv.innerHTML="";
+  data.incomes.forEach(i=>{
+    const d=document.createElement("div");
+    d.className="item";
+    d.innerHTML=`<span>${i.title}</span><span>£${i.amount.toFixed(2)}</span>`;
+    incDiv.appendChild(d);
+  });
+  data.expenses.forEach(i=>{
+    const d=document.createElement("div");
+    d.className="item";
+    d.innerHTML=`<span>${i.title}</span><span>£${i.amount.toFixed(2)}</span>`;
+    expDiv.appendChild(d);
+  });
+  const inc=data.incomes.reduce((s,x)=>s+x.amount,0);
+  const exp=data.expenses.reduce((s,x)=>s+x.amount,0);
+  document.getElementById("sumIncome").textContent="£"+inc.toFixed(2);
+  document.getElementById("sumExpense").textContent="£"+exp.toFixed(2);
+  document.getElementById("sumAvailable").textContent="£"+(inc-exp).toFixed(2);
+}
+
+// TAB SWITCHING FIX
+document.querySelectorAll(".tab").forEach(tab=>{
+  tab.onclick=()=>{
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    tab.classList.add("active");
+    document.querySelectorAll("#app > div[id^='tab-']").forEach(div=>div.classList.add("hidden"));
+    document.getElementById("tab-"+tab.dataset.tab).classList.remove("hidden");
+  };
+});
 </script>
 </body>
 </html>
