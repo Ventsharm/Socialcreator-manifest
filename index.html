@@ -15,7 +15,7 @@
   html,body{height:100%}
   body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
 
-  /* ---------- Buttons ---------- */
+  /* ---------- Buttons (white + black border) ---------- */
   .btn{
     background:#fff; color:#000; border:1.6px solid #000; border-radius:var(--btnr);
     padding:10px 14px; font-weight:800; cursor:pointer; transition:transform .06s ease;
@@ -41,15 +41,16 @@
   }
   input:focus{box-shadow:0 0 0 4px rgba(0,0,0,.06)}
 
-  /* ---------- App shell ---------- */
+  /* ---------- App shell (hidden until login) ---------- */
   .app{display:none; width:min(950px,96vw); margin:24px auto; background:#fff; border:1px solid var(--ring); border-radius:22px; box-shadow:var(--shadow); overflow:hidden}
   .topbar{display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--ring); background:#fff}
   .brand{font-size:20px; font-weight:900}
   .userbox{
-    display:flex; flex-direction:column; align-items:flex-end; gap:10px; color:#555; flex-wrap:wrap;  /* stacked: email over logout */
+    display:flex; flex-direction:column; align-items:flex-end;
+    gap:10px; color:#555; flex-wrap:wrap; /* ensures Logout sits under email */
   }
 
-  /* Tabs */
+  /* Tabs at top */
   .tabs{display:flex; gap:10px; padding:12px 14px; border-bottom:1px solid var(--ring); background:#fff}
   .tab{flex:1; text-align:center; padding:10px 12px; border-radius:999px; border:1.6px solid #000; background:#fff; font-weight:800; cursor:pointer}
   .tab[aria-selected="true"]{box-shadow:0 0 0 2px #000 inset}
@@ -70,7 +71,7 @@
   .item.show .item_actions{display:flex}
   @keyframes reveal{from{opacity:0; transform:translateY(-4px)} to{opacity:1; transform:none}}
 
-  /* Include badge */
+  /* Include badge: ✅ or blank */
   .include-pill{font-weight:900; color:#16a34a}
 
   /* Overview soft colours */
@@ -83,7 +84,7 @@
 
   .footer{padding:10px 16px; color:#777; border-top:1px solid var(--ring); text-align:center}
 
-  /* Edit modal */
+  /* Edit modal (plain white) */
   dialog::backdrop{background:rgba(0,0,0,.35)}
   dialog{border:0; border-radius:18px; padding:0; width:min(520px,92vw); box-shadow:var(--shadow); background:#fff}
   .modal{padding:18px}
@@ -108,7 +109,7 @@
       <button class="btn sm" data-auth="forgot">Forgot</button>
     </div>
 
-    <!-- Resend verification shown when signed-in but unverified -->
+    <!-- Shown when signed in but NOT verified -->
     <div id="verifyBox" class="center-row" style="display:none; justify-content:center; margin:0 0 10px">
       <span style="font-weight:800; color:#444">Email not verified.</span>
       <button id="btnResend" class="btn sm">Resend Verification</button>
@@ -410,7 +411,7 @@ btnDoLogin.addEventListener("click", async ()=>{
     const e = loginEmail.value.trim(), p = loginPass.value;
     if(!e || !p) return alert("Enter email and password.");
     await auth.signInWithEmailAndPassword(e,p);
-    // If unverified, the auth state handler will reveal verifyBox
+    // If unverified, the auth state handler below will reveal verifyBox
   }catch(err){ alert(err.message); }
 });
 
@@ -424,7 +425,7 @@ btnDoReset.addEventListener("click", async ()=>{
   }catch(err){ alert(err.message); }
 });
 
-/* Resend verification (shown only when unverified) */
+/* Resend verification (visible only when unverified) */
 btnResend.addEventListener("click", async ()=>{
   try{
     if(!auth.currentUser) return;
@@ -519,7 +520,7 @@ function renderAll(){
     };
   });
 
-  // Overview totals
+  // Overview
   const totalAll  = state.incomes.reduce((s,x)=>s+Number(x.amount||0),0);
   const totalInc  = state.incomes.filter(x=>x.include).reduce((s,x)=>s+Number(x.amount||0),0);
   const totalExpn = state.expenses.reduce((s,x)=>s+Number(x.amount||0),0);
@@ -610,8 +611,8 @@ auth.onAuthStateChanged(async (u)=>{
     // Logged out
     authPage.style.display = "flex";
     appShell.style.display = "none";
-    userEmail.textContent = "Signed out";
     verifyBox.style.display = "none";
+    userEmail.textContent = "Signed out";
     btnLogout.style.display = "none";
     return;
   }
@@ -621,6 +622,7 @@ auth.onAuthStateChanged(async (u)=>{
     appShell.style.display = "none";
     verifyBox.style.display = "flex";
     userEmail.textContent = `${u.email} (verify)`;
+    btnLogout.style.display = "none";
     return;
   }
   // Signed in + verified → show app
@@ -640,6 +642,33 @@ auth.onAuthStateChanged(async (u)=>{
     await pullOnce();
   }
 });
+
+/* ============== Auto-detect email verification (no page refresh) ============== */
+/* This uses Firebase Auth only (NOT Firestore) — it does not add reads/writes. */
+setInterval(async ()=>{
+  const u = auth.currentUser;
+  if(u && !u.emailVerified){
+    try{
+      await u.reload(); // refresh Auth user metadata
+      if(u.emailVerified){
+        // Transition to the app immediately (mirror the onAuthStateChanged verified path)
+        authPage.style.display = "none";
+        verifyBox.style.display = "none";
+        appShell.style.display = "block";
+        userEmail.textContent = u.email || "Account";
+        btnLogout.style.display = "inline-block";
+
+        // Ensure state is rendered; do not add extra Firestore reads beyond the lazy-first-read
+        state = readCache(u.uid);
+        if(!state.incomes) state = { incomes:[], expenses:[] };
+        renderAll();
+        if(!localStorage.getItem(LCKEY(u.uid))){
+          await pullOnce();
+        }
+      }
+    }catch(e){ /* ignore transient errors */ }
+  }
+}, 5000); // check every 5 seconds
 </script>
 </body>
 </html>
