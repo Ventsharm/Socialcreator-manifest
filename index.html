@@ -6,79 +6,21 @@
   <title>File Converter</title>
   <link rel="icon" href="Icon-192.png">
   <style>
-    body {
-      font-family: system-ui, sans-serif;
-      background: #f5f6f8;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 30px 10px;
-      color: #222;
-    }
-    .app {
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      padding: 25px 20px;
-      width: 100%;
-      max-width: 420px;
-      box-sizing: border-box;
-    }
-    h1 {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-size: 1.4rem;
-      margin-bottom: 20px;
-    }
-    h1 img {
-      width: 28px; height: 28px;
-    }
-    label { font-weight: 600; display:block; margin:15px 0 6px; }
-    input, select, button {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-      box-sizing: border-box;
-    }
-    select { background:#fff; }
-    .row { display:flex; gap:10px; }
-    button {
-      border:none;
-      color:#fff;
-      font-weight:600;
-      cursor:pointer;
-      transition:opacity 0.2s;
-    }
-    button:hover{opacity:0.9;}
-    .blue { background: linear-gradient(90deg,#007bff,#00aaff);}
-    .gray { background:#ccc; color:#000; }
-    #status {
-      display:none;
-      text-align:center;
-      color:#0a0;
-      font-weight:600;
-      margin-top:10px;
-    }
-    #error {
-      color:#e00;
-      font-weight:500;
-      margin:8px 0;
-    }
-    #preview img {
-      width:100%;
-      border-radius:14px;
-      margin-top:8px;
-    }
-    #info {
-      text-align:left;
-      margin-top:5px;
-      font-size:0.9rem;
-    }
+    body{font-family:system-ui,sans-serif;background:#f5f6f8;display:flex;flex-direction:column;align-items:center;padding:30px 10px;color:#222}
+    .app{background:#fff;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,0.1);padding:25px 20px;width:100%;max-width:420px;box-sizing:border-box}
+    h1{display:flex;align-items:center;justify-content:center;gap:8px;font-size:1.4rem;margin-bottom:20px}
+    h1 img{width:28px;height:28px}
+    label{font-weight:600;display:block;margin:15px 0 6px}
+    input,select,button{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #ccc;font-size:1rem;box-sizing:border-box}
+    .row{display:flex;gap:10px}
+    button{border:none;color:#fff;font-weight:600;cursor:pointer;transition:opacity .2s}
+    button:hover{opacity:.9}
+    .blue{background:linear-gradient(90deg,#007bff,#00aaff)}
+    .gray{background:#ccc;color:#000}
+    #status{display:none;text-align:center;color:#0a0;font-weight:600;margin-top:10px}
+    #error{color:#e00;font-weight:500;margin:8px 0}
+    #preview img{width:100%;border-radius:14px;margin-top:8px}
+    #info{text-align:left;margin-top:5px;font-size:.9rem}
   </style>
 </head>
 <body>
@@ -119,141 +61,112 @@
   </div><script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.js"></script>
 <script>
-if (window.pdfjsLib) {
+if (window.pdfjsLib)
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.js";
-}
 
 (function(){
-  const $ = s => document.querySelector(s);
-  const filesEl=$("#files"), formatEl=$("#format"), wEl=$("#width"), hEl=$("#height"),
-        unitsEl=$("#units"), preview=$("#preview"), info=$("#info"),
-        error=$("#error"), convertBtn=$("#convert"), resetBtn=$("#reset"),
-        status=$("#status");
+  const $=s=>document.querySelector(s);
+  const files=$("#files"),fmt=$("#format"),w=$("#width"),h=$("#height"),
+        unit=$("#units"),preview=$("#preview"),info=$("#info"),
+        err=$("#error"),status=$("#status");
+  const MAX=8000, PDF_DPI=300;
 
-  const MAX_SIZE = 8000;
-  const PDF_DPI = 300;
+  const cmToIn=cm=>cm/2.54, pxToIn=px=>px/PDF_DPI, inToPx=inches=>inches*PDF_DPI;
+  const inchToPx96=i=>i*96, cmToPx96=c=>c*37.7953;
+  const toPxScreen=(v,u)=>!isFinite(v)?undefined:u==="in"?inchToPx96(v):u==="cm"?cmToPx96(v):v;
 
-  const cmToIn = cm => cm / 2.54;
-  const pxToIn_pdf = px => px / PDF_DPI;
-  const inToPx_pdf = inch => Math.round(inch * PDF_DPI);
-  const inchToPx_screen = inch => Math.round(inch * 96);
-  const cmToPx_screen = cm => Math.round(cm * 37.7953);
-  const toPx_screen = (v,u) => !isFinite(v)?undefined:u==="in"?inchToPx_screen(v):u==="cm"?cmToPx_screen(v):v;
+  let counter=1;
+  const clear=()=>{status.style.display="none";err.textContent="";};
+  fmt.addEventListener("change",clear);unit.addEventListener("change",clear);
 
-  let convertCount = 1;
-
-  function clearStatus(){ status.style.display="none"; error.textContent=""; }
-  formatEl.addEventListener("change",clearStatus);
-  unitsEl.addEventListener("change",clearStatus);
-
-  filesEl.addEventListener("change",async e=>{
+  files.addEventListener("change",async e=>{
     const f=e.target.files[0];
-    preview.innerHTML="";info.textContent="";error.textContent="";status.style.display="none";
+    preview.innerHTML="";info.textContent="";err.textContent="";status.style.display="none";
     if(!f)return;
     if(/pdf$/i.test(f.name)){
       const buf=await f.arrayBuffer();
       const pdf=await pdfjsLib.getDocument({data:buf}).promise;
-      const page=await pdf.getPage(1);
-      const vp=page.getViewport({scale:1});
-      const cnv=document.createElement("canvas");
-      cnv.width=vp.width;cnv.height=vp.height;
+      const page=await pdf.getPage(1);const vp=page.getViewport({scale:1});
+      const cnv=document.createElement("canvas");cnv.width=vp.width;cnv.height=vp.height;
       await page.render({canvasContext:cnv.getContext("2d"),viewport:vp}).promise;
       const img=new Image();img.src=cnv.toDataURL();
       info.textContent=`Original size: ${Math.round(vp.width)} × ${Math.round(vp.height)}px (PDF preview)`;
       preview.appendChild(img);
     }else{
-      const url=URL.createObjectURL(f);
-      const img=new Image();
-      img.onload=()=>{info.textContent=`Original size: ${img.width} × ${img.height}px`;preview.appendChild(img);URL.revokeObjectURL(url);};
+      const url=URL.createObjectURL(f);const img=new Image();
+      img.onload=()=>{info.textContent=`Original size: ${img.width} × ${img.height}px`;
+        preview.appendChild(img);URL.revokeObjectURL(url);};
       img.src=url;
     }
   });
 
-  resetBtn.addEventListener("click",()=>{
-    filesEl.value="";preview.innerHTML="";info.textContent="";
-    error.textContent="";wEl.value="";hEl.value="";
-    convertCount=1;status.style.display="none";
-  });
+  $("#reset").addEventListener("click",()=>{files.value="";preview.innerHTML="";info.textContent="";
+    err.textContent="";w.value="";h.value="";counter=1;status.style.display="none";});
 
-  async function fileToImage(f){
-    const u=URL.createObjectURL(f);
-    const img=new Image();
-    await new Promise(r=>{img.onload=r;img.src=u;});
-    URL.revokeObjectURL(u);
-    return img;
-  }
+  async function fileToImage(f){const u=URL.createObjectURL(f);
+    const img=new Image();await new Promise(r=>{img.onload=r;img.src=u;});
+    URL.revokeObjectURL(u);return img;}
 
-  async function imageToCanvas(img,w,h){
-    const c=document.createElement("canvas");
-    c.width=w||img.width;c.height=h||img.height;
-    c.getContext("2d").drawImage(img,0,0,c.width,c.height);
-    return c;
-  }
+  async function imageToCanvas(img,W,H){const c=document.createElement("canvas");
+    c.width=W||img.width;c.height=H||img.height;
+    c.getContext("2d").drawImage(img,0,0,c.width,c.height);return c;}
 
-  function downloadBlob(blob,name){
-    const u=URL.createObjectURL(blob);
+  function download(blob,name){const u=URL.createObjectURL(blob);
     const a=document.createElement("a");a.href=u;a.download=name;a.click();
-    setTimeout(()=>URL.revokeObjectURL(u),4000);
-  }
-
-  function getPdfInches(imgWpx,imgHpx,wVal,hVal,unit){
-    const hasW=Number.isFinite(wVal), hasH=Number.isFinite(hVal);
-    let wIn = hasW ? (unit==="in"?wVal:unit==="cm"?cmToIn(wVal):pxToIn_pdf(wVal)) : pxToIn_pdf(imgWpx);
-    let hIn = hasH ? (unit==="in"?hVal:unit==="cm"?cmToIn(hVal):pxToIn_pdf(hVal)) : pxToIn_pdf(imgHpx);
-    return {wIn,hIn};
-  }
+    setTimeout(()=>URL.revokeObjectURL(u),4000);}
 
   async function convert(){
-    error.textContent="";status.style.display="none";
-    const files=Array.from(filesEl.files||[]);
-    if(!files.length){alert("Please choose a file.");return;}
-    const fmt=formatEl.value,unit=unitsEl.value;
-    const wVal=parseFloat(wEl.value),hVal=parseFloat(hEl.value);
+    err.textContent="";status.style.display="none";
+    const list=Array.from(files.files||[]);if(!list.length){alert("Please choose a file.");return;}
+    const format=fmt.value, u=unit.value, wv=parseFloat(w.value), hv=parseFloat(h.value);
     const {jsPDF}=window.jspdf;
 
-    for(const f of files){
-      const base=f.name.replace(/\.[^.]+$/,""),suffix=`-conv${convertCount++}`;
-      const isPDF=/pdf$/i.test(f.name),isIMG=/^image\//.test(f.type);
+    for(const f of list){
+      const base=f.name.replace(/\.[^.]+$/,""), name=`${base}-conv${counter++}`;
+      const isPDF=/pdf$/i.test(f.name), isIMG=/^image\//.test(f.type);
 
-      if(isIMG&&fmt==="pdf"){
+      if(isIMG && format==="pdf"){
         const img=await fileToImage(f);
-        const {wIn,hIn}=getPdfInches(img.width,img.height,wVal,hVal,unit);
-        const drawW=inToPx_pdf(wIn),drawH=inToPx_pdf(hIn);
-        if(drawW>MAX_SIZE||drawH>MAX_SIZE){error.textContent="Size too large. Try smaller values.";preview.insertAdjacentElement("beforebegin",error);return;}
+        // physical inches for page
+        const wIn=isFinite(wv)?(u==="in"?wv:u==="cm"?cmToIn(wv):pxToIn(wv)):pxToIn(img.width);
+        const hIn=isFinite(hv)?(u==="in"?hv:u==="cm"?cmToIn(hv):pxToIn(hv)):pxToIn(img.height);
+        // convert to points for jsPDF
+        const wPt=wIn*72, hPt=hIn*72;
+        const drawW=inToPx(wIn), drawH=inToPx(hIn);
+        if(drawW>MAX||drawH>MAX){err.textContent="Size too large. Try smaller values.";preview.insertAdjacentElement("beforebegin",err);return;}
         const cnv=await imageToCanvas(img,drawW,drawH);
-        const doc=new jsPDF({unit:"in",format:[wIn,hIn]});
-        doc.addImage(cnv.toDataURL("image/jpeg",0.92),"JPEG",0,0,wIn,hIn);
-        downloadBlob(doc.output("blob"),`${base}${suffix}.pdf`);
+        const doc=new jsPDF({unit:"pt",format:[wPt,hPt]});
+        doc.addImage(cnv.toDataURL("image/jpeg",0.92),"JPEG",0,0,wPt,hPt);
+        download(doc.output("blob"),`${name}.pdf`);
       }
-      else if(isPDF&&fmt!=="pdf"){
+      else if(isPDF && format!=="pdf"){
         const ab=await f.arrayBuffer();
         const pdf=await pdfjsLib.getDocument({data:ab}).promise;
         for(let p=1;p<=pdf.numPages;p++){
-          const page=await pdf.getPage(p);
-          const vp=page.getViewport({scale:1});
-          const cnv=document.createElement("canvas");
-          cnv.width=vp.width;cnv.height=vp.height;
+          const page=await pdf.getPage(p), vp=page.getViewport({scale:1});
+          const cnv=document.createElement("canvas");cnv.width=vp.width;cnv.height=vp.height;
           await page.render({canvasContext:cnv.getContext("2d"),viewport:vp}).promise;
-          const blob=await new Promise(r=>cnv.toBlob(r,"image/"+fmt,0.92));
-          downloadBlob(blob,`${base}${suffix}-p${p}.${fmt}`);
+          const blob=await new Promise(r=>cnv.toBlob(r,"image/"+format,0.92));
+          download(blob,`${name}-p${p}.${format}`);
         }
       }
-      else if(isIMG&&fmt!=="pdf"){
+      else if(isIMG && format!=="pdf"){
         const img=await fileToImage(f);
-        const W=toPx_screen(wVal,unit)||img.width,H=toPx_screen(hVal,unit)||img.height;
-        if(W>MAX_SIZE||H>MAX_SIZE){error.textContent="Size too large. Try smaller values.";preview.insertAdjacentElement("beforebegin",error);return;}
+        const W=toPxScreen(wv,u)||img.width,H=toPxScreen(hv,u)||img.height;
+        if(W>MAX||H>MAX){err.textContent="Size too large. Try smaller values.";preview.insertAdjacentElement("beforebegin",err);return;}
         const cnv=await imageToCanvas(img,W,H);
-        const blob=await new Promise(r=>cnv.toBlob(r,"image/"+fmt,0.92));
-        downloadBlob(blob,`${base}${suffix}.${fmt}`);
+        const blob=await new Promise(r=>cnv.toBlob(r,"image/"+format,0.92));
+        download(blob,`${name}.${format}`);
       }
-      else{error.textContent="Unsupported conversion.";}
+      else err.textContent="Unsupported conversion.";
     }
     status.style.display="block";
   }
 
-  convertBtn.addEventListener("click",convert);
-  if("serviceWorker"in navigator){navigator.serviceWorker.register("service-worker.js");}
+  $("#convert").addEventListener("click",convert);
+  if("serviceWorker"in navigator)
+    navigator.serviceWorker.register("service-worker.js");
 })();
 </script>
 </body>
