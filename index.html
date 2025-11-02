@@ -45,7 +45,7 @@
   .app{display:none; width:min(950px,96vw); margin:24px auto; background:#fff; border:1px solid var(--ring); border-radius:22px; box-shadow:var(--shadow); overflow:hidden}
   .topbar{display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--ring); background:#fff}
   .brand{font-size:20px; font-weight:900}
-  .userbox{display:flex; flex-direction:column; align-items:flex-end; gap:6px; color:#555}
+  .userbox{display:flex; gap:10px; align-items:center; color:#555; flex-wrap:wrap}
 
   /* Tabs at top */
   .tabs{display:flex; gap:10px; padding:12px 14px; border-bottom:1px solid var(--ring); background:#fff}
@@ -162,10 +162,106 @@
     <div class="brand">Budget Planner</div>
     <div class="userbox">
       <span id="userEmail">Signed out</span>
-      <!-- ✅ Added logout button under email -->
-      <button id="btnLogout" class="btn sm" style="display:none; margin-top:6px;">Logout</button>
+      <button id="btnLogout" class="btn sm" style="display:none">Logout</button>
     </div>
-  </div><!-- Firebase (compat) -->
+  </div>
+
+  <!-- Tabs at top -->
+  <div class="tabs" role="tablist" aria-label="Sections">
+    <button class="tab" id="tab-inc" data-tab="incomes" aria-selected="true">Incomes</button>
+    <button class="tab" id="tab-exp" data-tab="expenses" aria-selected="false">Expenses</button>
+    <button class="tab" id="tab-ovw" data-tab="overview" aria-selected="false">Overview</button>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <!-- Incomes -->
+    <section class="card" id="view-incomes" aria-labelledby="tab-inc">
+      <h2 class="section">Income Sources</h2>
+      <div class="row">
+        <input id="inc-name" type="text" placeholder="Income name e.g. Salary / Benefit" />
+        <input id="inc-amt" type="number" min="0" step="0.01" placeholder="Amount e.g. 1200" />
+      </div>
+      <div class="center-row" style="margin-top:8px">
+        <span style="color:#444; font-weight:800">Include in available income:</span>
+        <input id="inc-include" type="checkbox" />
+      </div>
+      <div class="btnrow" style="margin-top:10px">
+        <button id="add-inc" class="btn">Add Income</button>
+        <button id="reset-inc" class="btn">Reset</button>
+      </div>
+      <div id="inc-list" class="list"></div>
+    </section>
+
+    <!-- Expenses -->
+    <section class="card" id="view-expenses" aria-labelledby="tab-exp" style="display:none">
+      <h2 class="section">Expenses</h2>
+      <div class="row">
+        <input id="exp-name" type="text" placeholder="Bill e.g. Rent / Spotify" />
+        <input id="exp-amt" type="number" min="0" step="0.01" placeholder="Amount e.g. 500" />
+      </div>
+      <div class="btnrow" style="margin-top:10px">
+        <button id="add-exp" class="btn">Add Bill</button>
+        <button id="reset-exp" class="btn">Reset</button>
+      </div>
+      <div id="exp-list" class="list"></div>
+    </section>
+
+    <!-- Overview (stacked with soft colours) -->
+    <section class="card" id="view-overview" aria-labelledby="tab-ovw" style="display:none">
+      <h2 class="section">Overview</h2>
+      <div class="kpi blue">
+        <div class="k">Total Income (All)</div>
+        <div id="ovw-total" class="v">£0.00</div>
+      </div>
+      <div class="kpi purple">
+        <div class="k">Available Income (Included − Expenses)</div>
+        <div id="ovw-available" class="v">£0.00</div>
+      </div>
+      <div class="kpi orange">
+        <div class="k">Expenses</div>
+        <div id="ovw-exp" class="v">£0.00</div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:8px">
+        <button id="btnDeleteAccount" class="btn" style="border-color:#000">Delete Account</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="footer">Budget Planner</div>
+</div>
+
+<!-- Edit Modal -->
+<dialog id="editModal">
+  <div class="modal">
+    <h3 id="editTitle">Edit Item</h3>
+    <div class="row">
+      <div>
+        <label for="edit-name">Name</label>
+        <input id="edit-name" type="text" required />
+      </div>
+      <div>
+        <label for="edit-amt">Amount</label>
+        <input id="edit-amt" type="number" min="0" step="0.01" required />
+      </div>
+    </div>
+    <div id="edit-include-wrap" class="center-row" style="margin-top:10px">
+      <label for="edit-include" style="font-weight:800">Include in available income</label>
+      <input id="edit-include" type="checkbox" />
+    </div>
+    <div class="actions">
+      <button id="edit-save" class="btn">Save</button>
+      <button id="edit-cancel" class="btn">Cancel</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Offline popup -->
+<div id="offlinePop" class="offline-pop">
+  <span>You're offline — changes save locally and sync when online.</span>
+  <button id="offlineOk" class="btn sm" style="margin-left:8px">OK</button>
+</div><!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
@@ -309,6 +405,7 @@ btnDoLogin.addEventListener("click", async ()=>{
       await auth.signOut();
       return;
     }
+    // success → auth state listener will show app
   }catch(err){ alert(err.message); }
 });
 
@@ -356,6 +453,7 @@ function deleteDocFS(type, id){
 
 /* ============== Renderers ============== */
 function renderAll(){
+  // Incomes
   incList.innerHTML = "";
   state.incomes.forEach(doc=>{
     const el = document.createElement("div");
@@ -369,10 +467,12 @@ function renderAll(){
       <div class="item_actions">
         <button class="btn" data-act="edit" data-type="incomes" data-id="${doc.id}">Edit</button>
         <button class="btn" data-act="del"  data-type="incomes" data-id="${doc.id}">Delete</button>
-      </div>`;
+      </div>
+    `;
     incList.appendChild(el);
   });
 
+  // Expenses
   expList.innerHTML = "";
   state.expenses.forEach(doc=>{
     const el = document.createElement("div");
@@ -386,14 +486,17 @@ function renderAll(){
       <div class="item_actions">
         <button class="btn" data-act="edit" data-type="expenses" data-id="${doc.id}">Edit</button>
         <button class="btn" data-act="del"  data-type="expenses" data-id="${doc.id}">Delete</button>
-      </div>`;
+      </div>
+    `;
     expList.appendChild(el);
   });
 
+  // Click to reveal per-item actions
   document.querySelectorAll(".item").forEach(row=>{
     const head = row.querySelector(".item_head");
     head.onclick = ()=> row.classList.toggle("show");
   });
+  // Edit/Delete handlers
   document.querySelectorAll(".item_actions .btn").forEach(b=>{
     b.onclick = ()=>{
       const act=b.dataset.act, type=b.dataset.type, id=b.dataset.id;
@@ -402,6 +505,7 @@ function renderAll(){
     };
   });
 
+  // Overview
   const totalAll  = state.incomes.reduce((s,x)=>s+Number(x.amount||0),0);
   const totalInc  = state.incomes.filter(x=>x.include).reduce((s,x)=>s+Number(x.amount||0),0);
   const totalExpn = state.expenses.reduce((s,x)=>s+Number(x.amount||0),0);
@@ -453,11 +557,12 @@ addExp.onclick = ()=>{
 };
 resetExp.onclick = ()=>{ expName.value=""; expAmt.value=""; };
 
-/* ============== Delete Account ============== */
+/* ============== Delete Account (Overview only) ============== */
 btnDeleteAccount.addEventListener("click", async ()=>{
   if(!user) return;
   if(!confirm("Delete your account and all your data? This cannot be undone.")) return;
   try{
+    // Delete subcollections (incomes, expenses)
     const uref = base(user.uid);
     const delCol = async (name)=>{
       const snap = await uref.collection(name).get();
@@ -467,7 +572,8 @@ btnDeleteAccount.addEventListener("click", async ()=>{
     };
     await delCol("incomes");
     await delCol("expenses");
-    await uref.delete().catch(()=>{});
+    await uref.delete().catch(()=>{}); // ignore if doc missing
+    // Delete auth user (may require recent login)
     await user.delete();
     alert("Account deleted.");
   }catch(err){
@@ -487,28 +593,32 @@ if(!navigator.onLine) showOfflinePop();
 auth.onAuthStateChanged(async (u)=>{
   user = u;
   if(!u){
+    // Show auth screen only
     authPage.style.display = "flex";
     appShell.style.display = "none";
     userEmail.textContent = "Signed out";
-    btnLogout.style.display = "none";
     return;
   }
   if(!u.emailVerified){
     authPage.style.display = "flex";
     appShell.style.display = "none";
     userEmail.textContent = `${u.email} (verify)`;
-    btnLogout.style.display = "none";
     return;
   }
+  // Signed in + verified → show app
   authPage.style.display = "none";
   appShell.style.display = "block";
   userEmail.textContent = u.email || "Account";
-  btnLogout.style.display = "inline-block";
 
+  // Load from cache first (0 reads on refresh)
   state = readCache(u.uid);
   if(!state.incomes) state = { incomes:[], expenses:[] };
   renderAll();
-  if(!localStorage.getItem(LCKEY(u.uid))) await pullOnce();
+
+  // Lazy pull once if no cache yet (first login)
+  if(!localStorage.getItem(LCKEY(u.uid))){
+    await pullOnce();
+  }
 });
 </script>
 </body>
