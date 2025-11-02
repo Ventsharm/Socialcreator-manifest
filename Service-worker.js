@@ -1,4 +1,4 @@
-const CACHE_NAME = 'budget-cache-v1';
+const CACHE_NAME = 'socialcreator-budget-cache-v1';
 const ASSETS = [
   './',
   './index.html',
@@ -22,7 +22,5 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(res => res || fetch(e.request))
-  );
+  e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
 });
