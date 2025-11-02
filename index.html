@@ -6,427 +6,211 @@
 <title>Budget Planner</title>
 <link rel="icon" href="Icon-192.png" />
 <style>
-  :root{
-    --bg:#f5f6fa;--card:#ffffff;--text:#121416;--muted:#6b7280;
-    --blue:#1677ff;--blue2:#0d6efd;--danger:#ef4444;--ok:#10b981;
-    --shadow:0 10px 30px rgba(0,0,0,.08);
-    --radius:18px;
-  }
-  *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
-  .wrap{max-width:980px;margin:28px auto;padding:12px}
-  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
-  h1{margin:0 0 14px;font-size:34px;letter-spacing:.2px;text-align:center}
-  .topline{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-  .pilltabs{display:flex;gap:10px;justify-content:center;margin:14px 0 18px}
-  .pilltabs button{padding:12px 18px;border-radius:999px;border:1px solid #e5e7eb;background:#f1f5f9;font-weight:700;cursor:pointer}
-  .pilltabs button.active{background:var(--blue);border-color:var(--blue);color:#fff}
-  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-  input,select,button{font-size:16px}
-  input,select{width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px;background:#fff}
-  .btn{border:none;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
-  .btn-blue{background:linear-gradient(90deg,var(--blue2),#2aa0ff);color:#fff}
-  .btn-gray{background:#e5e7eb}
-  .btn-danger{background:var(--danger);color:#fff}
-  .kpi{padding:16px;border-radius:14px;background:#f8fafc;border:1px solid #eef2f7;text-align:center}
-  .kpi h3{margin:0 0 4px;font-size:14px;color:var(--muted);font-weight:600}
-  .kpi .val{font-size:22px;font-weight:800}
-  .list{display:flex;flex-direction:column;gap:12px;margin-top:14px}
-  .item{border:1px solid #eef2f7;border-radius:14px;background:#fff;padding:12px 12px;display:flex;align-items:center;gap:10px}
-  .item .name{font-weight:700}
-  .item .amt{margin-left:auto;font-weight:800}
-  .item .actions{display:flex;gap:8px;margin-left:10px}
-  .hint{color:var(--muted);font-size:14px;text-align:center;margin-top:10px}
-  .footer{margin-top:12px;color:var(--muted);font-size:14px;text-align:center}
-  /* Auth modal */
-  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;place-items:center;padding:16px;z-index:50}
-  .overlay.show{display:grid}
-  .modal{width:min(520px,100%);background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:22px}
-  .modal h2{margin:0 0 10px}
-  .seg{display:flex;gap:8px;margin-bottom:12px}
-  .seg button{flex:1;border:1px solid #e5e7eb;border-radius:12px;background:#f1f5f9;padding:10px;font-weight:700}
-  .seg button.active{background:var(--blue);border-color:var(--blue);color:#fff}
-  .stack{display:flex;flex-direction:column;gap:10px}
-  .note{background:#fff7ed;border:1px dashed #f59e0b;padding:10px 12px;border-radius:12px;color:#92400e;font-size:14px}
-  .inline{display:flex;align-items:center;gap:8px}
-  .switch{display:flex;align-items:center;gap:10px}
-  .switch input{width:18px;height:18px}
-  .sr{position:absolute;left:-9999px}
-  @media (max-width:720px){.row{grid-template-columns:1fr}}
+:root{
+ --bg:#f5f6fa;--card:#fff;--text:#111;--muted:#6b7280;
+ --blue:#1677ff;--blue2:#0d6efd;--danger:#ef4444;
+ --shadow:0 10px 30px rgba(0,0,0,.08);--radius:18px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.wrap{max-width:980px;margin:40px auto;padding:12px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
+h1{text-align:center;font-size:32px;margin:0 0 20px}
+.pilltabs{display:flex;gap:10px;justify-content:center;margin:14px 0 18px}
+.pilltabs button{padding:12px 18px;border-radius:999px;border:1px solid #e5e7eb;background:#f1f5f9;font-weight:700;cursor:pointer}
+.pilltabs button.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+input,button{font-size:16px}
+input{width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px}
+.btn{border:none;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
+.btn-blue{background:linear-gradient(90deg,var(--blue2),#2aa0ff);color:#fff}
+.btn-gray{background:#e5e7eb}
+.btn-danger{background:var(--danger);color:#fff}
+.list{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.item{border:1px solid #eef2f7;border-radius:14px;background:#fff;padding:12px;display:flex;align-items:center;gap:10px}
+.item .name{font-weight:700}
+.item .amt{margin-left:auto;font-weight:800}
+.item .actions{display:flex;gap:8px;margin-left:10px}
+.kpi{padding:16px;border-radius:14px;background:#f8fafc;text-align:center}
+.kpi h3{margin:0 0 4px;font-size:14px;color:var(--muted)}
+.kpi .val{font-size:22px;font-weight:800}
+.footer{margin-top:14px;text-align:center;color:#6b7280;font-size:14px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;place-items:center;z-index:50;padding:16px}
+.overlay.show{display:grid}
+.modal{background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:22px;width:min(500px,100%)}
+.modal h2{margin:0 0 12px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:10px}
+.seg{display:flex;gap:8px;margin-bottom:10px}
+.seg button{flex:1;border:1px solid #e5e7eb;border-radius:12px;background:#f1f5f9;padding:10px;font-weight:700}
+.seg button.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.note{font-size:14px;background:#fff7ed;padding:8px;border-radius:10px;color:#92400e}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <div class="topline">
-        <h1>Budget Planner</h1>
-        <div class="inline" id="userBox">
-          <span id="userEmail" class="hint">Signed out</span>
-          <button id="loginBtn" class="btn btn-blue">Login / Register</button>
-          <button id="logoutBtn" class="btn btn-gray" style="display:none;">Logout</button>
-        </div>
-      </div>
 
-      <div class="pilltabs">
-        <button class="tabBtn active" data-tab="incomes">Incomes</button>
-        <button class="tabBtn" data-tab="expenses">Expenses</button>
-        <button class="tabBtn" data-tab="overview">Overview</button>
-      </div>
+<div class="wrap" id="planner" style="display:none;">
+  <div class="card">
+    <h1>Budget Planner</h1>
 
-      <!-- Incomes -->
-      <section id="tab-incomes">
-        <h3>Income Sources</h3>
-        <div class="row">
-          <input id="incomeName" placeholder="Income name e.g. Cashier or Benefit" />
-          <input id="incomeAmt" type="number" step="0.01" placeholder="Amount e.g. 1200" />
-        </div>
-        <label class="switch" style="margin-top:10px">
-          <input type="checkbox" id="incomeInclude" checked />
-          <span>Include in available income</span>
-        </label>
-        <div style="margin-top:10px" class="row">
-          <button id="addIncome" class="btn btn-blue">Add Income</button>
-          <button id="resetLocalA" class="btn btn-gray">Reset (local)</button>
-        </div>
-        <div class="list" id="incomeList"></div>
-      </section>
-
-      <!-- Expenses -->
-      <section id="tab-expenses" style="display:none">
-        <h3>Expenses</h3>
-        <div class="row">
-          <input id="expenseName" placeholder="Bill / Subscription e.g. Rent or Spotify" />
-          <input id="expenseAmt" type="number" step="0.01" placeholder="Amount e.g. 500" />
-        </div>
-        <div style="margin-top:10px" class="row">
-          <button id="addExpense" class="btn btn-blue">Add Bill</button>
-          <button id="resetLocalB" class="btn btn-gray">Reset (local)</button>
-        </div>
-        <div class="list" id="expenseList"></div>
-      </section>
-
-      <!-- Overview -->
-      <section id="tab-overview" style="display:none">
-        <div class="row3">
-          <div class="kpi"><h3>Total Income (All)</h3><div id="kpiIncome" class="val">£0.00</div></div>
-          <div class="kpi" style="background:#f5f3ff"><h3 style="color:#6d28d9">Available Income (Included - Expenses)</h3><div id="kpiAvail" class="val" style="color:#6d28d9">£0.00</div></div>
-          <div class="kpi" style="background:#fff1f2"><h3 style="color:#dc2626">Expenses</h3><div id="kpiExpense" class="val" style="color:#dc2626">£0.00</div></div>
-        </div>
-        <p class="hint" style="margin-top:14px">Overview shows totals and lets you quickly toggle “include in available” on any item.</p>
-      </section>
-
-      <button id="logoutBtnBottom" class="btn btn-gray" style="width:100%;margin-top:16px;display:none;">Logout</button>
-      <div class="footer">Synced via Firebase. Cached offline; <span id="readStat">0</span> reads on refresh.</div>
+    <div class="pilltabs">
+      <button class="tabBtn active" data-tab="incomes">Incomes</button>
+      <button class="tabBtn" data-tab="expenses">Expenses</button>
+      <button class="tabBtn" data-tab="overview">Overview</button>
     </div>
-  </div>
 
-  <!-- Edit modal -->
-  <div class="overlay" id="editOverlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editTitle">
-      <h2 id="editTitle">Edit Item</h2>
-      <div class="stack">
-        <input id="editName" />
-        <input id="editAmt" type="number" step="0.01" />
-        <label class="switch"><input id="editInclude" type="checkbox" /><span>Include in available</span></label>
-        <div class="row">
-          <button id="saveEdit" class="btn btn-blue">Save</button>
-          <button id="cancelEdit" class="btn btn-gray">Cancel</button>
-        </div>
+    <section id="tab-incomes">
+      <h3>Income Sources</h3>
+      <div class="row">
+        <input id="incomeName" placeholder="Income name e.g. Cashier or Benefit" />
+        <input id="incomeAmt" type="number" step="0.01" placeholder="Amount e.g. 1200" />
       </div>
+      <label><input type="checkbox" id="incomeInclude" checked> Include in available income</label>
+      <div class="row" style="margin-top:10px">
+        <button id="addIncome" class="btn btn-blue">Add Income</button>
+        <button id="resetLocal" class="btn btn-gray">Reset</button>
+      </div>
+      <div class="list" id="incomeList"></div>
+    </section>
+
+    <section id="tab-expenses" style="display:none;">
+      <h3>Expenses</h3>
+      <div class="row">
+        <input id="expenseName" placeholder="Bill / Subscription e.g. Rent" />
+        <input id="expenseAmt" type="number" step="0.01" placeholder="Amount e.g. 500" />
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button id="addExpense" class="btn btn-blue">Add Bill</button>
+        <button id="resetLocal2" class="btn btn-gray">Reset</button>
+      </div>
+      <div class="list" id="expenseList"></div>
+    </section>
+
+    <section id="tab-overview" style="display:none;">
+      <div class="row3">
+        <div class="kpi"><h3>Total Income (All)</h3><div id="kpiIncome" class="val">£0.00</div></div>
+        <div class="kpi" style="background:#f3f0ff"><h3 style="color:#6d28d9">Available Income</h3><div id="kpiAvail" class="val" style="color:#6d28d9">£0.00</div></div>
+        <div class="kpi" style="background:#fff1f2"><h3 style="color:#dc2626">Expenses</h3><div id="kpiExpense" class="val" style="color:#dc2626">£0.00</div></div>
+      </div>
+    </section>
+
+    <button id="logout" class="btn btn-gray" style="width:100%;margin-top:16px;">Logout</button>
+    <div class="footer">Synced via Firebase. Cached offline; <span id="reads">0</span> reads on refresh.</div>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div class="overlay show" id="authScreen">
+  <div class="modal">
+    <h2>Budget Planner Login</h2>
+    <div class="seg">
+      <button id="segLogin" class="active">Login</button>
+      <button id="segRegister">Register</button>
+      <button id="segReset">Forgot</button>
     </div>
-  </div>
 
-  <!-- Auth modal -->
-  <div class="overlay" id="authOverlay">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
-      <h2 id="authTitle">Budget Planner Login</h2>
-      <div class="seg">
-        <button id="segLogin" class="active">Login</button>
-        <button id="segRegister">Register</button>
-        <button id="segReset">Forgot</button>
-      </div>
-
-      <div id="authLogin" class="stack">
-        <input id="loginEmail" placeholder="Email" autocomplete="username" />
-        <input id="loginPass" type="password" placeholder="Password" autocomplete="current-password" />
-        <button id="doLogin" class="btn btn-blue">Login</button>
-      </div>
-
-      <div id="authRegister" class="stack" style="display:none">
-        <input id="regEmail" placeholder="Email" autocomplete="email" />
-        <input id="regPass" type="password" placeholder="Password (min 6)" autocomplete="new-password" />
-        <button id="doRegister" class="btn btn-blue">Create account</button>
-        <div class="note">After registering we’ll send a verification email. Please confirm before using sync.</div>
-      </div>
-
-      <div id="authReset" class="stack" style="display:none">
-        <input id="rstEmail" placeholder="Email for reset link" autocomplete="email" />
-        <button id="doReset" class="btn btn-blue">Email me a reset link</button>
-      </div>
-
-      <p id="authMsg" class="hint" aria-live="polite"></p>
+    <div id="boxLogin" class="stack">
+      <input id="loginEmail" placeholder="Email" />
+      <input id="loginPass" type="password" placeholder="Password" />
+      <button id="doLogin" class="btn btn-blue">Login</button>
     </div>
+
+    <div id="boxRegister" class="stack" style="display:none">
+      <input id="regEmail" placeholder="Email" />
+      <input id="regPass" type="password" placeholder="Password (min 6)" />
+      <button id="doRegister" class="btn btn-blue">Create Account</button>
+      <div class="note">After registering we’ll send a verification email. Please verify before login.</div>
+    </div>
+
+    <div id="boxReset" class="stack" style="display:none">
+      <input id="rstEmail" placeholder="Email" />
+      <button id="doReset" class="btn btn-blue">Send Reset Link</button>
+    </div>
+
+    <p id="authMsg" style="text-align:center;color:#6b7280;"></p>
   </div>
+</div>
 
-  <!-- Firebase + App -->
-  <script type="module">
-    // --- Firebase (modular v10) ---
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-    import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence,
-             signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification,
-             sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove,
-             serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence,
+         signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification,
+         sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    // Your config (you gave me these)
-    const firebaseConfig = {
-      apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
-      authDomain: "budget-app-283de.firebaseapp.com",
-      projectId: "budget-app-283de",
-      storageBucket: "budget-app-283de.firebasestorage.app",
-      messagingSenderId: "162369707369",
-      appId: "1:162369707369:web:3faa7f002f8ba22dc0f1f8"
-    };
+const config = {
+  apiKey:"AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
+  authDomain:"budget-app-283de.firebaseapp.com",
+  projectId:"budget-app-283de",
+  storageBucket:"budget-app-283de.firebasestorage.app",
+  messagingSenderId:"162369707369",
+  appId:"1:162369707369:web:3faa7f002f8ba22dc0f1f8"
+};
+const app = initializeApp(config);
+const auth = getAuth(app);
+const db = getFirestore(app);
+await setPersistence(auth,browserLocalPersistence);
 
-    // Init
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db   = getFirestore(app);
-    await setPersistence(auth, browserLocalPersistence);
+const $=s=>document.querySelector(s);
+const tabs={incomes:$("#tab-incomes"),expenses:$("#tab-expenses"),overview:$("#tab-overview")};
+document.querySelectorAll(".tabBtn").forEach(b=>{
+  b.onclick=()=>{document.querySelectorAll(".tabBtn").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  for(let k in tabs)tabs[k].style.display=k===b.dataset.tab?"block":"none";}
+});
 
-    // ---------- DOM helpers ----------
-    const $ = s => document.querySelector(s);
-    const fmt = n => "£" + (Number(n||0)).toFixed(2);
+let me=null,state={incomes:[],expenses:[]},reads=0;
+const LC={key:u=>"bp_"+u.uid,get:u=>JSON.parse(localStorage.getItem("bp_"+u.uid)||"{}"),set(u,d){localStorage.setItem("bp_"+u.uid,JSON.stringify(d));}};
+const fmt=n=>"£"+(Number(n||0)).toFixed(2);
+function calc(){
+ const incAll=state.incomes.reduce((s,x)=>s+Number(x.amount||0),0);
+ const incInc=state.incomes.filter(x=>x.include).reduce((s,x)=>s+Number(x.amount||0),0);
+ const expAll=state.expenses.reduce((s,x)=>s+Number(x.amount||0),0);
+ $("#kpiIncome").textContent=fmt(incAll);
+ $("#kpiExpense").textContent=fmt(expAll);
+ $("#kpiAvail").textContent=fmt(incInc-expAll);
+}
+function render(){
+ const iL=$("#incomeList"),eL=$("#expenseList");iL.innerHTML=eL.innerHTML="";
+ state.incomes.forEach(x=>{
+   const d=document.createElement("div");d.className="item";
+   const c=document.createElement("input");c.type="checkbox";c.checked=x.include;
+   c.onchange=()=>{x.include=c.checked;save();};
+   d.append(c,Object.assign(document.createElement("div"),{className:"name",textContent:x.name}),
+     Object.assign(document.createElement("div"),{className:"amt",textContent:fmt(x.amount)}));
+   ebtn("Edit",()=>edit("income",x),d); ebtn("Delete",()=>del("income",x),d);
+   iL.append(d);
+ });
+ state.expenses.forEach(x=>{
+   const d=document.createElement("div");d.className="item";
+   d.append(Object.assign(document.createElement("div"),{className:"name",textContent:x.name}),
+            Object.assign(document.createElement("div"),{className:"amt",textContent:fmt(x.amount)}));
+   ebtn("Edit",()=>edit("expense",x),d); ebtn("Delete",()=>del("expense",x),d);
+   eL.append(d);
+ });
+ calc();
+}
+function ebtn(txt,fn,par){const b=document.createElement("button");b.textContent=txt;b.className=txt==="Delete"?"btn btn-danger":"btn btn-blue";b.onclick=fn;par.append(b);}
+function del(t,x){if(confirm("Delete "+x.name+"?")){state[t+"s"]=state[t+"s"].filter(i=>i.id!==x.id);save();}}
+function save(){if(!me)return;const data={incomes:state.incomes,expenses:state.expenses,updatedAt:serverTimestamp()};setDoc(doc(db,"budgets",me.uid),data,{merge:true});LC.set(me,data);render();}
+async function load(){const c=LC.get(me);if(c.incomes)state=c;render();const s=await getDoc(doc(db,"budgets",me.uid));reads++;$("#reads").textContent=reads;if(s.exists()){state=s.data();LC.set(me,state);render();}}
+$("#addIncome").onclick=()=>{const n=$("#incomeName").value.trim(),a=parseFloat($("#incomeAmt").value),inc=$("#incomeInclude").checked;if(!n||!isFinite(a))return alert("Enter name/amount");state.incomes.push({id:crypto.randomUUID(),name:n,amount:a,include:inc});save();$("#incomeName").value=$("#incomeAmt").value="";};
+$("#addExpense").onclick=()=>{const n=$("#expenseName").value.trim(),a=parseFloat($("#expenseAmt").value);if(!n||!isFinite(a))return alert("Enter name/amount");state.expenses.push({id:crypto.randomUUID(),name:n,amount:a});save();$("#expenseName").value=$("#expenseAmt").value="";};
+$("#resetLocal").onclick=$("#resetLocal2").onclick=()=>{if(me){localStorage.removeItem("bp_"+me.uid);location.reload();}};
+$("#logout").onclick=()=>signOut(auth);
 
-    // Tabs
-    const tabs = { incomes:$("#tab-incomes"), expenses:$("#tab-expenses"), overview:$("#tab-overview") };
-    document.querySelectorAll(".tabBtn").forEach(b=>{
-      b.addEventListener("click", ()=>{
-        document.querySelectorAll(".tabBtn").forEach(x=>x.classList.remove("active"));
-        b.classList.add("active");
-        const t = b.dataset.tab;
-        Object.keys(tabs).forEach(k => tabs[k].style.display = (k===t? "block":"none"));
-      });
-    });
+$("#segLogin").onclick=()=>show("login");$("#segRegister").onclick=()=>show("register");$("#segReset").onclick=()=>show("reset");
+function show(w){$("#boxLogin").style.display=w==="login"?"flex":"none";$("#boxRegister").style.display=w==="register"?"flex":"none";$("#boxReset").style.display=w==="reset"?"flex":"none";
+["segLogin","segRegister","segReset"].forEach(id=>$("#"+id).classList.toggle("active",id==="seg"+w[0].toUpperCase()+w.slice(1)));}
+$("#doLogin").onclick=async()=>{try{const e=$("#loginEmail").value,p=$("#loginPass").value;const u=await signInWithEmailAndPassword(auth,e,p);if(!u.user.emailVerified){await sendEmailVerification(u.user);$("#authMsg").textContent="Verify your email first.";}else $("#authScreen").classList.remove("show");}catch(x){$("#authMsg").textContent=x.message;}};
+$("#doRegister").onclick=async()=>{try{const e=$("#regEmail").value,p=$("#regPass").value;const u=await createUserWithEmailAndPassword(auth,e,p);await sendEmailVerification(u.user);$("#authMsg").textContent="Verification sent. Confirm then login.";}catch(x){$("#authMsg").textContent=x.message;}};
+$("#doReset").onclick=async()=>{try{await sendPasswordResetEmail(auth,$("#rstEmail").value);$("#authMsg").textContent="Password reset email sent.";}catch(x){$("#authMsg").textContent=x.message;}};
 
-    // UI elements
-    const userEmail = $("#userEmail"), loginBtn=$("#loginBtn"), logoutBtn=$("#logoutBtn"), logoutBtnBottom=$("#logoutBtnBottom");
-    const readStat = $("#readStat");
-    const incomeList = $("#incomeList"), expenseList=$("#expenseList");
-    const kpiIncome=$("#kpiIncome"), kpiExpense=$("#kpiExpense"), kpiAvail=$("#kpiAvail");
-
-    // Auth modal controls
-    const authOverlay=$("#authOverlay"), authMsg=$("#authMsg");
-    const segLogin=$("#segLogin"), segRegister=$("#segRegister"), segReset=$("#segReset");
-    const authLogin=$("#authLogin"), authRegister=$("#authRegister"), authReset=$("#authReset");
-    function showAuth(which="login"){authOverlay.classList.add("show"); authMsg.textContent="";
-      authLogin.style.display= which==="login"?"flex":"none";
-      authRegister.style.display= which==="register"?"flex":"none";
-      authReset.style.display= which==="reset"?"flex":"none";
-      segLogin.classList.toggle("active",which==="login");
-      segRegister.classList.toggle("active",which==="register");
-      segReset.classList.toggle("active",which==="reset");
-    }
-    segLogin.onclick=()=>showAuth("login"); segRegister.onclick=()=>showAuth("register"); segReset.onclick=()=>showAuth("reset");
-    loginBtn.onclick=()=>showAuth("login");
-    authOverlay.addEventListener("click",e=>{ if(e.target===authOverlay) authOverlay.classList.remove("show"); });
-
-    // Edit modal
-    const editOverlay=$("#editOverlay"), editName=$("#editName"), editAmt=$("#editAmt"), editInclude=$("#editInclude");
-    let editRef = null; // {type:"income"|"expense", id}
-    $("#cancelEdit").onclick=()=>{editOverlay.classList.remove("show")};
-
-    // ---------- Local cache (zero reads on refresh) ----------
-    const LC = {
-      key(u){ return "bp_cache_"+u.uid; },
-      get(u){ try{ return JSON.parse(localStorage.getItem(this.key(u))||"{}"); } catch { return {}; } },
-      set(u,data){ localStorage.setItem(this.key(u), JSON.stringify(data)); },
-      clear(u){ localStorage.removeItem(this.key(u)); }
-    };
-
-    // ---------- Firestore doc shape ----------
-    // userDoc: budgets/{uid} => { incomes:[{id,name,amount,include}], expenses:[{id,name,amount}], updatedAt }
-    const userDocRef = uid => doc(db, "budgets", uid);
-
-    // ---------- State ----------
-    let me = null;
-    let state = { incomes:[], expenses:[] };
-    let reads = 0;
-
-    // ---------- Render ----------
-    function render(){
-      // lists
-      incomeList.innerHTML = "";
-      state.incomes.forEach(item=>{
-        const row = document.createElement("div"); row.className="item";
-        const tick = document.createElement("input"); tick.type="checkbox"; tick.checked=item.include; tick.title="Include in available";
-        tick.onchange = ()=>{ item.include = tick.checked; persist("incomes"); calc(); };
-        const n = document.createElement("div"); n.className="name"; n.textContent=item.name;
-        const a = document.createElement("div"); a.className="amt"; a.textContent=fmt(item.amount);
-        const actions = document.createElement("div"); actions.className="actions";
-        const ebtn = document.createElement("button"); ebtn.className="btn btn-blue"; ebtn.textContent="Edit";
-        ebtn.onclick=()=>openEdit("income", item);
-        const dbtn = document.createElement("button"); dbtn.className="btn btn-danger"; dbtn.textContent="Delete";
-        dbtn.onclick=()=>{ if(confirm(`Delete "${item.name}" (${fmt(item.amount)})?`)){ state.incomes = state.incomes.filter(x=>x.id!==item.id); persist("incomes"); } };
-        actions.append(ebtn, dbtn);
-        row.append(tick, n, a, actions);
-        incomeList.append(row);
-      });
-
-      expenseList.innerHTML="";
-      state.expenses.forEach(item=>{
-        const row = document.createElement("div"); row.className="item";
-        const n = document.createElement("div"); n.className="name"; n.textContent=item.name;
-        const a = document.createElement("div"); a.className="amt"; a.textContent=fmt(item.amount);
-        const actions = document.createElement("div"); actions.className="actions";
-        const ebtn = document.createElement("button"); ebtn.className="btn btn-blue"; ebtn.textContent="Edit";
-        ebtn.onclick=()=>openEdit("expense", item);
-        const dbtn = document.createElement("button"); dbtn.className="btn btn-danger"; dbtn.textContent="Delete";
-        dbtn.onclick=()=>{ if(confirm(`Delete "${item.name}" (${fmt(item.amount)})?`)){ state.expenses = state.expenses.filter(x=>x.id!==item.id); persist("expenses"); } };
-        actions.append(ebtn, dbtn);
-        row.append(n, a, actions);
-        expenseList.append(row);
-      });
-
-      calc();
-    }
-    function calc(){
-      const incAll = state.incomes.reduce((s,x)=>s+Number(x.amount||0),0);
-      const incInc = state.incomes.filter(x=>x.include).reduce((s,x)=>s+Number(x.amount||0),0);
-      const expAll = state.expenses.reduce((s,x)=>s+Number(x.amount||0),0);
-      kpiIncome.textContent = fmt(incAll);
-      kpiExpense.textContent = fmt(expAll);
-      kpiAvail.textContent = fmt(incInc - expAll);
-    }
-
-    // ---------- Persist with minimal reads ----------
-    async function persist(which){
-      if(!me) return;
-      // Save to Firestore
-      const ref = userDocRef(me.uid);
-      const payload = { incomes: state.incomes, expenses: state.expenses, updatedAt: serverTimestamp() };
-      await setDoc(ref, payload, { merge:true });
-      // Update local cache
-      LC.set(me, { incomes:state.incomes, expenses:state.expenses, updatedAt: Date.now() });
-      render();
-    }
-
-    async function loadFromCloudOnce(){
-      if(!me) return;
-      const cached = LC.get(me);
-      if(cached.incomes || cached.expenses){ state = { incomes: cached.incomes||[], expenses: cached.expenses||[] }; render(); }
-      // Only read when user explicitly logs in (first load)
-      const snap = await getDoc(userDocRef(me.uid)); reads++; readStat.textContent = reads;
-      if(snap.exists()){
-        const d = snap.data();
-        state = { incomes: d.incomes||[], expenses: d.expenses||[] };
-        LC.set(me, { incomes:state.incomes, expenses:state.expenses, updatedAt: Date.now() });
-        render();
-      }else{
-        // Create blank doc
-        await setDoc(userDocRef(me.uid), { incomes:[], expenses:[], updatedAt: serverTimestamp() });
-        LC.set(me, { incomes:[], expenses:[], updatedAt: Date.now() });
-        state = { incomes:[], expenses:[] }; render();
-      }
-    }
-
-    // ---------- Add items ----------
-    const rand = () => Math.random().toString(36).slice(2,9);
-    $("#addIncome").onclick = ()=>{
-      const name = $("#incomeName").value.trim();
-      const amt  = parseFloat($("#incomeAmt").value||"");
-      const inc  = $("#incomeInclude").checked;
-      if(!name || !isFinite(amt)) return alert("Enter name and amount.");
-      state.incomes.push({ id:rand(), name, amount:amt, include:inc });
-      $("#incomeName").value=""; $("#incomeAmt").value="";
-      persist("incomes");
-    };
-    $("#addExpense").onclick = ()=>{
-      const name = $("#expenseName").value.trim();
-      const amt  = parseFloat($("#expenseAmt").value||"");
-      if(!name || !isFinite(amt)) return alert("Enter name and amount.");
-      state.expenses.push({ id:rand(), name, amount:amt });
-      $("#expenseName").value=""; $("#expenseAmt").value="";
-      persist("expenses");
-    };
-
-    // Edit
-    function openEdit(type,item){
-      editRef = { type, id:item.id };
-      editName.value = item.name;
-      editAmt.value = item.amount;
-      editInclude.parentElement.style.display = (type==="income") ? "flex" : "none";
-      editInclude.checked = (type==="income") ? !!item.include : false;
-      editOverlay.classList.add("show");
-    }
-    $("#saveEdit").onclick = ()=>{
-      if(!editRef) return;
-      const arr = editRef.type==="income" ? state.incomes : state.expenses;
-      const i = arr.findIndex(x=>x.id===editRef.id);
-      if(i>=0){
-        arr[i].name = editName.value.trim();
-        arr[i].amount = parseFloat(editAmt.value||0);
-        if(editRef.type==="income") arr[i].include = editInclude.checked;
-        persist(editRef.type==="income"?"incomes":"expenses");
-      }
-      editOverlay.classList.remove("show");
-    };
-
-    // Reset local only (no cloud writes)
-    $("#resetLocalA").onclick = ()=>{ if(confirm("Clear local cache?")){ if(me) LC.clear(me); location.reload(); } };
-    $("#resetLocalB").onclick = ()=>{ if(confirm("Clear local cache?")){ if(me) LC.clear(me); location.reload(); } };
-
-    // ---------- Auth actions ----------
-    $("#doLogin").onclick = async ()=>{
-      try{
-        const email = $("#loginEmail").value.trim(), pass = $("#loginPass").value;
-        const cred = await signInWithEmailAndPassword(auth,email,pass);
-        if(!cred.user.emailVerified){
-          authMsg.textContent = "Please verify your email. A new link has been sent.";
-          await sendEmailVerification(cred.user);
-          return;
-        }
-        authOverlay.classList.remove("show");
-      }catch(e){ authMsg.textContent = e.message; }
-    };
-    $("#doRegister").onclick = async ()=>{
-      try{
-        const email = $("#regEmail").value.trim(), pass = $("#regPass").value;
-        const cred = await createUserWithEmailAndPassword(auth,email,pass);
-        await sendEmailVerification(cred.user);
-        authMsg.textContent = "Verification email sent. Please confirm, then login.";
-      }catch(e){ authMsg.textContent = e.message; }
-    };
-    $("#doReset").onclick = async ()=>{
-      try{
-        const email = $("#rstEmail").value.trim(); await sendPasswordResetEmail(auth,email);
-        authMsg.textContent = "Password reset email sent.";
-      }catch(e){ authMsg.textContent = e.message; }
-    };
-
-    async function doLogout(){ await signOut(auth); }
-    logoutBtn.onclick = doLogout; logoutBtnBottom.onclick = doLogout;
-
-    // ---------- Auth state ----------
-    onAuthStateChanged(auth, async (user)=>{
-      me = user || null;
-      if(me){
-        userEmail.textContent = me.email || "(no email)";
-        loginBtn.style.display="none"; logoutBtn.style.display="inline-block"; logoutBtnBottom.style.display="inline-block";
-        // Enforce verification
-        if(!me.emailVerified){
-          showAuth("login");
-          authMsg.textContent = "Please verify your email address to use sync.";
-          return;
-        }
-        await loadFromCloudOnce();
-      }else{
-        userEmail.textContent = "Signed out";
-        loginBtn.style.display="inline-block"; logoutBtn.style.display="none"; logoutBtnBottom.style.display="none";
-        state = { incomes:[], expenses:[] }; render();
-      }
-    });
-
-  </script>
+onAuthStateChanged(auth,async u=>{
+ if(u&&u.emailVerified){me=u;$("#authScreen").classList.remove("show");$("#planner").style.display="block";await load();}
+ else {$("#planner").style.display="none";$("#authScreen").classList.add("show");}
+});
+function edit(t,x){const n=prompt("Edit name",x.name);if(!n)return;const a=parseFloat(prompt("Edit amount",x.amount));if(isFinite(a)){x.name=n;x.amount=a;save();}}
+</script>
 </body>
 </html>
