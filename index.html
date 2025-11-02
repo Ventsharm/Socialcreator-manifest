@@ -15,7 +15,7 @@
   html,body{height:100%}
   body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
 
-  /* ---------- Buttons (white + black border) ---------- */
+  /* ---------- Buttons ---------- */
   .btn{
     background:#fff; color:#000; border:1.6px solid #000; border-radius:var(--btnr);
     padding:10px 14px; font-weight:800; cursor:pointer; transition:transform .06s ease;
@@ -23,7 +23,7 @@
   .btn:active{transform:translateY(1px)}
   .btn.sm{padding:8px 12px; font-weight:700}
 
-  /* ---------- Auth full-screen ---------- */
+  /* ---------- Auth Screen ---------- */
   .auth-screen{
     position:fixed; inset:0; background:#fff; display:flex; align-items:center; justify-content:center; padding:20px; z-index:50;
   }
@@ -41,21 +41,18 @@
   }
   input:focus{box-shadow:0 0 0 4px rgba(0,0,0,.06)}
 
-  /* ---------- App shell (hidden until login) ---------- */
+  /* ---------- App Shell ---------- */
   .app{display:none; width:min(950px,96vw); margin:24px auto; background:#fff; border:1px solid var(--ring); border-radius:22px; box-shadow:var(--shadow); overflow:hidden}
   .topbar{display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--ring); background:#fff}
   .brand{font-size:20px; font-weight:900}
-  .userbox{
-    display:flex; flex-direction:column; align-items:flex-end;
-    gap:10px; color:#555; flex-wrap:wrap;
-  }
+  .userbox{display:flex; flex-direction:column; align-items:flex-end; gap:10px; color:#555; flex-wrap:wrap;}
 
-  /* Tabs at top */
+  /* Tabs */
   .tabs{display:flex; gap:10px; padding:12px 14px; border-bottom:1px solid var(--ring); background:#fff}
   .tab{flex:1; text-align:center; padding:10px 12px; border-radius:999px; border:1.6px solid #000; background:#fff; font-weight:800; cursor:pointer}
   .tab[aria-selected="true"]{box-shadow:0 0 0 2px #000 inset}
 
-  /* Content cards */
+  /* Content Cards */
   .content{padding:16px; display:grid; gap:14px}
   .card{background:#fff; border:1px solid var(--ring); border-radius:var(--radius); padding:16px}
   h2.section{margin:2px 0 12px; font-size:1.1rem; font-weight:900}
@@ -72,10 +69,9 @@
   .item.show .item_actions{display:flex}
   @keyframes reveal{from{opacity:0; transform:translateY(-4px)} to{opacity:1; transform:none}}
 
-  /* Include badge: ✅ or blank */
   .include-pill{font-weight:900; color:#16a34a}
 
-  /* Overview soft colours */
+  /* Overview */
   .kpi{border:1px solid var(--ring); border-radius:16px; padding:16px; margin-bottom:12px; background:#fff}
   .kpi.blue{background:var(--soft-blue)}
   .kpi.purple{background:var(--soft-purple)}
@@ -86,7 +82,7 @@
 
   .footer{padding:10px 16px; color:#777; border-top:1px solid var(--ring); text-align:center}
 
-  /* Edit modal (plain white) */
+  /* Modal */
   dialog::backdrop{background:rgba(0,0,0,.35)}
   dialog{border:0; border-radius:18px; padding:0; width:min(520px,92vw); box-shadow:var(--shadow); background:#fff}
   .modal{padding:18px}
@@ -101,8 +97,8 @@
 </head>
 <body>
 
-<!-- ==================== AUTH FULL PAGE ==================== -->
-<section id="authPage" class="auth-screen" aria-label="Authentication">
+<!-- ==================== AUTH ==================== -->
+<section id="authPage" class="auth-screen">
   <div class="auth-card">
     <div class="auth-title">Budget Planner</div>
     <div class="auth-tabs">
@@ -111,7 +107,6 @@
       <button class="btn sm" data-auth="forgot">Forgot</button>
     </div>
 
-    <!-- Shown when signed in but NOT verified -->
     <div id="verifyBox" class="center-row" style="display:none; justify-content:center; margin:0 0 10px">
       <span style="font-weight:800; color:#444">Email not verified.</span>
       <button id="btnResend" class="btn sm">Resend Verification</button>
@@ -120,55 +115,31 @@
     <!-- Login -->
     <div id="auth-login" class="auth-view active">
       <div class="row">
-        <div>
-          <label for="login-email">Email</label>
-          <input id="login-email" type="email" autocomplete="email" />
-        </div>
-        <div>
-          <label for="login-pass">Password</label>
-          <input id="login-pass" type="password" autocomplete="current-password" />
-        </div>
+        <div><label>Email</label><input id="login-email" type="email" /></div>
+        <div><label>Password</label><input id="login-pass" type="password" /></div>
       </div>
-      <div style="display:flex; gap:10px; margin-top:12px">
-        <button id="do-login" class="btn">Login</button>
-      </div>
+      <button id="do-login" class="btn" style="margin-top:12px">Login</button>
     </div>
 
     <!-- Register -->
     <div id="auth-register" class="auth-view">
       <div class="row">
-        <div>
-          <label for="reg-email">Email</label>
-          <input id="reg-email" type="email" autocomplete="email" />
-        </div>
-        <div>
-          <label for="reg-pass">Password (min 6)</label>
-          <input id="reg-pass" type="password" autocomplete="new-password" />
-        </div>
+        <div><label>Email</label><input id="reg-email" type="email" /></div>
+        <div><label>Password (min 6)</label><input id="reg-pass" type="password" /></div>
       </div>
-      <div style="display:flex; gap:10px; margin-top:12px">
-        <button id="do-register" class="btn">Create Account</button>
-      </div>
+      <button id="do-register" class="btn" style="margin-top:12px">Create Account</button>
     </div>
 
     <!-- Forgot -->
     <div id="auth-forgot" class="auth-view">
-      <div class="row">
-        <div>
-          <label for="rst-email">Email for reset link</label>
-          <input id="rst-email" type="email" autocomplete="email" />
-        </div>
-      </div>
-      <div style="display:flex; gap:10px; margin-top:12px">
-        <button id="do-reset" class="btn">Send Reset</button>
-      </div>
+      <div><label>Email for reset link</label><input id="rst-email" type="email" /></div>
+      <button id="do-reset" class="btn" style="margin-top:12px">Send Reset</button>
     </div>
   </div>
 </section>
 
-<!-- ==================== APP (HIDDEN UNTIL LOGIN) ==================== -->
+<!-- ==================== APP ==================== -->
 <div class="app" id="app">
-  <!-- Top bar -->
   <div class="topbar">
     <div class="brand">Budget Planner</div>
     <div class="userbox">
@@ -177,32 +148,23 @@
     </div>
   </div>
 
-  <!-- Tabs at top -->
-  <div class="tabs" role="tablist" aria-label="Sections">
+  <div class="tabs">
     <button class="tab" id="tab-inc" data-tab="incomes" aria-selected="true">Incomes</button>
-    <button class="tab" id="tab-exp" data-tab="expenses" aria-selected="false">Expenses</button>
-    <button class="tab" id="tab-ovw" data-tab="overview" aria-selected="false">Overview</button>
+    <button class="tab" id="tab-exp" data-tab="expenses">Expenses</button>
+    <button class="tab" id="tab-ovw" data-tab="overview">Overview</button>
   </div>
 
-  <!-- Content -->
   <div class="content">
     <!-- Incomes -->
-    <section class="card" id="view-incomes" aria-labelledby="tab-inc">
+    <section class="card" id="view-incomes">
       <h2 class="section">Income Sources</h2>
       <div class="row">
-        <input id="inc-name" type="text" placeholder="Income name e.g. Salary / Benefit" />
-        <input id="inc-amt" type="number" min="0" step="0.01" placeholder="Amount e.g. 1200" />
+        <input id="inc-name" type="text" placeholder="Income name e.g. Salary" />
+        <input id="inc-amt" type="number" placeholder="Amount e.g. 1200" />
       </div>
-      <!-- NEW: income date -->
       <div class="row" style="margin-top:8px">
-        <div>
-          <label for="inc-date">Date Received</label>
-          <input id="inc-date" type="date" />
-        </div>
-        <div class="center-row" style="align-items:center">
-          <span style="color:#444; font-weight:800">Include in available income:</span>
-          <input id="inc-include" type="checkbox" />
-        </div>
+        <div><label>Date Received</label><input id="inc-date" type="date" /></div>
+        <div class="center-row"><span style="font-weight:800">Include in available income:</span><input id="inc-include" type="checkbox" /></div>
       </div>
       <div class="btnrow" style="margin-top:10px">
         <button id="add-inc" class="btn">Add Income</button>
@@ -212,18 +174,14 @@
     </section>
 
     <!-- Expenses -->
-    <section class="card" id="view-expenses" aria-labelledby="tab-exp" style="display:none">
+    <section class="card" id="view-expenses" style="display:none">
       <h2 class="section">Expenses</h2>
       <div class="row">
         <input id="exp-name" type="text" placeholder="Bill e.g. Rent / Spotify" />
-        <input id="exp-amt" type="number" min="0" step="0.01" placeholder="Amount e.g. 500" />
+        <input id="exp-amt" type="number" placeholder="Amount e.g. 500" />
       </div>
-      <!-- NEW: expense date -->
       <div class="row" style="margin-top:8px">
-        <div>
-          <label for="exp-date">Bill Date</label>
-          <input id="exp-date" type="date" />
-        </div>
+        <div><label>Bill Date</label><input id="exp-date" type="date" /></div>
       </div>
       <div class="btnrow" style="margin-top:10px">
         <button id="add-exp" class="btn">Add Bill</button>
@@ -233,29 +191,13 @@
     </section>
 
     <!-- Overview -->
-    <section class="card" id="view-overview" aria-labelledby="tab-ovw" style="display:none">
+    <section class="card" id="view-overview" style="display:none">
       <h2 class="section">Overview</h2>
-      <div class="kpi blue">
-        <div class="k">Total Income (All)</div>
-        <div id="ovw-total" class="v">£0.00</div>
-      </div>
-      <div class="kpi purple">
-        <div class="k">Available Income (Included − Expenses)</div>
-        <div id="ovw-available" class="v">£0.00</div>
-      </div>
-      <div class="kpi orange">
-        <div class="k">Expenses</div>
-        <div id="ovw-exp" class="v">£0.00</div>
-      </div>
-      <!-- NEW: Remaining to Pay -->
-      <div class="kpi green">
-        <div class="k">Remaining to Pay</div>
-        <div id="ovw-remaining" class="v">£0.00</div>
-      </div>
-
-      <div style="display:flex; gap:10px; margin-top:8px">
-        <button id="btnDeleteAccount" class="btn" style="border-color:#000">Delete Account</button>
-      </div>
+      <div class="kpi blue"><div class="k">Total Income (All)</div><div id="ovw-total" class="v">£0.00</div></div>
+      <div class="kpi purple"><div class="k">Available Income (Included − Expenses)</div><div id="ovw-available" class="v">£0.00</div></div>
+      <div class="kpi orange"><div class="k">Expenses</div><div id="ovw-exp" class="v">£0.00</div></div>
+      <div class="kpi green"><div class="k">Remaining to Pay</div><div id="ovw-remaining" class="v">£0.00</div></div>
+      <button id="btnDeleteAccount" class="btn">Delete Account</button>
     </section>
   </div>
 
@@ -267,17 +209,14 @@
   <div class="modal">
     <h3 id="editTitle">Edit Item</h3>
     <div class="row">
-      <div>
-        <label for="edit-name">Name</label>
-        <input id="edit-name" type="text" required />
-      </div>
-      <div>
-        <label for="edit-amt">Amount</label>
-        <input id="edit-amt" type="number" min="0" step="0.01" required />
-      </div>
+      <div><label for="edit-name">Name</label><input id="edit-name" type="text" required /></div>
+      <div><label for="edit-amt">Amount</label><input id="edit-amt" type="number" required /></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <div><label id="edit-date-label">Date</label><input id="edit-date" type="date" /></div>
     </div>
     <div id="edit-include-wrap" class="center-row" style="margin-top:10px">
-      <label for="edit-include" style="font-weight:800">Include in available income</label>
+      <label style="font-weight:800">Include in available income</label>
       <input id="edit-include" type="checkbox" />
     </div>
     <div class="actions">
@@ -288,20 +227,17 @@
 </dialog>
 
 <!-- Offline popup -->
-<div id="offlinePop" class="offline-pop">
-  <span>You're offline — changes save locally and sync when online.</span>
-  <button id="offlineOk" class="btn sm" style="margin-left:8px">OK</button>
-</div>
+<div id="offlinePop" class="offline-pop"><span>You're offline — changes save locally.</span><button id="offlineOk" class="btn sm">OK</button></div>
 
-<!-- Firebase (compat) -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script><script>
-/* ============== Helpers & Shortcuts ============== */
+/* ============== Helpers ============== */
 const $ = s => document.querySelector(s);
 const fmt = n => "£" + (Number(n||0)).toFixed(2);
 
-/* ============== Firebase Init (your keys) ============== */
+/* ============== Firebase Init ============== */
 const firebaseConfig = {
   apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
   authDomain: "budget-app-283de.firebaseapp.com",
@@ -316,7 +252,7 @@ const db   = firebase.firestore();
 firebase.firestore().enablePersistence({ synchronizeTabs:true }).catch(()=>{});
 
 /* ============== Elements ============== */
-/* Auth page */
+/* Auth */
 const authPage   = $("#authPage");
 const authTabs   = document.querySelectorAll("[data-auth]");
 const vLogin     = $("#auth-login");
@@ -347,7 +283,7 @@ const viewOverview = $("#view-overview");
 /* Incomes */
 const incName = $("#inc-name");
 const incAmt  = $("#inc-amt");
-const incDate = $("#inc-date");       // NEW
+const incDate = $("#inc-date");
 const incInc  = $("#inc-include");
 const addInc  = $("#add-inc");
 const resetInc= $("#reset-inc");
@@ -356,16 +292,16 @@ const incList = $("#inc-list");
 /* Expenses */
 const expName = $("#exp-name");
 const expAmt  = $("#exp-amt");
-the_expDate   = $("#exp-date");       // NEW (unique name to avoid clash)
+const expDate = $("#exp-date");
 const addExp  = $("#add-exp");
 const resetExp= $("#reset-exp");
 const expList = $("#exp-list");
 
 /* Overview */
-const ovwTotal = $("#ovw-total");
-const ovwAvail = $("#ovw-available");
-const ovwExp   = $("#ovw-exp");
-const ovwRemain= $("#ovw-remaining"); // NEW
+const ovwTotal   = $("#ovw-total");
+const ovwAvail   = $("#ovw-available");
+const ovwExp     = $("#ovw-exp");
+const ovwRemain  = $("#ovw-remaining");
 const btnDeleteAccount = $("#btnDeleteAccount");
 
 /* Edit modal */
@@ -373,6 +309,8 @@ const editModal   = $("#editModal");
 const editTitle   = $("#editTitle");
 const editName    = $("#edit-name");
 const editAmount  = $("#edit-amt");
+const editDate    = $("#edit-date");
+const editDateLabel = $("#edit-date-label");
 const editInclude = $("#edit-include");
 const editIncWrap = $("#edit-include-wrap");
 const editSave    = $("#edit-save");
@@ -392,7 +330,7 @@ const readCache = uid => {
 };
 const writeCache = (uid, data) => localStorage.setItem(LCKEY(uid), JSON.stringify(data));
 
-/* ============== Tabs Logic (top) ============== */
+/* ============== Tabs ============== */
 function showTab(which){
   tabInc.setAttribute("aria-selected", which==="incomes");
   tabExp.setAttribute("aria-selected", which==="expenses");
@@ -405,31 +343,27 @@ tabInc.onclick = ()=>showTab("incomes");
 tabExp.onclick = ()=>showTab("expenses");
 tabOvw.onclick = ()=>showTab("overview");
 
-/* ============== Auth Screen (full page) ============== */
+/* ============== Auth tabs (Login/Register/Forgot) ============== */
 function showAuthView(which){
   vLogin.classList.remove("active");
   vRegister.classList.remove("active");
   vForgot.classList.remove("active");
-  (which==="login"    ? vLogin :
-   which==="register" ? vRegister : vForgot).classList.add("active");
+  (which==="login" ? vLogin : which==="register" ? vRegister : vForgot).classList.add("active");
 }
-authTabs.forEach(btn=>{
-  btn.addEventListener("click", ()=>showAuthView(btn.dataset.auth));
-});
+authTabs.forEach(btn=>btn.addEventListener("click", ()=>showAuthView(btn.dataset.auth)));
 
-/* Register */
+/* ============== Auth actions ============== */
 btnDoReg.addEventListener("click", async ()=>{
   try{
     const e = regEmail.value.trim(), p = regPass.value;
     if(!e || !p) return alert("Enter email and password.");
     const cred = await auth.createUserWithEmailAndPassword(e,p);
     await cred.user.sendEmailVerification();
-    alert("✅ Please verify your email before logging in. Check your inbox and spam folder.");
+    alert("✅ Verify your email before logging in (check inbox/spam).");
     showAuthView("login");
   }catch(err){ alert(err.message); }
 });
 
-/* Login */
 btnDoLogin.addEventListener("click", async ()=>{
   try{
     const e = loginEmail.value.trim(), p = loginPass.value;
@@ -438,29 +372,26 @@ btnDoLogin.addEventListener("click", async ()=>{
   }catch(err){ alert(err.message); }
 });
 
-/* Forgot */
 btnDoReset.addEventListener("click", async ()=>{
   try{
     const e = rstEmail.value.trim();
     if(!e) return alert("Enter your email.");
     await auth.sendPasswordResetEmail(e);
-    alert("Password reset email sent. Check your inbox and spam folder.");
+    alert("Password reset email sent.");
   }catch(err){ alert(err.message); }
 });
 
-/* Resend verification (visible only when unverified) */
 btnResend.addEventListener("click", async ()=>{
   try{
     if(!auth.currentUser) return;
     await auth.currentUser.sendEmailVerification();
-    alert("Verification email re-sent! Check your inbox and spam folder.");
+    alert("Verification email re-sent.");
   }catch(err){ alert(err.message); }
 });
 
-/* Logout */
 btnLogout.addEventListener("click", async ()=>{ await auth.signOut(); });
 
-/* ============== Firestore Helpers ============== */
+/* ============== Firestore helpers ============== */
 const base = uid => db.collection("users").doc(uid);
 async function pullOnce(){
   if(!user) return;
@@ -535,12 +466,10 @@ function renderAll(){
     expList.appendChild(el);
   });
 
-  // Click to reveal per-item actions
+  // Row behaviors
   document.querySelectorAll(".item").forEach(row=>{
-    const head = row.querySelector(".item_head");
-    head.onclick = ()=> row.classList.toggle("show");
+    row.querySelector(".item_head").onclick = ()=>row.classList.toggle("show");
   });
-  // Edit/Delete/Paid handlers
   document.querySelectorAll(".item_actions .btn").forEach(b=>{
     b.onclick = ()=>{
       const act=b.dataset.act, type=b.dataset.type, id=b.dataset.id;
@@ -556,10 +485,10 @@ function renderAll(){
   const totalExpn = state.expenses.reduce((s,x)=>s+Number(x.amount||0),0);
   const totalPaid = state.expenses.filter(x=>x.paid).reduce((s,x)=>s+Number(x.amount||0),0);
 
-  ovwTotal.textContent = fmt(totalAll);
-  ovwAvail.textContent = fmt(totalInc - totalExpn);
-  ovwExp.textContent   = fmt(totalExpn);
-  ovwRemain.textContent= fmt(totalExpn - totalPaid);
+  ovwTotal.textContent   = fmt(totalAll);
+  ovwAvail.textContent   = fmt(totalInc - totalExpn);
+  ovwExp.textContent     = fmt(totalExpn);
+  ovwRemain.textContent  = fmt(totalExpn - totalPaid);
 }
 
 /* ============== Paid Toggle ============== */
@@ -577,16 +506,24 @@ function openEdit(type,id){
   editTitle.textContent = type==="incomes" ? "Edit Income" : "Edit Expense";
   editName.value   = src.title;
   editAmount.value = src.amount;
-  if(type==="incomes"){ editIncWrap.style.display="flex"; editInclude.checked=!!src.include; }
-  else { editIncWrap.style.display="none"; }
+  editDate.value   = src.date || "";
+  if(type==="incomes"){
+    editIncWrap.style.display = "flex";
+    editInclude.checked = !!src.include;
+    editDateLabel.textContent = "Date Received";
+  }else{
+    editIncWrap.style.display = "none";
+    editDateLabel.textContent = "Bill Date";
+  }
   editModal.showModal();
 }
 editCancel.onclick = ()=>editModal.close();
 editSave.onclick = ()=>{
   const name = editName.value.trim();
   const amt  = parseFloat(editAmount.value);
+  const date = editDate.value;
   if(!name || !isFinite(amt)) return alert("Enter a valid name and amount.");
-  const patch = { title:name, amount:amt };
+  const patch = { title:name, amount:amt, date };
   if(editing.type==="incomes") patch.include = !!editInclude.checked;
   updateDocFS(editing.type, editing.id, patch);
   editModal.close();
@@ -596,10 +533,8 @@ editSave.onclick = ()=>{
 addInc.onclick = ()=>{
   const title = incName.value.trim();
   const amount= parseFloat(incAmt.value);
-  const include = !!incInc.checked;
-  const date = incDate.value || ""; // store raw date string (yyyy-mm-dd OK)
   if(!title || !isFinite(amount)) return alert("Enter a valid name and amount.");
-  addDocFS("incomes", { title, amount, include, date });
+  addDocFS("incomes", { title, amount, include:!!incInc.checked, date:incDate.value || "" });
   incName.value=""; incAmt.value=""; incDate.value=""; incInc.checked=false;
 };
 resetInc.onclick = ()=>{ incName.value=""; incAmt.value=""; incDate.value=""; incInc.checked=false; };
@@ -607,14 +542,13 @@ resetInc.onclick = ()=>{ incName.value=""; incAmt.value=""; incDate.value=""; in
 addExp.onclick = ()=>{
   const title = expName.value.trim();
   const amount= parseFloat(expAmt.value);
-  const date = the_expDate.value || "";
   if(!title || !isFinite(amount)) return alert("Enter a valid name and amount.");
-  addDocFS("expenses", { title, amount, date, paid:false });
-  expName.value=""; expAmt.value=""; the_expDate.value="";
+  addDocFS("expenses", { title, amount, date:expDate.value || "", paid:false });
+  expName.value=""; expAmt.value=""; expDate.value="";
 };
-resetExp.onclick = ()=>{ expName.value=""; expAmt.value=""; the_expDate.value=""; };
+resetExp.onclick = ()=>{ expName.value=""; expAmt.value=""; expDate.value=""; };
 
-/* ============== Delete Account (Overview only) ============== */
+/* ============== Delete Account ============== */
 btnDeleteAccount.addEventListener("click", async ()=>{
   if(!user) return;
   if(!confirm("Delete your account and all your data? This cannot be undone.")) return;
@@ -636,12 +570,12 @@ btnDeleteAccount.addEventListener("click", async ()=>{
   }
 });
 
-/* ============== Online/Offline Popup ============== */
+/* ============== Offline banner ============== */
 function showOfflinePop(){ offlinePop.style.display = "flex"; }
 function hideOfflinePop(){ offlinePop.style.display = "none"; }
 window.addEventListener("offline", showOfflinePop);
 window.addEventListener("online",  hideOfflinePop);
-offlineOk.addEventListener("click", hideOfflinePop);
+offlineOk && offlineOk.addEventListener("click", hideOfflinePop);
 if(!navigator.onLine) showOfflinePop();
 
 /* ============== Auth State ============== */
@@ -663,7 +597,7 @@ auth.onAuthStateChanged(async (u)=>{
     btnLogout.style.display = "none";
     return;
   }
-  // Signed in + verified → show app
+  // Verified → show app
   authPage.style.display = "none";
   verifyBox.style.display = "none";
   appShell.style.display = "block";
@@ -681,7 +615,7 @@ auth.onAuthStateChanged(async (u)=>{
   }
 });
 
-/* ============== Auto-detect email verification (no page refresh) ============== */
+/* ============== Auto-detect email verification (no refresh) ============== */
 setInterval(async ()=>{
   const u = auth.currentUser;
   if(u && !u.emailVerified){
