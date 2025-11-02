@@ -37,7 +37,7 @@ button{cursor:pointer;font-weight:600}
 .hidden{display:none}
 .note{text-align:center;color:var(--muted);font-size:.9rem;margin-top:12px}
 .tabs{display:flex;gap:8px;margin-top:18px}
-.tab{flex:1;text-align:center;padding:10px;border:1px solid var(--b2);border-radius:12px;cursor:pointer}
+.tab{flex:1;text-align:center;padding:10px;border:1px solid var(--b2);border-radius:12px;cursor:pointer;user-select:none;touch-action:manipulation;}
 .tab.active{background:#eef6ff;border-color:#b6dbff;color:#064d96}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .row{display:flex;gap:10px;margin-top:10px}
@@ -181,24 +181,78 @@ onAuthStateChanged(auth,async u=>{
   }
 });
 
+/* --- FIXED TAB SYSTEM --- */
 const panes={inc:document.getElementById("pane-inc"),exp:document.getElementById("pane-exp"),ov:document.getElementById("pane-ov")};
-const tabs=document.querySelectorAll(".tab");
-tabs.forEach(t=>t.onclick=()=>{tabs.forEach(x=>x.classList.remove("active"));t.classList.add("active");Object.values(panes).forEach(p=>p.classList.add("hidden"));panes[t.dataset.tab].classList.remove("hidden");});
+function setTab(id){
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.classList.toggle("active",t.dataset.tab===id);
+  });
+  Object.values(panes).forEach(p=>p.classList.add("hidden"));
+  (panes[id]||panes.inc).classList.remove("hidden");
+}
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click",e=>{
+    e.preventDefault();e.stopPropagation();setTab(t.dataset.tab);
+  },{passive:true});
+});
+setTab("inc");
+/* --- END FIXED TAB SYSTEM --- */
+
 const tInc=document.getElementById("tInc"),tExp=document.getElementById("tExp"),tAvail=document.getElementById("tAvail");
-function render(){panes.inc.innerHTML="";panes.exp.innerHTML="";cache.entries.filter(e=>e.kind==="income").forEach(e=>panes.inc.append(row(e)));cache.entries.filter(e=>e.kind==="expense").forEach(e=>panes.exp.append(row(e)));const inc=cache.entries.filter(e=>e.kind==="income").reduce((a,b)=>a+Number(b.amount||0),0);const exp=cache.entries.filter(e=>e.kind==="expense").reduce((a,b)=>a+Number(b.amount||0),0);tInc.textContent="£"+fmt(inc);tExp.textContent="£"+fmt(exp);tAvail.textContent="£"+fmt(inc-exp);}
-function row(e){const el=document.createElement("div");el.className="item";el.innerHTML=`<div>${e.title}</div><div>£${fmt(e.amount)}</div><button class='gray' data-a='edit'>Edit</button><button class='gray' data-a='del'>Del</button>`;el.querySelector("[data-a='edit']").onclick=()=>openEdit(e.id);el.querySelector("[data-a='del']").onclick=()=>del(e.id);return el;}
+function render(){
+  panes.inc.innerHTML="";panes.exp.innerHTML="";
+  cache.entries.filter(e=>e.kind==="income").forEach(e=>panes.inc.append(row(e)));
+  cache.entries.filter(e=>e.kind==="expense").forEach(e=>panes.exp.append(row(e)));
+  const inc=cache.entries.filter(e=>e.kind==="income").reduce((a,b)=>a+Number(b.amount||0),0);
+  const exp=cache.entries.filter(e=>e.kind==="expense").reduce((a,b)=>a+Number(b.amount||0),0);
+  tInc.textContent="£"+fmt(inc);tExp.textContent="£"+fmt(exp);tAvail.textContent="£"+fmt(inc-exp);
+}
+function row(e){
+  const el=document.createElement("div");
+  el.className="item";
+  el.innerHTML=`<div>${e.title}</div><div>£${fmt(e.amount)}</div><button class='gray' data-a='edit'>Edit</button><button class='gray' data-a='del'>Del</button>`;
+  el.querySelector("[data-a='edit']").onclick=()=>openEdit(e.id);
+  el.querySelector("[data-a='del']").onclick=()=>del(e.id);
+  return el;
+}
 const title=document.getElementById("title"),amount=document.getElementById("amount"),kind=document.getElementById("kind");
-document.getElementById("addBtn").onclick=async()=>{if(!title.value||!amount.value)return;const e={id:crypto.randomUUID(),title:title.value,amount:Number(amount.value),kind:kind.value};cache.entries.unshift(e);save();render();title.value="";amount.value="";if(UID)await setDoc(doc(db,"users",UID,"entries",e.id),e);};
+document.getElementById("addBtn").onclick=async()=>{
+  if(!title.value||!amount.value)return;
+  const e={id:crypto.randomUUID(),title:title.value,amount:Number(amount.value),kind:kind.value};
+  cache.entries.unshift(e);save();render();
+  title.value="";amount.value="";
+  if(UID)await setDoc(doc(db,"users",UID,"entries",e.id),e);
+};
 
 let editing=null;
 const modalBack=document.getElementById("modalBack");
-function openEdit(id){const e=cache.entries.find(x=>x.id===id);if(!e)return;editing=id;document.getElementById("mTitleInput").value=e.title;document.getElementById("mAmountInput").value=e.amount;modalBack.style.display="flex";}
+function openEdit(id){
+  const e=cache.entries.find(x=>x.id===id);
+  if(!e)return;
+  editing=id;
+  document.getElementById("mTitleInput").value=e.title;
+  document.getElementById("mAmountInput").value=e.amount;
+  modalBack.style.display="flex";
+}
 document.getElementById("mClose").onclick=()=>modalBack.style.display="none";
-document.getElementById("mSave").onclick=async()=>{const e=cache.entries.find(x=>x.id===editing);if(!e)return;e.title=document.getElementById("mTitleInput").value;e.amount=Number(document.getElementById("mAmountInput").value);save();render();modalBack.style.display="none";if(UID)await setDoc(doc(db,"users",UID,"entries",e.id),e);};
-document.getElementById("mDelete").onclick=async()=>{cache.entries=cache.entries.filter(x=>x.id!==editing);save();render();modalBack.style.display="none";if(UID)await deleteDoc(doc(db,"users",UID,"entries",editing));};
+document.getElementById("mSave").onclick=async()=>{
+  const e=cache.entries.find(x=>x.id===editing);
+  if(!e)return;
+  e.title=document.getElementById("mTitleInput").value;
+  e.amount=Number(document.getElementById("mAmountInput").value);
+  save();render();modalBack.style.display="none";
+  if(UID)await setDoc(doc(db,"users",UID,"entries",e.id),e);
+};
+document.getElementById("mDelete").onclick=async()=>{
+  cache.entries=cache.entries.filter(x=>x.id!==editing);
+  save();render();modalBack.style.display="none";
+  if(UID)await deleteDoc(doc(db,"users",UID,"entries",editing));
+};
 render();
 
-if("serviceWorker"in navigator){navigator.serviceWorker.register("/Socialcreator-manifest/service-worker.js",{scope:"/Socialcreator-manifest/"});}
+if("serviceWorker"in navigator){
+  navigator.serviceWorker.register("/Socialcreator-manifest/service-worker.js",{scope:"/Socialcreator-manifest/"});
+}
 </script>
 </body>
 </html>
