@@ -8,110 +8,108 @@
 <meta name="theme-color" content="#000000" />
 <link rel="icon" href="Icon-192.png" />
 <style>
-:root{--bg:#f5f6f8;--card:#fff;--text:#111;--muted:#6b7280;--b:#e5e7eb;--b2:#d1d5db;--pri:#0d6efd;--pri2:#00aaff;--good:#128a12;--bad:#c30000;--shadow:0 6px 18px rgba(0,0,0,.10);}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
-.wrap{max-width:740px;margin:24px auto;padding:0 12px}
-.card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:18px}
-.header{display:flex;align-items:center;gap:10px}
-.logo{width:28px;height:28px;border-radius:6px}
-h1{font-size:1.35rem;margin:0}
-.auth{margin-left:auto;display:flex;gap:8px;align-items:center}
-.chip{font-size:.9rem;color:var(--muted)}
-button{cursor:pointer}
-.btn{padding:10px 14px;border-radius:10px;border:1px solid var(--b2);background:#f3f4f6}
-.btn.primary{border:none;background:linear-gradient(90deg,var(--pri),var(--pri2));color:#fff;font-weight:700}
-.btn.danger{background:#eee;color:#000;border:1px solid #ddd}
-.link{color:var(--pri);font-size:.9rem;text-decoration:underline;cursor:pointer;margin-top:6px;display:inline-block}
-.tabs{display:flex;gap:8px;margin-top:14px}
+:root{
+  --bg:#f5f6f8;--card:#fff;--text:#111;--muted:#6b7280;
+  --b:#e5e7eb;--b2:#d1d5db;--pri:#0d6efd;--pri2:#00aaff;
+  --shadow:0 8px 24px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg);color:var(--text);
+  display:flex;justify-content:center;align-items:center;
+  min-height:100vh;padding:20px;
+}
+.card{
+  background:var(--card);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  padding:26px 22px;
+  width:100%;max-width:420px;
+  box-sizing:border-box;
+}
+h1{font-size:1.4rem;text-align:center;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px}
+h1 img{width:28px;height:28px}
+input,button,select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--b);font-size:1rem;margin-top:10px}
+button{cursor:pointer;font-weight:600}
+.primary{background:linear-gradient(90deg,var(--pri),var(--pri2));color:#fff;border:none}
+.gray{background:#f3f4f6}
+.hidden{display:none}
+.note{text-align:center;color:var(--muted);font-size:.9rem;margin-top:12px}
+.tabs{display:flex;gap:8px;margin-top:18px}
 .tab{flex:1;text-align:center;padding:10px;border:1px solid var(--b2);border-radius:12px;cursor:pointer}
 .tab.active{background:#eef6ff;border-color:#b6dbff;color:#064d96}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.row{display:flex;gap:10px}
-input,select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--b);outline:none;font-size:1rem}
-input:focus,select:focus{border-color:#5aa4ff;box-shadow:0 0 0 3px rgba(0,120,255,.15)}
-.list{margin-top:12px;border:1px solid var(--b);border-radius:12px;overflow:hidden}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.row{display:flex;gap:10px;margin-top:10px}
+.totals{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
+.totals .box{background:#f7f7f9;border:1px solid var(--b);border-radius:12px;padding:12px;text-align:center}
+.totals b{display:block;margin-top:4px}
 .item{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--b)}
 .item:last-child{border-bottom:none}
-.money{font-weight:700}
-.muted{color:var(--muted)}
-.note{margin-top:10px;text-align:center;color:var(--muted);font-size:.95rem}
-.hidden{display:none}
 .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;padding:14px;z-index:30}
 .modal{background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:16px;max-width:420px;width:100%}
-.switch{display:flex;align-items:center;gap:8px}
-.switch input{width:auto}
-.totals{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
-.totals .box{background:#f7f7f9;border:1px solid var(--b);border-radius:12px;padding:10px;text-align:center}
-.totals b{display:block;margin-top:4px}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="card">
-    <div class="header">
-      <img src="Icon-192.png" class="logo" alt="logo" />
-      <h1>Ventsharm Budget</h1>
-      <div class="auth">
-        <span id="authState" class="chip">Signed out</span>
-        <button id="loginBtn" class="btn primary">Login / Register</button>
-        <button id="logoutBtn" class="btn danger hidden">Logout</button>
-      </div>
-    </div>
 
-    <div id="authExtras" class="hidden" style="margin-top:6px">
-      <span id="forgotPass" class="link">Forgot password?</span> ·
-      <span id="resendVerify" class="link">Resend verification</span>
-    </div>
-
-    <div class="tabs">
-      <div class="tab active" data-tab="inc">Incomes</div>
-      <div class="tab" data-tab="exp">Expenses</div>
-      <div class="tab" data-tab="ov">Overview</div>
-    </div>
-
-    <div class="grid2" style="margin-top:12px">
-      <input id="title" placeholder="Title (e.g. Salary, Rent)" />
-      <input id="amount" type="number" placeholder="Amount" />
-    </div>
-
-    <div class="row" style="margin-top:10px">
-      <select id="kind">
-        <option value="income">Income</option>
-        <option value="expense">Expense</option>
-      </select>
-      <button id="addBtn" class="btn primary" style="flex:1">Add</button>
-      <button id="resetLocal" class="btn">Reset (local)</button>
-    </div>
-
-    <div class="totals">
-      <div class="box"><span class="muted">Income</span><b id="tInc">£0.00</b></div>
-      <div class="box"><span class="muted">Expense</span><b id="tExp">£0.00</b></div>
-      <div class="box"><span class="muted">Available</span><b id="tAvail">£0.00</b></div>
-    </div>
-
-    <div id="pane-inc" class="list" style="margin-top:10px"></div>
-    <div id="pane-exp" class="list hidden" style="margin-top:10px"></div>
-    <div id="pane-ov" class="hidden note" style="margin-top:10px"></div>
-
-    <p class="note">Synced via Firebase. Cached offline; 0 reads on refresh.</p>
-  </div>
+<div class="card" id="loginCard">
+  <h1><img src="Icon-192.png"> Ventsharm Budget</h1>
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button id="loginBtn" class="primary">Login / Register</button>
+  <button id="forgotBtn" class="gray">Forgot Password</button>
+  <button id="verifyBtn" class="gray hidden">Resend Verification</button>
+  <p class="note">Sign in or create an account to access your budget.</p>
 </div>
 
-<!-- Edit Modal -->
+<div class="card hidden" id="appCard">
+  <div class="header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <h1 style="margin:0;display:flex;align-items:center;gap:8px"><img src="Icon-192.png"> Ventsharm Budget</h1>
+    <button id="logoutBtn" class="gray" style="width:auto">Logout</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="inc">Incomes</div>
+    <div class="tab" data-tab="exp">Expenses</div>
+    <div class="tab" data-tab="ov">Overview</div>
+  </div>
+
+  <div class="grid2">
+    <input id="title" placeholder="Title (e.g. Salary, Rent)">
+    <input id="amount" type="number" placeholder="Amount">
+  </div>
+
+  <div class="row">
+    <select id="kind">
+      <option value="income">Income</option>
+      <option value="expense">Expense</option>
+    </select>
+    <button id="addBtn" class="primary" style="flex:1">Add</button>
+  </div>
+
+  <div class="totals">
+    <div class="box"><span class="muted">Income</span><b id="tInc">£0.00</b></div>
+    <div class="box"><span class="muted">Expense</span><b id="tExp">£0.00</b></div>
+    <div class="box"><span class="muted">Available</span><b id="tAvail">£0.00</b></div>
+  </div>
+
+  <div id="pane-inc" style="margin-top:10px"></div>
+  <div id="pane-exp" class="hidden" style="margin-top:10px"></div>
+  <div id="pane-ov" class="hidden note" style="margin-top:10px"></div>
+
+  <p class="note">Synced via Firebase. Cached offline; 0 reads on refresh.</p>
+</div>
+
+<!-- Modal for editing -->
 <div id="modalBack" class="modal-back">
   <div class="modal">
     <h3>Edit Entry</h3>
-    <input id="mTitleInput" placeholder="Title" />
-    <input id="mAmountInput" type="number" placeholder="Amount" style="margin-top:10px" />
-    <div class="switch" style="margin-top:10px">
-      <input id="mInclude" type="checkbox" />
-      <label for="mInclude">Include in available income</label>
-    </div>
+    <input id="mTitleInput" placeholder="Title">
+    <input id="mAmountInput" type="number" placeholder="Amount" style="margin-top:10px">
     <div class="row" style="margin-top:12px">
-      <button id="mSave" class="btn primary" style="flex:1">Save</button>
-      <button id="mDelete" class="btn danger">Delete</button>
-      <button id="mClose" class="btn">Close</button>
+      <button id="mSave" class="primary" style="flex:1">Save</button>
+      <button id="mDelete" class="gray">Delete</button>
+      <button id="mClose" class="gray">Close</button>
     </div>
   </div>
 </div>
@@ -132,36 +130,74 @@ const app = initializeApp({
 const auth=getAuth(app); const db=getFirestore(app);
 await setPersistence(auth,browserLocalPersistence);
 
-const $=s=>document.querySelector(s);
-const loginBtn=$("#loginBtn"),logoutBtn=$("#logoutBtn"),authState=$("#authState"),authExtras=$("#authExtras"),forgotPass=$("#forgotPass"),resendVerify=$("#resendVerify");
-const LS="vb_cache_v5";let cache=JSON.parse(localStorage.getItem(LS)||'{"entries":[],"uid":null}');let UID=cache.uid;
-function save(){localStorage.setItem(LS,JSON.stringify(cache));}
+const loginCard=document.getElementById("loginCard");
+const appCard=document.getElementById("appCard");
+const email=document.getElementById("email");
+const pass=document.getElementById("password");
+const loginBtn=document.getElementById("loginBtn");
+const forgotBtn=document.getElementById("forgotBtn");
+const verifyBtn=document.getElementById("verifyBtn");
+const logoutBtn=document.getElementById("logoutBtn");
+const LS="vb_cache_v5";
+let cache=JSON.parse(localStorage.getItem(LS)||'{"entries":[],"uid":null}');
+let UID=cache.uid;function save(){localStorage.setItem(LS,JSON.stringify(cache));}
 function fmt(n){return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
-function id(){return crypto.randomUUID();}
-const panes={inc:$("#pane-inc"),exp:$("#pane-exp"),ov:$("#pane-ov")},tabs=document.querySelectorAll(".tab");
-tabs.forEach(t=>t.onclick=()=>{tabs.forEach(x=>x.classList.remove("active"));t.classList.add("active");Object.values(panes).forEach(p=>p.classList.add("hidden"));panes[t.dataset.tab].classList.remove("hidden");});
-const tInc=$("#tInc"),tExp=$("#tExp"),tAvail=$("#tAvail");
-function renderTotals(){const inc=cache.entries.filter(e=>e.kind==="income"&&e.include!==false).reduce((a,b)=>a+Number(b.amount||0),0);const exp=cache.entries.filter(e=>e.kind==="expense").reduce((a,b)=>a+Number(b.amount||0),0);tInc.textContent="£"+fmt(inc);tExp.textContent="£"+fmt(exp);tAvail.textContent="£"+fmt(inc-exp);}
-function renderLists(){panes.inc.innerHTML="";panes.exp.innerHTML="";cache.entries.filter(e=>e.kind==="income").forEach(e=>panes.inc.append(row(e)));cache.entries.filter(e=>e.kind==="expense").forEach(e=>panes.exp.append(row(e)));panes.ov.innerHTML=`Entries: ${cache.entries.length}<br><span class="muted">Signed ${UID?"in":"out"}</span>`;renderTotals();}
-function row(e){const el=document.createElement("div");el.className="item";el.innerHTML=`<div>${e.title}<div class="muted" style="font-size:.85rem">${e.kind}${e.include===false?" · excluded":""}</div></div><div class="money">£${fmt(e.amount)}</div><button class="btn" data-a="edit">Edit</button><button class="btn danger" data-a="del">Delete</button>`;el.querySelector("[data-a='edit']").onclick=()=>openEdit(e.id);el.querySelector("[data-a='del']").onclick=()=>del(e.id);return el;}
-function openEdit(id){const e=cache.entries.find(x=>x.id===id);if(!e)return;editing=id;$("#mTitleInput").value=e.title;$("#mAmountInput").value=e.amount;$("#mInclude").checked=e.include!==false;$("#modalBack").style.display="flex";}
-function closeEdit(){$("#modalBack").style.display="none";editing=null;}
-$("#mClose").onclick=closeEdit;
-$("#mSave").onclick=async()=>{const e=cache.entries.find(x=>x.id===editing);if(!e)return;e.title=$("#mTitleInput").value;e.amount=Number($("#mAmountInput").value||0);e.include=$("#mInclude").checked;save();renderLists();closeEdit();if(UID)await setDoc(doc(db,"users",UID,"entries",e.id),e);};
-$("#mDelete").onclick=async()=>{await del(editing);closeEdit();};
-async function del(id){cache.entries=cache.entries.filter(x=>x.id!==id);save();renderLists();if(UID)await deleteDoc(doc(db,"users",UID,"entries",id));}
-$("#addBtn").onclick=async()=>{const t=$("#title").value.trim(),a=Number($("#amount").value||0),k=$("#kind").value;if(!t||!a)return;const e={id:id(),title:t,amount:a,kind:k,include:true,ts:Date.now()};cache.entries.unshift(e);save();renderLists();$("#title").value="";$("#amount").value="";if(UID)await setDoc(doc(db,"users",UID,"entries",e.id),e);};
-$("#resetLocal").onclick=()=>{if(confirm("Clear local data?")){cache={uid:UID,entries:[]};save();renderLists();}};
 
-loginBtn.onclick=async()=>{const email=prompt("Email:");if(!email)return;const pass=prompt("Password:");if(!pass)return;
-try{await signInWithEmailAndPassword(auth,email,pass);}
-catch{const u=await createUserWithEmailAndPassword(auth,email,pass);await sendEmailVerification(u.user);alert("Account created! Check your email for verification.");}};
-forgotPass.onclick=async()=>{const email=prompt("Enter your email to reset password:");if(!email)return;await sendPasswordResetEmail(auth,email);alert("Password reset link sent!");};
-resendVerify.onclick=async()=>{if(auth.currentUser){await sendEmailVerification(auth.currentUser);alert("Verification email resent!");}else alert("You must be logged in first.");};
+loginBtn.onclick=async()=>{
+  if(!email.value||!pass.value){alert("Enter email and password");return;}
+  try{
+    await signInWithEmailAndPassword(auth,email.value,pass.value);
+  }catch{
+    const u=await createUserWithEmailAndPassword(auth,email.value,pass.value);
+    await sendEmailVerification(u.user);
+    alert("Account created! Check your email for verification.");
+  }
+};
+
+forgotBtn.onclick=async()=>{
+  if(!email.value)return alert("Enter your email first");
+  await sendPasswordResetEmail(auth,email.value);
+  alert("Password reset email sent!");
+};
+
+verifyBtn.onclick=async()=>{
+  if(auth.currentUser){await sendEmailVerification(auth.currentUser);alert("Verification email sent again!");}
+};
+
 logoutBtn.onclick=()=>signOut(auth);
 
-onAuthStateChanged(auth,async u=>{UID=u?.uid||null;cache.uid=UID;save();authState.textContent=UID?"Signed in":"Signed out";loginBtn.classList.toggle("hidden",!!UID);logoutBtn.classList.toggle("hidden",!UID);authExtras.classList.toggle("hidden",!UID);if(UID){if(!u.emailVerified){alert("Please verify your email before continuing.");await signOut(auth);return;}const q=await getDocs(collection(db,"users",UID,"entries"));cache.entries=q.docs.map(d=>d.data());save();renderLists();}});
-renderLists();
+onAuthStateChanged(auth,async u=>{
+  if(u && u.emailVerified){
+    UID=u.uid;cache.uid=UID;save();
+    loginCard.classList.add("hidden");
+    appCard.classList.remove("hidden");
+    const q=await getDocs(collection(db,"users",UID,"entries"));
+    cache.entries=q.docs.map(d=>d.data());save();render();
+  }else{
+    UID=null;cache.uid=null;save();
+    loginCard.classList.remove("hidden");
+    appCard.classList.add("hidden");
+    verifyBtn.classList.toggle("hidden",!u);
+  }
+});
+
+const panes={inc:document.getElementById("pane-inc"),exp:document.getElementById("pane-exp"),ov:document.getElementById("pane-ov")};
+const tabs=document.querySelectorAll(".tab");
+tabs.forEach(t=>t.onclick=()=>{tabs.forEach(x=>x.classList.remove("active"));t.classList.add("active");Object.values(panes).forEach(p=>p.classList.add("hidden"));panes[t.dataset.tab].classList.remove("hidden");});
+const tInc=document.getElementById("tInc"),tExp=document.getElementById("tExp"),tAvail=document.getElementById("tAvail");
+function render(){panes.inc.innerHTML="";panes.exp.innerHTML="";cache.entries.filter(e=>e.kind==="income").forEach(e=>panes.inc.append(row(e)));cache.entries.filter(e=>e.kind==="expense").forEach(e=>panes.exp.append(row(e)));const inc=cache.entries.filter(e=>e.kind==="income").reduce((a,b)=>a+Number(b.amount||0),0);const exp=cache.entries.filter(e=>e.kind==="expense").reduce((a,b)=>a+Number(b.amount||0),0);tInc.textContent="£"+fmt(inc);tExp.textContent="£"+fmt(exp);tAvail.textContent="£"+fmt(inc-exp);}
+function row(e){const el=document.createElement("div");el.className="item";el.innerHTML=`<div>${e.title}</div><div>£${fmt(e.amount)}</div><button class='gray' data-a='edit'>Edit</button><button class='gray' data-a='del'>Del</button>`;el.querySelector("[data-a='edit']").onclick=()=>openEdit(e.id);el.querySelector("[data-a='del']").onclick=()=>del(e.id);return el;}
+const title=document.getElementById("title"),amount=document.getElementById("amount"),kind=document.getElementById("kind");
+document.getElementById("addBtn").onclick=async()=>{if(!title.value||!amount.value)return;const e={id:crypto.randomUUID(),title:title.value,amount:Number(amount.value),kind:kind.value};cache.entries.unshift(e);save();render();title.value="";amount.value="";if(UID)await setDoc(doc(db,"users",UID,"entries",e.id),e);};
+
+let editing=null;
+const modalBack=document.getElementById("modalBack");
+function openEdit(id){const e=cache.entries.find(x=>x.id===id);if(!e)return;editing=id;document.getElementById("mTitleInput").value=e.title;document.getElementById("mAmountInput").value=e.amount;modalBack.style.display="flex";}
+document.getElementById("mClose").onclick=()=>modalBack.style.display="none";
+document.getElementById("mSave").onclick=async()=>{const e=cache.entries.find(x=>x.id===editing);if(!e)return;e.title=document.getElementById("mTitleInput").value;e.amount=Number(document.getElementById("mAmountInput").value);save();render();modalBack.style.display="none";if(UID)await setDoc(doc(db,"users",UID,"entries",e.id),e);};
+document.getElementById("mDelete").onclick=async()=>{cache.entries=cache.entries.filter(x=>x.id!==editing);save();render();modalBack.style.display="none";if(UID)await deleteDoc(doc(db,"users",UID,"entries",editing));};
+render();
+
 if("serviceWorker"in navigator){navigator.serviceWorker.register("/Socialcreator-manifest/service-worker.js",{scope:"/Socialcreator-manifest/"});}
 </script>
 </body>
