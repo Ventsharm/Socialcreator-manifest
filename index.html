@@ -1,137 +1,310 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Ventsharm Budget</title>
-<link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#000000">
-<link rel="icon" href="Icon-192.png">
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#000000" />
+<link rel="icon" href="Icon-192.png" />
 <style>
-:root {--bg:#f5f6f8;--card:#fff;--text:#111;--b:#e5e7eb;--pri:#0d6efd;}
-*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-body{background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;min-height:100vh;padding:10px}
-.card{background:var(--card);border-radius:18px;box-shadow:0 4px 18px rgba(0,0,0,.1);padding:24px;max-width:420px;width:100%;}
-h1{display:flex;align-items:center;gap:8px;justify-content:center;font-size:1.4rem;margin-bottom:20px}
-h1 img{width:28px;height:28px}
-input,select,button{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #ccc;font-size:1rem;margin-top:10px}
-button{cursor:pointer;font-weight:600}
-.btn{background:linear-gradient(90deg,#007bff,#00aaff);border:none;color:#fff}
-.btn.gray{background:#ccc;color:#000}
-.note{text-align:center;margin-top:10px;font-size:.9rem;color:#666}
-.tabs{display:flex;gap:6px;margin-bottom:10px}
-.tab{flex:1;text-align:center;padding:8px;border:1px solid #ccc;border-radius:10px;cursor:pointer}
-.tab.active{background:#eef6ff;border-color:#b6dbff;color:#064d96}
-.list{border:1px solid #ddd;border-radius:10px;margin-top:10px}
-.row{display:grid;grid-template-columns:1fr auto auto;gap:6px;padding:8px 10px;border-bottom:1px solid #eee;align-items:center}
-.row:last-child{border-bottom:none}
-.money{font-weight:700}
-.hidden{display:none}
+  :root{
+    --bg:#f5f6f8; --card:#fff; --text:#111; --muted:#6b7280;
+    --b:#e5e7eb; --b2:#d1d5db; --pri:#0d6efd; --pri2:#00aaff; --good:#128a12; --bad:#c30000;
+    --shadow:0 6px 18px rgba(0,0,0,.10);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+  .wrap{max-width:740px;margin:24px auto;padding:0 12px}
+  .card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:18px}
+  .header{display:flex;align-items:center;gap:10px}
+  .logo{width:28px;height:28px;border-radius:6px}
+  h1{font-size:1.35rem;margin:0}
+  .auth{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .chip{font-size:.9rem;color:var(--muted)}
+  button{cursor:pointer}
+  .btn{padding:10px 14px;border-radius:10px;border:1px solid var(--b2);background:#f3f4f6}
+  .btn.primary{border:none;background:linear-gradient(90deg,var(--pri),var(--pri2));color:#fff;font-weight:700}
+  .btn.danger{background:#eee;color:#000;border:1px solid #ddd}
+  .tabs{display:flex;gap:8px;margin-top:14px}
+  .tab{flex:1;text-align:center;padding:10px;border:1px solid var(--b2);border-radius:12px;cursor:pointer}
+  .tab.active{background:#eef6ff;border-color:#b6dbff;color:#064d96}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .row{display:flex;gap:10px}
+  input,select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--b);outline:none;font-size:1rem}
+  input:focus,select:focus{border-color:#5aa4ff;box-shadow:0 0 0 3px rgba(0,120,255,.15)}
+  .list{margin-top:12px;border:1px solid var(--b);border-radius:12px;overflow:hidden}
+  .item{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--b)}
+  .item:last-child{border-bottom:none}
+  .money{font-weight:700}
+  .muted{color:var(--muted)}
+  .note{margin-top:10px;text-align:center;color:var(--muted);font-size:.95rem}
+  .hidden{display:none}
+  /* Modal */
+  .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;padding:14px;z-index:30}
+  .modal{background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:16px;max-width:420px;width:100%}
+  .switch{display:flex;align-items:center;gap:8px}
+  .switch input{width:auto}
+  .totals{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
+  .totals .box{background:#f7f7f9;border:1px solid var(--b);border-radius:12px;padding:10px;text-align:center}
+  .totals b{display:block;margin-top:4px}
 </style>
 </head>
 <body>
+<div class="wrap">
+  <div class="card">
+    <div class="header">
+      <img src="Icon-192.png" class="logo" alt="logo" />
+      <h1>Ventsharm Budget</h1>
+      <div class="auth">
+        <span id="authState" class="chip">Signed out</span>
+        <button id="loginBtn" class="btn primary">Login / Register</button>
+        <button id="logoutBtn" class="btn danger hidden">Logout</button>
+      </div>
+    </div>
 
-<div id="loginCard" class="card">
-  <h1><img src="Icon-192.png" alt=""> Ventsharm Budget</h1>
-  <input id="email" type="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button id="loginBtn" class="btn">Login / Register</button>
-  <p id="loginMsg" class="note"></p>
+    <div class="tabs">
+      <div class="tab active" data-tab="inc">Incomes</div>
+      <div class="tab" data-tab="exp">Expenses</div>
+      <div class="tab" data-tab="ov">Overview</div>
+    </div>
+
+    <div class="grid2" style="margin-top:12px">
+      <input id="title" placeholder="Title (e.g. Salary, Rent)" />
+      <input id="amount" type="number" placeholder="Amount" />
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <select id="kind">
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+      <button id="addBtn" class="btn primary" style="flex:1">Add</button>
+      <button id="resetLocal" class="btn">Reset (local)</button>
+    </div>
+
+    <!-- Totals -->
+    <div class="totals">
+      <div class="box"><span class="muted">Income</span><b id="tInc">£0.00</b></div>
+      <div class="box"><span class="muted">Expense</span><b id="tExp">£0.00</b></div>
+      <div class="box"><span class="muted">Available</span><b id="tAvail">£0.00</b></div>
+    </div>
+
+    <!-- Lists -->
+    <div id="pane-inc" class="list" style="margin-top:10px"></div>
+    <div id="pane-exp" class="list hidden" style="margin-top:10px"></div>
+    <div id="pane-ov" class="hidden note" style="margin-top:10px"></div>
+
+    <p class="note">Syncs via Firebase. Cached locally for offline; 0 reads on refresh.</p>
+  </div>
 </div>
 
-<div id="appCard" class="card hidden">
-  <h1><img src="Icon-192.png" alt=""> Ventsharm Budget</h1>
-  <div style="text-align:right;margin-bottom:10px">
-    <button id="logoutBtn" class="btn gray">Logout</button>
+<!-- Edit Modal -->
+<div id="modalBack" class="modal-back" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="modal">
+    <h3 id="mTitle" style="margin:0 0 10px">Edit entry</h3>
+    <input id="mTitleInput" placeholder="Title" />
+    <input id="mAmountInput" type="number" placeholder="Amount" style="margin-top:10px" />
+    <div class="switch" style="margin-top:10px">
+      <input id="mInclude" type="checkbox" />
+      <label for="mInclude">Include in available income</label>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button id="mSave" class="btn primary" style="flex:1">Save</button>
+      <button id="mDelete" class="btn danger">Delete</button>
+      <button id="mClose" class="btn">Close</button>
+    </div>
   </div>
+</div><script type="module">
+/* ===== Firebase v10.13.2 ===== */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+import { getAuth, setPersistence, browserLocalPersistence,
+         signInWithEmailAndPassword, createUserWithEmailAndPassword,
+         signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-  <div class="tabs">
-    <div class="tab active" data-tab="inc">Incomes</div>
-    <div class="tab" data-tab="exp">Expenses</div>
-    <div class="tab" data-tab="ov">Overview</div>
-  </div>
+/* Your confirmed budget Firebase keys */
+const firebaseConfig = {
+  apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
+  authDomain: "budget-app-283de.firebaseapp.com",
+  projectId: "budget-app-283de",
+  storageBucket: "budget-app-283de.firebasestorage.app",
+  messagingSenderId: "162369707369",
+  appId: "1:162369707369:web:3faa7f002f8ba22dc0f1f8"
+};
 
-  <input id="title" placeholder="Title (e.g. Salary, Rent)">
-  <input id="amount" type="number" placeholder="Amount">
-  <select id="kind">
-    <option value="income">Income</option>
-    <option value="expense">Expense</option>
-  </select>
-  <button id="addBtn" class="btn" style="margin-top:10px">Add</button>
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+await setPersistence(auth, browserLocalPersistence); // stay logged in
 
-  <div id="pane-inc" class="list"></div>
-  <div id="pane-exp" class="list hidden"></div>
-  <div id="pane-ov" class="hidden note"></div>
-  <p class="note">Synced via Firebase / Cached offline</p>
-</div>
+/* ===== Elements ===== */
+const $ = s => document.querySelector(s);
+const tabs = document.querySelectorAll(".tab");
+const panes = { inc: $("#pane-inc"), exp: $("#pane-exp"), ov: $("#pane-ov") };
+const tInc=$("#tInc"), tExp=$("#tExp"), tAvail=$("#tAvail");
+const loginBtn=$("#loginBtn"), logoutBtn=$("#logoutBtn"), authState=$("#authState");
+const title=$("#title"), amount=$("#amount"), kind=$("#kind"), addBtn=$("#addBtn"), resetLocal=$("#resetLocal");
 
-<script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-import {getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-import {getFirestore, collection, doc, setDoc, getDocs, deleteDoc} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+/* ===== Local cache (0 reads on refresh) ===== */
+const LS_KEY = "vb_budget_cache_v3";
+let cache = JSON.parse(localStorage.getItem(LS_KEY) || '{"uid":null,"entries":[]}');
+let UID = cache.uid || null;
+const saveCache = () => localStorage.setItem(LS_KEY, JSON.stringify(cache));
 
-const app = initializeApp({
- apiKey:"AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
- authDomain:"budget-app-283de.firebaseapp.com",
- projectId:"budget-app-283de",
- storageBucket:"budget-app-283de.firebasestorage.app",
- messagingSenderId:"162369707369",
- appId:"1:162369707369:web:3faa7f002f8ba22dc0f1f8"
+/* ===== Helpers ===== */
+const money = n => Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const id = () => crypto.randomUUID();
+
+/* ===== Render ===== */
+function renderTotals(){
+  const inc = cache.entries.filter(e=>e.kind==="income" && e.include!==false)
+                .reduce((a,b)=>a+Number(b.amount||0),0);
+  const exp = cache.entries.filter(e=>e.kind==="expense")
+                .reduce((a,b)=>a+Number(b.amount||0),0);
+  const avail = inc - exp;
+  tInc.textContent = "£"+money(inc);
+  tExp.textContent = "£"+money(exp);
+  tAvail.textContent = "£"+money(avail);
+}
+
+function itemRow(e){
+  const el = document.createElement("div");
+  el.className = "item";
+  el.innerHTML = `
+    <div>
+      <div>${e.title}</div>
+      <div class="muted" style="font-size:.9rem">${e.kind}${e.include===false?' · excluded':''}</div>
+    </div>
+    <div class="money">£${money(e.amount)}</div>
+    <button class="btn" data-a="edit">Edit</button>
+    <button class="btn danger" data-a="del">Delete</button>
+  `;
+  el.querySelector('[data-a="edit"]').onclick = () => openEdit(e.id);
+  el.querySelector('[data-a="del"]').onclick  = () => removeEntry(e.id);
+  return el;
+}
+
+function renderLists(){
+  panes.inc.innerHTML = "";
+  panes.exp.innerHTML = "";
+  const inc = cache.entries.filter(e=>e.kind==="income");
+  const exp = cache.entries.filter(e=>e.kind==="expense");
+  inc.forEach(e=>panes.inc.append(itemRow(e)));
+  exp.forEach(e=>panes.exp.append(itemRow(e)));
+  panes.ov.innerHTML = `
+    <div>Entries: ${cache.entries.length}</div>
+    <div class="muted">Signed ${UID ? 'in' : 'out'} · Local first, cloud sync on actions</div>
+  `;
+  renderTotals();
+}
+
+/* ===== Tabs ===== */
+tabs.forEach(t=>t.addEventListener('click',()=>{
+  tabs.forEach(x=>x.classList.remove('active')); t.classList.add('active');
+  Object.values(panes).forEach(p=>p.classList.add('hidden'));
+  panes[t.dataset.tab].classList.remove('hidden');
+}));
+
+/* ===== CRUD ===== */
+async function addEntry(){
+  const titleVal = title.value.trim();
+  const amountVal = Number(amount.value || 0);
+  if(!titleVal || !amountVal) return;
+  const entry = { id:id(), title:titleVal, amount:amountVal, kind:kind.value, include:true, ts:Date.now() };
+  cache.entries.unshift(entry);
+  saveCache(); renderLists();
+  title.value=""; amount.value="";
+  if(UID){ // lazy write
+    await setDoc(doc(db,"users",UID,"entries",entry.id), entry);
+  }
+}
+addBtn.addEventListener('click', addEntry);
+
+async function removeEntry(entryId){
+  cache.entries = cache.entries.filter(e=>e.id!==entryId);
+  saveCache(); renderLists();
+  if(UID){ await deleteDoc(doc(db,"users",UID,"entries",entryId)); }
+}
+
+/* ===== Edit modal ===== */
+const back=$("#modalBack"), mTitle=$("#mTitleInput"), mAmount=$("#mAmountInput"), mInclude=$("#mInclude");
+let editingId=null;
+function openEdit(id){
+  const e = cache.entries.find(x=>x.id===id); if(!e) return;
+  editingId = id; mTitle.value = e.title; mAmount.value = e.amount; mInclude.checked = (e.include!==false);
+  back.style.display="flex";
+}
+function closeEdit(){ back.style.display="none"; editingId=null; }
+$("#mClose").onclick = closeEdit;
+
+$("#mSave").onclick = async ()=>{
+  if(!editingId) return;
+  const e = cache.entries.find(x=>x.id===editingId); if(!e) return;
+  e.title = mTitle.value.trim() || e.title;
+  e.amount = Number(mAmount.value || e.amount || 0);
+  e.include = !!mInclude.checked;
+  saveCache(); renderLists(); closeEdit();
+  if(UID){ await setDoc(doc(db,"users",UID,"entries",e.id), e); }
+};
+
+$("#mDelete").onclick = async ()=>{
+  if(!editingId) return;
+  const id = editingId; editingId=null; closeEdit();
+  await removeEntry(id);
+};
+
+/* ===== Auth (lazy sync; 0 reads on refresh) ===== */
+loginBtn.onclick = async ()=>{
+  const email = prompt("Email:");
+  if(!email) return;
+  const pass = prompt("Password:");
+  if(!pass) return;
+  try{
+    await signInWithEmailAndPassword(auth,email,pass);
+  }catch{
+    // register if missing
+    await createUserWithEmailAndPassword(auth,email,pass);
+  }
+};
+
+logoutBtn.onclick = ()=>signOut(auth);
+
+onAuthStateChanged(auth, async (user)=>{
+  UID = user?.uid || null;
+  cache.uid = UID; saveCache();
+  authState.textContent = UID ? "Signed in" : "Signed out";
+  loginBtn.classList.toggle("hidden", !!UID);
+  logoutBtn.classList.toggle("hidden", !UID);
+
+  if(UID){
+    // One-time lazy hydrate (first login / this page load)
+    const snap = await getDocs(collection(db,"users",UID,"entries"));
+    const cloud = snap.docs.map(d=>d.data());
+    // simple merge: keep newest by id/ts
+    const map = new Map();
+    [...cloud, ...cache.entries].forEach(e=>{
+      const prev = map.get(e.id);
+      if(!prev || (e.ts||0) > (prev.ts||0)) map.set(e.id,e);
+    });
+    cache.entries = [...map.values()].sort((a,b)=>b.ts-a.ts);
+    saveCache(); renderLists();
+  }
 });
-const auth = getAuth(app);const db = getFirestore(app);
-await setPersistence(auth,browserLocalPersistence);
 
-const $=s=>document.querySelector(s);
-const loginCard=$("#loginCard"),appCard=$("#appCard"),loginBtn=$("#loginBtn"),logoutBtn=$("#logoutBtn"),loginMsg=$("#loginMsg");
-const tabs=document.querySelectorAll(".tab"),panes={inc:$("#pane-inc"),exp:$("#pane-exp"),ov:$("#pane-ov")};
-const title=$("#title"),amount=$("#amount"),kind=$("#kind");
-const LS="budget_cache_v1";let cache=JSON.parse(localStorage.getItem(LS)||'{"entries":[],"uid":null}');let uid=cache.uid;
-function saveCache(){localStorage.setItem(LS,JSON.stringify(cache));}
-function fmt(n){return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
-function render(){const inc=cache.entries.filter(e=>e.kind==="income"),exp=cache.entries.filter(e=>e.kind==="expense");
-const incSum=inc.reduce((a,b)=>a+Number(b.amount||0),0),expSum=exp.reduce((a,b)=>a+Number(b.amount||0),0);
-const avail=incSum-expSum;$("#pane-ov").innerHTML=`Total Income: £${fmt(incSum)}<br>Total Expense: £${fmt(expSum)}<br><b>Available: £${fmt(avail)}</b>`;
-$("#pane-inc").innerHTML="";inc.forEach(e=>$("#pane-inc").append(row(e)));
-$("#pane-exp").innerHTML="";exp.forEach(e=>$("#pane-exp").append(row(e)));}
+/* ===== Reset local ===== */
+resetLocal.onclick = ()=>{
+  if(!confirm("Clear local cache? (Cloud data will re-sync when logged in)")) return;
+  cache = { uid: UID, entries: [] };
+  saveCache(); renderLists();
+};
 
-function row(e){const d=document.createElement("div");d.className="row";
-d.innerHTML=`<div>${e.title}</div><div class="money">£${fmt(e.amount)}</div>
-<div><button data-a="d" class="btn gray" style="padding:6px 10px">Del</button></div>`;
-d.querySelector("[data-a='d']").onclick=()=>del(e.id);return d;}
+/* ===== Boot ===== */
+renderLists();
 
-tabs.forEach(t=>t.onclick=()=>{tabs.forEach(x=>x.classList.remove("active"));t.classList.add("active");
-Object.keys(panes).forEach(p=>panes[p].classList.add("hidden"));panes[t.dataset.tab].classList.remove("hidden");});
-
-$("#addBtn").onclick=async()=>{if(!title.value||!amount.value)return;
-const id=crypto.randomUUID(),e={id,title:title.value,amount:Number(amount.value),kind:kind.value,ts:Date.now()};
-cache.entries.push(e);saveCache();render();title.value="";amount.value="";if(uid)await setDoc(doc(db,"budgets",uid,"entries",id),e);};
-
-async function del(id){cache.entries=cache.entries.filter(x=>x.id!==id);saveCache();render();if(uid)await deleteDoc(doc(db,"budgets",uid,"entries",id));}
-
-loginBtn.onclick=async()=>{const email=$("#email").value,pass=$("#password").value;
-if(!email||!pass){loginMsg.textContent="Enter email & password";return;}
-try{await signInWithEmailAndPassword(auth,email,pass);}catch{await createUserWithEmailAndPassword(auth,email,pass);}};
-
-logoutBtn.onclick=()=>signOut(auth);
-
-onAuthStateChanged(auth,async u=>{
- uid=u?.uid||null;
- if(uid){
-  loginCard.classList.add("hidden");
-  appCard.classList.remove("hidden");
-  const q=await getDocs(collection(db,"budgets",uid,"entries"));
-  cache.entries=q.docs.map(d=>d.data());cache.uid=uid;saveCache();render();
- }else{
-  appCard.classList.add("hidden");
-  loginCard.classList.remove("hidden");
- }
-});
-render();
-</script>
-
-<script>
-if('serviceWorker'in navigator){
- navigator.serviceWorker.register('/Socialcreator-manifest/service-worker.js',{scope:'/Socialcreator-manifest/'});
+/* ===== PWA SW (scoped to /Socialcreator-manifest/) ===== */
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("/Socialcreator-manifest/service-worker.js",{scope:"/Socialcreator-manifest/"}).catch(()=>{});
 }
 </script>
 </body>
