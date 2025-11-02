@@ -1,50 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Ventsharm Budget</title>
-
-<!-- PWA -->
-<link rel="manifest" href="manifest.webmanifest" />
-<meta name="theme-color" content="#000000" />
-<link rel="icon" href="Icon-192.png" />
-
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="Icon-192.png">
 <style>
-  :root { --bg:#f5f6f8; --card:#fff; --text:#111; --muted:#666; --b:#e5e7eb; --pri:#0d6efd; --ok:#128a12; --err:#c30000; }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:var(--bg);font-family:system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;color:var(--text)}
-  .wrap{max-width:900px;margin:26px auto;padding:0 12px}
-  .card{background:var(--card);border:1px solid var(--b);border-radius:18px;box-shadow:0 6px 18px rgba(0,0,0,.06);padding:16px}
-  h1{display:flex;align-items:center;gap:10px;font-size:1.4rem;margin:0 0 10px}
-  h1 img{width:28px;height:28px}
-  .topbar{display:flex;gap:8px;justify-content:space-between;align-items:center;margin:8px 0 14px}
-  .topbar .actions{display:flex;gap:8px}
-  button{border:1px solid var(--b);background:#fff;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer}
-  .btn{background:linear-gradient(90deg,#007bff,#00aaff);color:#fff;border:none}
-  .btn.gray{background:#f2f4f7;color:#111;border:1px solid #d9d9d9}
-  .tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--b);padding-bottom:6px;margin-bottom:14px}
-  .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--b);background:#fff;cursor:pointer}
-  .tab.active{background:#eef6ff;border-color:#b6dbff;color:#064d96}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-  input,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #cfcfcf;font-size:1rem}
-  .list{margin-top:10px;border:1px solid var(--b);border-radius:12px;overflow:hidden}
-  .row{display:grid;grid-template-columns:1fr auto auto;gap:10px;padding:10px 12px;border-bottom:1px solid #f0f0f0;align-items:center}
-  .row:last-child{border-bottom:none}
-  .pill{font-size:.85rem;padding:4px 8px;border-radius:999px;border:1px solid var(--b);background:#fafafa}
-  .money{font-weight:700}
-  .muted{color:var(--muted);font-size:.92rem}
-  .stat{background:#fafafa;border:1px solid var(--b);border-radius:12px;padding:10px 12px}
-  .ok{color:var(--ok)} .err{color:var(--err)}
-  .note{margin-top:8px;font-size:.9rem;text-align:center;color:var(--muted)}
-  /* Modal */
-  .modalBack{position:fixed;inset:0;background:rgba(0,0,0,.25);display:none;align-items:center;justify-content:center;padding:12px}
-  .modal{background:#fff;border-radius:16px;max-width:460px;width:100%;padding:16px;border:1px solid var(--b)}
-  .modal h3{margin:0 0 10px;font-size:1.1rem}
-  .switch{display:flex;align-items:center;gap:8px}
-  .switch input{width:auto}
-  @media (max-width:720px){ .grid3{grid-template-columns:1fr} .row{grid-template-columns:1fr auto auto} }
+:root { --bg:#f5f6f8; --card:#fff; --text:#111; --muted:#666; --b:#e5e7eb; --pri:#0d6efd; --ok:#128a12; --err:#c30000; }
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);font-family:system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;color:var(--text)}
+.wrap{max-width:900px;margin:26px auto;padding:0 12px}
+.card{background:var(--card);border:1px solid var(--b);border-radius:18px;box-shadow:0 6px 18px rgba(0,0,0,.06);padding:16px}
+h1{display:flex;align-items:center;gap:10px;font-size:1.4rem;margin:0 0 10px}
+h1 img{width:28px;height:28px}
+.topbar{display:flex;gap:8px;justify-content:space-between;align-items:center;margin:8px 0 14px}
+.topbar .actions{display:flex;gap:8px}
+button{border:1px solid var(--b);background:#fff;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer}
+.btn{background:linear-gradient(90deg,#007bff,#00aaff);color:#fff;border:none}
+.btn.gray{background:#f2f4f7;color:#111;border:1px solid #d9d9d9}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--b);padding-bottom:6px;margin-bottom:14px}
+.tab{padding:8px 12px;border-radius:10px;border:1px solid var(--b);background:#fff;cursor:pointer}
+.tab.active{background:#eef6ff;border-color:#b6dbff;color:#064d96}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+input,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #cfcfcf;font-size:1rem}
+.list{margin-top:10px;border:1px solid var(--b);border-radius:12px;overflow:hidden}
+.row{display:grid;grid-template-columns:1fr auto auto;gap:10px;padding:10px 12px;border-bottom:1px solid #f0f0f0;align-items:center}
+.row:last-child{border-bottom:none}
+.money{font-weight:700}
+.muted{color:var(--muted);font-size:.92rem}
+.stat{background:#fafafa;border:1px solid var(--b);border-radius:12px;padding:10px 12px}
+.ok{color:var(--ok)} .err{color:var(--err)}
+.note{margin-top:8px;font-size:.9rem;text-align:center;color:var(--muted)}
+.modalBack{position:fixed;inset:0;background:rgba(0,0,0,.25);display:none;align-items:center;justify-content:center;padding:12px}
+.modal{background:#fff;border-radius:16px;max-width:460px;width:100%;padding:16px;border:1px solid var(--b)}
+.modal h3{margin:0 0 10px;font-size:1.1rem}
+.switch{display:flex;align-items:center;gap:8px}
+.switch input{width:auto}
+@media (max-width:720px){ .grid3{grid-template-columns:1fr} .row{grid-template-columns:1fr auto auto} }
 </style>
 </head>
 <body>
@@ -60,17 +55,15 @@
       </div>
     </div>
 
-    <!-- Tabs -->
     <div class="tabs">
       <div class="tab active" data-tab="incomes">Incomes</div>
       <div class="tab" data-tab="expenses">Expenses</div>
       <div class="tab" data-tab="overview">Overview</div>
     </div>
 
-    <!-- Add form -->
     <div class="grid3" style="margin-bottom:10px">
-      <input id="title" placeholder="Title (e.g. Salary, Rent)" />
-      <input id="amount" type="number" placeholder="Amount" />
+      <input id="title" placeholder="Title (e.g. Salary, Rent)">
+      <input id="amount" type="number" placeholder="Amount">
       <select id="kind">
         <option value="income">Income</option>
         <option value="expense">Expense</option>
@@ -80,15 +73,11 @@
       <button id="btnAdd" class="btn">Add</button>
       <button id="btnResetLocal" class="btn gray">Reset (local)</button>
     </div>
+
     <div id="msg" class="muted"></div>
 
-    <!-- Lists -->
-    <div id="pane-incomes">
-      <div class="list" id="listIncomes"></div>
-    </div>
-    <div id="pane-expenses" style="display:none">
-      <div class="list" id="listExpenses"></div>
-    </div>
+    <div id="pane-incomes"><div class="list" id="listIncomes"></div></div>
+    <div id="pane-expenses" style="display:none"><div class="list" id="listExpenses"></div></div>
     <div id="pane-overview" style="display:none">
       <div class="grid3">
         <div class="stat"><div class="muted">Total income</div><div id="statIncome" class="money">£0.00</div></div>
@@ -99,23 +88,22 @@
     </div>
   </div>
 
-  <p class="note">Syncs via Firebase. Cached locally for offline; 0 reads on refresh. Scope isolated to <code>/Socialcreator-manifest/</code>.</p>
+  <p class="note">Syncs via Firebase. Cached locally for offline; 0 reads on refresh.</p>
 </div>
 
-<!-- Edit Modal -->
 <div id="editBack" class="modalBack">
   <div class="modal">
     <h3>Edit entry</h3>
     <div class="grid2" style="margin-bottom:10px">
-      <input id="editTitle" />
-      <input id="editAmount" type="number" />
+      <input id="editTitle">
+      <input id="editAmount" type="number">
     </div>
     <div class="grid2" style="margin-bottom:10px">
       <select id="editKind">
         <option value="income">Income</option>
         <option value="expense">Expense</option>
       </select>
-      <label class="switch"><input id="editInclude" type="checkbox" /> Include in available</label>
+      <label class="switch"><input id="editInclude" type="checkbox"> Include in available</label>
     </div>
     <div class="grid2">
       <button id="saveEdit" class="btn">Save</button>
@@ -124,20 +112,79 @@
   </div>
 </div>
 
-<!-- Firebase v10.13.2 -->
-<script type="module" src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"></script>
-<script type="module" src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"></script>
-<script type="module" src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js"></script>
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-<!-- App logic (next part) -->
-<script type="module" src="./main.js"></script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
+  authDomain: "budget-app-283de.firebaseapp.com",
+  projectId: "budget-app-283de",
+  storageBucket: "budget-app-283de.firebasestorage.app",
+  messagingSenderId: "162369707369",
+  appId: "1:162369707369:web:3faa7f002f8ba22dc0f1f8"
+};
 
-<!-- Scoped Service Worker -->
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+await setPersistence(auth, browserLocalPersistence);
+
+const $=s=>document.querySelector(s);
+const tabs=document.querySelectorAll(".tab"),panes={incomes:$("#pane-incomes"),expenses:$("#pane-expenses"),overview:$("#pane-overview")};
+const listIncomes=$("#listIncomes"),listExpenses=$("#listExpenses"),msg=$("#msg"),authState=$("#authState");
+const statIncome=$("#statIncome"),statExpense=$("#statExpense"),statAvail=$("#statAvail");
+const LS_KEY="budget_cache_v1";
+let cache=JSON.parse(localStorage.getItem(LS_KEY)||'{"entries":[],"uid":null}');let uid=cache.uid||null;
+function saveCache(){localStorage.setItem(LS_KEY,JSON.stringify(cache));}
+function fmt(n){return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
+tabs.forEach(t=>t.onclick=()=>{tabs.forEach(x=>x.classList.remove("active"));t.classList.add("active");const k=t.dataset.tab;Object.keys(panes).forEach(p=>panes[p].style.display=p===k?'block':'none');});
+function render(){const inc=cache.entries.filter(e=>e.kind==="income"),exp=cache.entries.filter(e=>e.kind==="expense");
+const incSum=inc.reduce((s,e)=>s+Number(e.amount||0),0),expSum=exp.reduce((s,e)=>s+Number(e.amount||0),0);
+const avail=inc.filter(e=>e.include!==false).reduce((s,e)=>s+Number(e.amount||0),0)-expSum;
+statIncome.textContent="£"+fmt(incSum);statExpense.textContent="£"+fmt(expSum);
+statAvail.textContent="£"+fmt(avail);statAvail.classList.toggle("ok",avail>=0);statAvail.classList.toggle("err",avail<0);
+listIncomes.innerHTML="";inc.forEach(e=>listIncomes.appendChild(row(e)));listExpenses.innerHTML="";exp.forEach(e=>listExpenses.appendChild(row(e)));}
+
+function row(e){const d=document.createElement("div");d.className="row";d.innerHTML=`
+<div><strong>${e.title||"(untitled)"}</strong><div class="muted">Include: ${e.kind==="income"?(e.include===false?"No":"Yes"):"-"}</div></div>
+<div class="money">£${fmt(e.amount)}</div><div><button class='btn gray' data-a='e'>Edit</button><button class='btn' style='margin-left:6px' data-a='d'>Del</button></div>`;
+d.querySelector("[data-a='e']").onclick=()=>openEdit(e.id);d.querySelector("[data-a='d']").onclick=()=>removeEntry(e.id);return d;}
+
+$("#btnAdd").onclick=async()=>{const title=$("#title").value.trim(),amount=Number($("#amount").value),kind=$("#kind").value;
+if(!title||!amount){msg.textContent="Please enter details.";return;}
+const id=crypto.randomUUID(),entry={id,title,amount,kind,include:true,ts:Date.now()};
+cache.entries.push(entry);saveCache();render();
+if(uid){await setDoc(doc(db,"budgets",uid,"entries",id),entry);}
+$("#title").value="";$("#amount").value="";};
+
+$("#btnResetLocal").onclick=()=>{if(confirm("Clear cache?")){cache.entries=[];saveCache();render();}};
+
+const back=$("#editBack"),editTitle=$("#editTitle"),editAmount=$("#editAmount"),editKind=$("#editKind"),editInclude=$("#editInclude");let editId=null;
+window.openEdit=id=>{const e=cache.entries.find(x=>x.id===id);if(!e)return;editId=id;editTitle.value=e.title;editAmount.value=e.amount;editKind.value=e.kind;editInclude.checked=e.include!==false;back.style.display="flex";};
+$("#cancelEdit").onclick=()=>back.style.display="none";
+$("#saveEdit").onclick=async()=>{const i=cache.entries.findIndex(x=>x.id===editId);if(i<0)return;
+const e=cache.entries[i];e.title=editTitle.value;e.amount=Number(editAmount.value);e.kind=editKind.value;e.include=e.kind==="income"?!!editInclude.checked:undefined;
+cache.entries[i]=e;saveCache();render();back.style.display="none";if(uid){await setDoc(doc(db,"budgets",uid,"entries",e.id),e);}};
+
+async function removeEntry(id){cache.entries=cache.entries.filter(e=>e.id!==id);saveCache();render();if(uid){await deleteDoc(doc(db,"budgets",uid,"entries",id));}}
+
+$("#btnLogin").onclick=async()=>{const email=prompt("Email:"),pass=prompt("Password:");if(!email||!pass)return;
+try{await signInWithEmailAndPassword(auth,email,pass);}catch{await createUserWithEmailAndPassword(auth,email,pass);}};
+
+$("#btnLogout").onclick=()=>signOut(auth);
+onAuthStateChanged(auth,async u=>{uid=u?.uid||null;authState.textContent=uid?`Signed in: ${u.email}`:"Signed out";
+if(uid){const q=await getDocs(collection(db,"budgets",uid,"entries"));
+const server=q.docs.map(d=>d.data());const map=new Map();[...server,...cache.entries].forEach(e=>{const p=map.get(e.id);if(!p||(e.ts||0)>(p.ts||0))map.set(e.id,e);});
+cache.entries=[...map.values()];cache.uid=uid;saveCache();render();}else render();});
+render();
+</script>
+
 <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/Socialcreator-manifest/service-worker.js', { scope: '/Socialcreator-manifest/' })
-    .then(()=>console.log('✅ Budget SW registered'))
-    .catch(e=>console.error('SW reg failed', e));
+if('serviceWorker' in navigator){
+navigator.serviceWorker.register('/Socialcreator-manifest/service-worker.js',{scope:'/Socialcreator-manifest/'});
 }
 </script>
 </body>
