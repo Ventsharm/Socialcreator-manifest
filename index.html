@@ -8,46 +8,42 @@
 <meta name="theme-color" content="#000000" />
 <link rel="icon" href="Icon-192.png" />
 <style>
-  :root{
-    --bg:#f5f6f8; --card:#fff; --text:#111; --muted:#6b7280;
-    --b:#e5e7eb; --b2:#d1d5db; --pri:#0d6efd; --pri2:#00aaff; --good:#128a12; --bad:#c30000;
-    --shadow:0 6px 18px rgba(0,0,0,.10);
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
-  .wrap{max-width:740px;margin:24px auto;padding:0 12px}
-  .card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:18px}
-  .header{display:flex;align-items:center;gap:10px}
-  .logo{width:28px;height:28px;border-radius:6px}
-  h1{font-size:1.35rem;margin:0}
-  .auth{margin-left:auto;display:flex;gap:8px;align-items:center}
-  .chip{font-size:.9rem;color:var(--muted)}
-  button{cursor:pointer}
-  .btn{padding:10px 14px;border-radius:10px;border:1px solid var(--b2);background:#f3f4f6}
-  .btn.primary{border:none;background:linear-gradient(90deg,var(--pri),var(--pri2));color:#fff;font-weight:700}
-  .btn.danger{background:#eee;color:#000;border:1px solid #ddd}
-  .tabs{display:flex;gap:8px;margin-top:14px}
-  .tab{flex:1;text-align:center;padding:10px;border:1px solid var(--b2);border-radius:12px;cursor:pointer}
-  .tab.active{background:#eef6ff;border-color:#b6dbff;color:#064d96}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .row{display:flex;gap:10px}
-  input,select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--b);outline:none;font-size:1rem}
-  input:focus,select:focus{border-color:#5aa4ff;box-shadow:0 0 0 3px rgba(0,120,255,.15)}
-  .list{margin-top:12px;border:1px solid var(--b);border-radius:12px;overflow:hidden}
-  .item{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--b)}
-  .item:last-child{border-bottom:none}
-  .money{font-weight:700}
-  .muted{color:var(--muted)}
-  .note{margin-top:10px;text-align:center;color:var(--muted);font-size:.95rem}
-  .hidden{display:none}
-  /* Modal */
-  .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;padding:14px;z-index:30}
-  .modal{background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:16px;max-width:420px;width:100%}
-  .switch{display:flex;align-items:center;gap:8px}
-  .switch input{width:auto}
-  .totals{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
-  .totals .box{background:#f7f7f9;border:1px solid var(--b);border-radius:12px;padding:10px;text-align:center}
-  .totals b{display:block;margin-top:4px}
+:root{--bg:#f5f6f8;--card:#fff;--text:#111;--muted:#6b7280;--b:#e5e7eb;--b2:#d1d5db;--pri:#0d6efd;--pri2:#00aaff;--good:#128a12;--bad:#c30000;--shadow:0 6px 18px rgba(0,0,0,.10);}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.wrap{max-width:740px;margin:24px auto;padding:0 12px}
+.card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:18px}
+.header{display:flex;align-items:center;gap:10px}
+.logo{width:28px;height:28px;border-radius:6px}
+h1{font-size:1.35rem;margin:0}
+.auth{margin-left:auto;display:flex;gap:8px;align-items:center}
+.chip{font-size:.9rem;color:var(--muted)}
+button{cursor:pointer}
+.btn{padding:10px 14px;border-radius:10px;border:1px solid var(--b2);background:#f3f4f6}
+.btn.primary{border:none;background:linear-gradient(90deg,var(--pri),var(--pri2));color:#fff;font-weight:700}
+.btn.danger{background:#eee;color:#000;border:1px solid #ddd}
+.link{color:var(--pri);font-size:.9rem;text-decoration:underline;cursor:pointer;margin-top:6px;display:inline-block}
+.tabs{display:flex;gap:8px;margin-top:14px}
+.tab{flex:1;text-align:center;padding:10px;border:1px solid var(--b2);border-radius:12px;cursor:pointer}
+.tab.active{background:#eef6ff;border-color:#b6dbff;color:#064d96}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row{display:flex;gap:10px}
+input,select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--b);outline:none;font-size:1rem}
+input:focus,select:focus{border-color:#5aa4ff;box-shadow:0 0 0 3px rgba(0,120,255,.15)}
+.list{margin-top:12px;border:1px solid var(--b);border-radius:12px;overflow:hidden}
+.item{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--b)}
+.item:last-child{border-bottom:none}
+.money{font-weight:700}
+.muted{color:var(--muted)}
+.note{margin-top:10px;text-align:center;color:var(--muted);font-size:.95rem}
+.hidden{display:none}
+.modal-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;padding:14px;z-index:30}
+.modal{background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:16px;max-width:420px;width:100%}
+.switch{display:flex;align-items:center;gap:8px}
+.switch input{width:auto}
+.totals{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
+.totals .box{background:#f7f7f9;border:1px solid var(--b);border-radius:12px;padding:10px;text-align:center}
+.totals b{display:block;margin-top:4px}
 </style>
 </head>
 <body>
@@ -61,6 +57,11 @@
         <button id="loginBtn" class="btn primary">Login / Register</button>
         <button id="logoutBtn" class="btn danger hidden">Logout</button>
       </div>
+    </div>
+
+    <div id="authExtras" class="hidden" style="margin-top:6px">
+      <span id="forgotPass" class="link">Forgot password?</span> ·
+      <span id="resendVerify" class="link">Resend verification</span>
     </div>
 
     <div class="tabs">
@@ -83,26 +84,24 @@
       <button id="resetLocal" class="btn">Reset (local)</button>
     </div>
 
-    <!-- Totals -->
     <div class="totals">
       <div class="box"><span class="muted">Income</span><b id="tInc">£0.00</b></div>
       <div class="box"><span class="muted">Expense</span><b id="tExp">£0.00</b></div>
       <div class="box"><span class="muted">Available</span><b id="tAvail">£0.00</b></div>
     </div>
 
-    <!-- Lists -->
     <div id="pane-inc" class="list" style="margin-top:10px"></div>
     <div id="pane-exp" class="list hidden" style="margin-top:10px"></div>
     <div id="pane-ov" class="hidden note" style="margin-top:10px"></div>
 
-    <p class="note">Syncs via Firebase. Cached locally for offline; 0 reads on refresh.</p>
+    <p class="note">Synced via Firebase. Cached offline; 0 reads on refresh.</p>
   </div>
 </div>
 
 <!-- Edit Modal -->
-<div id="modalBack" class="modal-back" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+<div id="modalBack" class="modal-back">
   <div class="modal">
-    <h3 id="mTitle" style="margin:0 0 10px">Edit entry</h3>
+    <h3>Edit Entry</h3>
     <input id="mTitleInput" placeholder="Title" />
     <input id="mAmountInput" type="number" placeholder="Amount" style="margin-top:10px" />
     <div class="switch" style="margin-top:10px">
@@ -115,197 +114,55 @@
       <button id="mClose" class="btn">Close</button>
     </div>
   </div>
-</div><script type="module">
-/* ===== Firebase v10.13.2 ===== */
+</div>
+
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-import { getAuth, setPersistence, browserLocalPersistence,
-         signInWithEmailAndPassword, createUserWithEmailAndPassword,
-         signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import { getAuth, setPersistence, browserLocalPersistence, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-/* Your confirmed budget Firebase keys */
-const firebaseConfig = {
-  apiKey: "AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
-  authDomain: "budget-app-283de.firebaseapp.com",
-  projectId: "budget-app-283de",
-  storageBucket: "budget-app-283de.firebasestorage.app",
-  messagingSenderId: "162369707369",
-  appId: "1:162369707369:web:3faa7f002f8ba22dc0f1f8"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db   = getFirestore(app);
-await setPersistence(auth, browserLocalPersistence); // stay logged in
-
-/* ===== Elements ===== */
-const $ = s => document.querySelector(s);
-const tabs = document.querySelectorAll(".tab");
-const panes = { inc: $("#pane-inc"), exp: $("#pane-exp"), ov: $("#pane-ov") };
-const tInc=$("#tInc"), tExp=$("#tExp"), tAvail=$("#tAvail");
-const loginBtn=$("#loginBtn"), logoutBtn=$("#logoutBtn"), authState=$("#authState");
-const title=$("#title"), amount=$("#amount"), kind=$("#kind"), addBtn=$("#addBtn"), resetLocal=$("#resetLocal");
-
-/* ===== Local cache (0 reads on refresh) ===== */
-const LS_KEY = "vb_budget_cache_v3";
-let cache = JSON.parse(localStorage.getItem(LS_KEY) || '{"uid":null,"entries":[]}');
-let UID = cache.uid || null;
-const saveCache = () => localStorage.setItem(LS_KEY, JSON.stringify(cache));
-
-/* ===== Helpers ===== */
-const money = n => Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-const id = () => crypto.randomUUID();
-
-/* ===== Render ===== */
-function renderTotals(){
-  const inc = cache.entries.filter(e=>e.kind==="income" && e.include!==false)
-                .reduce((a,b)=>a+Number(b.amount||0),0);
-  const exp = cache.entries.filter(e=>e.kind==="expense")
-                .reduce((a,b)=>a+Number(b.amount||0),0);
-  const avail = inc - exp;
-  tInc.textContent = "£"+money(inc);
-  tExp.textContent = "£"+money(exp);
-  tAvail.textContent = "£"+money(avail);
-}
-
-function itemRow(e){
-  const el = document.createElement("div");
-  el.className = "item";
-  el.innerHTML = `
-    <div>
-      <div>${e.title}</div>
-      <div class="muted" style="font-size:.9rem">${e.kind}${e.include===false?' · excluded':''}</div>
-    </div>
-    <div class="money">£${money(e.amount)}</div>
-    <button class="btn" data-a="edit">Edit</button>
-    <button class="btn danger" data-a="del">Delete</button>
-  `;
-  el.querySelector('[data-a="edit"]').onclick = () => openEdit(e.id);
-  el.querySelector('[data-a="del"]').onclick  = () => removeEntry(e.id);
-  return el;
-}
-
-function renderLists(){
-  panes.inc.innerHTML = "";
-  panes.exp.innerHTML = "";
-  const inc = cache.entries.filter(e=>e.kind==="income");
-  const exp = cache.entries.filter(e=>e.kind==="expense");
-  inc.forEach(e=>panes.inc.append(itemRow(e)));
-  exp.forEach(e=>panes.exp.append(itemRow(e)));
-  panes.ov.innerHTML = `
-    <div>Entries: ${cache.entries.length}</div>
-    <div class="muted">Signed ${UID ? 'in' : 'out'} · Local first, cloud sync on actions</div>
-  `;
-  renderTotals();
-}
-
-/* ===== Tabs ===== */
-tabs.forEach(t=>t.addEventListener('click',()=>{
-  tabs.forEach(x=>x.classList.remove('active')); t.classList.add('active');
-  Object.values(panes).forEach(p=>p.classList.add('hidden'));
-  panes[t.dataset.tab].classList.remove('hidden');
-}));
-
-/* ===== CRUD ===== */
-async function addEntry(){
-  const titleVal = title.value.trim();
-  const amountVal = Number(amount.value || 0);
-  if(!titleVal || !amountVal) return;
-  const entry = { id:id(), title:titleVal, amount:amountVal, kind:kind.value, include:true, ts:Date.now() };
-  cache.entries.unshift(entry);
-  saveCache(); renderLists();
-  title.value=""; amount.value="";
-  if(UID){ // lazy write
-    await setDoc(doc(db,"users",UID,"entries",entry.id), entry);
-  }
-}
-addBtn.addEventListener('click', addEntry);
-
-async function removeEntry(entryId){
-  cache.entries = cache.entries.filter(e=>e.id!==entryId);
-  saveCache(); renderLists();
-  if(UID){ await deleteDoc(doc(db,"users",UID,"entries",entryId)); }
-}
-
-/* ===== Edit modal ===== */
-const back=$("#modalBack"), mTitle=$("#mTitleInput"), mAmount=$("#mAmountInput"), mInclude=$("#mInclude");
-let editingId=null;
-function openEdit(id){
-  const e = cache.entries.find(x=>x.id===id); if(!e) return;
-  editingId = id; mTitle.value = e.title; mAmount.value = e.amount; mInclude.checked = (e.include!==false);
-  back.style.display="flex";
-}
-function closeEdit(){ back.style.display="none"; editingId=null; }
-$("#mClose").onclick = closeEdit;
-
-$("#mSave").onclick = async ()=>{
-  if(!editingId) return;
-  const e = cache.entries.find(x=>x.id===editingId); if(!e) return;
-  e.title = mTitle.value.trim() || e.title;
-  e.amount = Number(mAmount.value || e.amount || 0);
-  e.include = !!mInclude.checked;
-  saveCache(); renderLists(); closeEdit();
-  if(UID){ await setDoc(doc(db,"users",UID,"entries",e.id), e); }
-};
-
-$("#mDelete").onclick = async ()=>{
-  if(!editingId) return;
-  const id = editingId; editingId=null; closeEdit();
-  await removeEntry(id);
-};
-
-/* ===== Auth (lazy sync; 0 reads on refresh) ===== */
-loginBtn.onclick = async ()=>{
-  const email = prompt("Email:");
-  if(!email) return;
-  const pass = prompt("Password:");
-  if(!pass) return;
-  try{
-    await signInWithEmailAndPassword(auth,email,pass);
-  }catch{
-    // register if missing
-    await createUserWithEmailAndPassword(auth,email,pass);
-  }
-};
-
-logoutBtn.onclick = ()=>signOut(auth);
-
-onAuthStateChanged(auth, async (user)=>{
-  UID = user?.uid || null;
-  cache.uid = UID; saveCache();
-  authState.textContent = UID ? "Signed in" : "Signed out";
-  loginBtn.classList.toggle("hidden", !!UID);
-  logoutBtn.classList.toggle("hidden", !UID);
-
-  if(UID){
-    // One-time lazy hydrate (first login / this page load)
-    const snap = await getDocs(collection(db,"users",UID,"entries"));
-    const cloud = snap.docs.map(d=>d.data());
-    // simple merge: keep newest by id/ts
-    const map = new Map();
-    [...cloud, ...cache.entries].forEach(e=>{
-      const prev = map.get(e.id);
-      if(!prev || (e.ts||0) > (prev.ts||0)) map.set(e.id,e);
-    });
-    cache.entries = [...map.values()].sort((a,b)=>b.ts-a.ts);
-    saveCache(); renderLists();
-  }
+const app = initializeApp({
+  apiKey:"AIzaSyCdqBDusmELyZ6S6OeiUX_I_POjydy-dN4",
+  authDomain:"budget-app-283de.firebaseapp.com",
+  projectId:"budget-app-283de",
+  storageBucket:"budget-app-283de.firebasestorage.app",
+  messagingSenderId:"162369707369",
+  appId:"1:162369707369:web:3faa7f002f8ba22dc0f1f8"
 });
+const auth=getAuth(app); const db=getFirestore(app);
+await setPersistence(auth,browserLocalPersistence);
 
-/* ===== Reset local ===== */
-resetLocal.onclick = ()=>{
-  if(!confirm("Clear local cache? (Cloud data will re-sync when logged in)")) return;
-  cache = { uid: UID, entries: [] };
-  saveCache(); renderLists();
-};
+const $=s=>document.querySelector(s);
+const loginBtn=$("#loginBtn"),logoutBtn=$("#logoutBtn"),authState=$("#authState"),authExtras=$("#authExtras"),forgotPass=$("#forgotPass"),resendVerify=$("#resendVerify");
+const LS="vb_cache_v5";let cache=JSON.parse(localStorage.getItem(LS)||'{"entries":[],"uid":null}');let UID=cache.uid;
+function save(){localStorage.setItem(LS,JSON.stringify(cache));}
+function fmt(n){return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
+function id(){return crypto.randomUUID();}
+const panes={inc:$("#pane-inc"),exp:$("#pane-exp"),ov:$("#pane-ov")},tabs=document.querySelectorAll(".tab");
+tabs.forEach(t=>t.onclick=()=>{tabs.forEach(x=>x.classList.remove("active"));t.classList.add("active");Object.values(panes).forEach(p=>p.classList.add("hidden"));panes[t.dataset.tab].classList.remove("hidden");});
+const tInc=$("#tInc"),tExp=$("#tExp"),tAvail=$("#tAvail");
+function renderTotals(){const inc=cache.entries.filter(e=>e.kind==="income"&&e.include!==false).reduce((a,b)=>a+Number(b.amount||0),0);const exp=cache.entries.filter(e=>e.kind==="expense").reduce((a,b)=>a+Number(b.amount||0),0);tInc.textContent="£"+fmt(inc);tExp.textContent="£"+fmt(exp);tAvail.textContent="£"+fmt(inc-exp);}
+function renderLists(){panes.inc.innerHTML="";panes.exp.innerHTML="";cache.entries.filter(e=>e.kind==="income").forEach(e=>panes.inc.append(row(e)));cache.entries.filter(e=>e.kind==="expense").forEach(e=>panes.exp.append(row(e)));panes.ov.innerHTML=`Entries: ${cache.entries.length}<br><span class="muted">Signed ${UID?"in":"out"}</span>`;renderTotals();}
+function row(e){const el=document.createElement("div");el.className="item";el.innerHTML=`<div>${e.title}<div class="muted" style="font-size:.85rem">${e.kind}${e.include===false?" · excluded":""}</div></div><div class="money">£${fmt(e.amount)}</div><button class="btn" data-a="edit">Edit</button><button class="btn danger" data-a="del">Delete</button>`;el.querySelector("[data-a='edit']").onclick=()=>openEdit(e.id);el.querySelector("[data-a='del']").onclick=()=>del(e.id);return el;}
+function openEdit(id){const e=cache.entries.find(x=>x.id===id);if(!e)return;editing=id;$("#mTitleInput").value=e.title;$("#mAmountInput").value=e.amount;$("#mInclude").checked=e.include!==false;$("#modalBack").style.display="flex";}
+function closeEdit(){$("#modalBack").style.display="none";editing=null;}
+$("#mClose").onclick=closeEdit;
+$("#mSave").onclick=async()=>{const e=cache.entries.find(x=>x.id===editing);if(!e)return;e.title=$("#mTitleInput").value;e.amount=Number($("#mAmountInput").value||0);e.include=$("#mInclude").checked;save();renderLists();closeEdit();if(UID)await setDoc(doc(db,"users",UID,"entries",e.id),e);};
+$("#mDelete").onclick=async()=>{await del(editing);closeEdit();};
+async function del(id){cache.entries=cache.entries.filter(x=>x.id!==id);save();renderLists();if(UID)await deleteDoc(doc(db,"users",UID,"entries",id));}
+$("#addBtn").onclick=async()=>{const t=$("#title").value.trim(),a=Number($("#amount").value||0),k=$("#kind").value;if(!t||!a)return;const e={id:id(),title:t,amount:a,kind:k,include:true,ts:Date.now()};cache.entries.unshift(e);save();renderLists();$("#title").value="";$("#amount").value="";if(UID)await setDoc(doc(db,"users",UID,"entries",e.id),e);};
+$("#resetLocal").onclick=()=>{if(confirm("Clear local data?")){cache={uid:UID,entries:[]};save();renderLists();}};
 
-/* ===== Boot ===== */
+loginBtn.onclick=async()=>{const email=prompt("Email:");if(!email)return;const pass=prompt("Password:");if(!pass)return;
+try{await signInWithEmailAndPassword(auth,email,pass);}
+catch{const u=await createUserWithEmailAndPassword(auth,email,pass);await sendEmailVerification(u.user);alert("Account created! Check your email for verification.");}};
+forgotPass.onclick=async()=>{const email=prompt("Enter your email to reset password:");if(!email)return;await sendPasswordResetEmail(auth,email);alert("Password reset link sent!");};
+resendVerify.onclick=async()=>{if(auth.currentUser){await sendEmailVerification(auth.currentUser);alert("Verification email resent!");}else alert("You must be logged in first.");};
+logoutBtn.onclick=()=>signOut(auth);
+
+onAuthStateChanged(auth,async u=>{UID=u?.uid||null;cache.uid=UID;save();authState.textContent=UID?"Signed in":"Signed out";loginBtn.classList.toggle("hidden",!!UID);logoutBtn.classList.toggle("hidden",!UID);authExtras.classList.toggle("hidden",!UID);if(UID){if(!u.emailVerified){alert("Please verify your email before continuing.");await signOut(auth);return;}const q=await getDocs(collection(db,"users",UID,"entries"));cache.entries=q.docs.map(d=>d.data());save();renderLists();}});
 renderLists();
-
-/* ===== PWA SW (scoped to /Socialcreator-manifest/) ===== */
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("/Socialcreator-manifest/service-worker.js",{scope:"/Socialcreator-manifest/"}).catch(()=>{});
-}
+if("serviceWorker"in navigator){navigator.serviceWorker.register("/Socialcreator-manifest/service-worker.js",{scope:"/Socialcreator-manifest/"});}
 </script>
 </body>
 </html>
