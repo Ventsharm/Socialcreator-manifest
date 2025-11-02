@@ -1,162 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>File Converter</title>
-<link rel="icon" href="Icon-192.png">
-<style>
-body{font-family:system-ui,sans-serif;background:#f5f6f8;display:flex;flex-direction:column;align-items:center;padding:30px 10px;color:#222}
-.app{background:#fff;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,.1);padding:25px 20px;width:100%;max-width:420px;box-sizing:border-box}
-h1{display:flex;align-items:center;justify-content:center;gap:8px;font-size:1.4rem;margin-bottom:20px}
-h1 img{width:28px;height:28px}
-label{font-weight:600;display:block;margin:15px 0 6px}
-input,select,button{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #ccc;font-size:1rem;box-sizing:border-box}
-.row{display:flex;gap:10px}
-button{border:none;color:#fff;font-weight:600;cursor:pointer;transition:opacity .2s}
-button:hover{opacity:.9}
-.blue{background:linear-gradient(90deg,#007bff,#00aaff)}
-.gray{background:#ccc;color:#000}
-#status{display:none;text-align:center;color:#0a0;font-weight:600;margin-top:10px}
-#error{color:#e00;font-weight:500;margin:8px 0}
-#preview img{width:100%;border-radius:14px;margin-top:8px}
-#info{text-align:left;margin-top:5px;font-size:.9rem}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Ventsharm Budget</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" href="Icon-192.png">
+
+  <style>
+    body{font-family:system-ui,sans-serif;background:#f5f6f8;display:flex;flex-direction:column;align-items:center;padding:30px 10px;color:#222}
+    .app{background:#fff;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,.1);padding:25px 20px;width:100%;max-width:420px;box-sizing:border-box}
+    h1{display:flex;align-items:center;justify-content:center;gap:8px;font-size:1.4rem;margin-bottom:20px}
+    h1 img{width:28px;height:28px}
+    label{font-weight:600;display:block;margin:15px 0 6px}
+    input,select,button{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #ccc;font-size:1rem;box-sizing:border-box}
+    .row{display:flex;gap:10px}
+    button{border:none;color:#fff;font-weight:600;cursor:pointer;transition:opacity .2s}
+    button:hover{opacity:.9}
+    .blue{background:linear-gradient(90deg,#007bff,#00aaff)}
+    .gray{background:#ccc;color:#000}
+    .muted{color:#666;font-size:.95rem;text-align:center;margin-top:10px}
+    #status{display:none;text-align:center;color:#0a0;font-weight:600;margin-top:10px}
+    #error{color:#e00;font-weight:500;margin:8px 0;text-align:center}
+    .section{margin-top:14px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .list{margin-top:10px;border:1px solid #e5e5e5;border-radius:12px;padding:10px;max-height:280px;overflow:auto}
+    .item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f1f1}
+    .item:last-child{border-bottom:none}
+  </style>
 </head>
 <body>
-<div class="app">
-<h1><img src="Icon-192.png" alt="icon"> File Converter</h1>
+  <div class="app">
+    <h1><img src="Icon-192.png" alt="icon"> Ventsharm Budget</h1>
 
-<label>Choose File</label>
-<input id="files" type="file" accept="image/*,.pdf" multiple>
+    <!-- Auth / header actions (placeholder; hook up to Firebase as in your saved build) -->
+    <div class="row">
+      <button id="loginBtn" class="blue">Login / Register</button>
+      <button id="logoutBtn" class="gray">Logout</button>
+    </div>
+    <div id="status">✅ Signed in</div>
+    <div id="error"></div>
 
-<label>Output Format</label>
-<select id="format">
-<option value="jpg">JPEG (.jpg)</option>
-<option value="png">PNG (.png)</option>
-<option value="webp">WEBP (.webp)</option>
-<option value="pdf">PDF (.pdf)</option>
-</select>
+    <!-- Quick add -->
+    <div class="section">
+      <label>Add entry</label>
+      <div class="grid">
+        <input id="title" placeholder="Title (e.g. Salary, Rent)" />
+        <input id="amount" type="number" placeholder="Amount" />
+      </div>
+      <div class="grid" style="margin-top:10px">
+        <select id="type">
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+        <button id="add" class="blue">Add</button>
+      </div>
+    </div>
 
-<label>Resize (optional)</label>
-<div class="row">
-<input id="width" type="number" placeholder="Width">
-<input id="height" type="number" placeholder="Height">
-</div>
-<select id="units">
-<option value="px">px</option>
-<option value="in">in</option>
-<option value="cm">cm</option>
-</select>
+    <!-- Overview -->
+    <div class="section">
+      <label>Overview</label>
+      <div class="grid">
+        <input id="totalIncome" disabled placeholder="Total income: 0" />
+        <input id="totalExpense" disabled placeholder="Total expense: 0" />
+      </div>
+      <div class="grid" style="margin-top:10px">
+        <input id="available" disabled placeholder="Available: 0" />
+        <button id="reset" class="gray">Reset (local)</button>
+      </div>
+    </div>
 
-<div style="margin-top:18px;" class="row">
-<button id="convert" class="blue">Convert & Download</button>
-<button id="reset" class="gray">Reset</button>
-</div>
+    <!-- Lists -->
+    <div class="section">
+      <label>Entries</label>
+      <div class="list" id="list"></div>
+    </div>
 
-<div id="status">✅ Complete</div>
-<div id="error"></div>
-<div id="info"></div>
-<div id="preview"></div>
-</div><script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.js"></script>
-<script>
-if(window.pdfjsLib)
-  pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.js";
+    <p class="muted">Data can sync with Firebase (use your saved build). This version is isolated to <code>/Socialcreator-manifest/</code> so it won’t merge with other PWAs.</p>
+  </div>
 
-(async()=>{
-const $=s=>document.querySelector(s);
-const files=$("#files"),fmt=$("#format"),w=$("#width"),h=$("#height"),unit=$("#units");
-const info=$("#info"),preview=$("#preview"),err=$("#error"),status=$("#status");
-const MAX=8000,PDF_DPI=300;let counter=1;
-const cmToIn=cm=>cm/2.54,pxToIn=px=>px/PDF_DPI,inToPx=in=>in*PDF_DPI;
-const inchToPx96=i=>i*96,cmToPx96=c=>c*37.7953;
-const toPxScreen=(v,u)=>!isFinite(v)?undefined:u==="in"?inchToPx96(v):u==="cm"?cmToPx96(v):v;
-const clear=()=>{status.style.display="none";err.textContent="";};
-fmt.addEventListener("change",clear);unit.addEventListener("change",clear);
+  <script>
+    // --- Minimal local-only logic (safe placeholder) ---
+    const $ = s => document.querySelector(s);
+    const listEl = $("#list"), err = $("#error"), statusEl = $("#status");
+    const storeKey = "vb_budget_local_v1";
+    let entries = JSON.parse(localStorage.getItem(storeKey) || "[]");
 
-files.addEventListener("change",async e=>{
-  const f=e.target.files[0];
-  preview.innerHTML="";info.textContent="";err.textContent="";status.style.display="none";
-  if(!f)return;
-  if(/pdf$/i.test(f.name)){
-    const buf=await f.arrayBuffer();
-    const pdf=await pdfjsLib.getDocument({data:buf}).promise;
-    const page=await pdf.getPage(1);const vp=page.getViewport({scale:1});
-    const cnv=document.createElement("canvas");cnv.width=vp.width;cnv.height=vp.height;
-    await page.render({canvasContext:cnv.getContext("2d"),viewport:vp}).promise;
-    const img=new Image();img.src=cnv.toDataURL();
-    info.textContent=`Original size: ${Math.round(vp.width)} × ${Math.round(vp.height)}px (PDF preview)`;
-    preview.appendChild(img);
-  }else{
-    const url=URL.createObjectURL(f);const img=new Image();
-    img.onload=()=>{info.textContent=`Original size: ${img.width} × ${img.height}px`;
-      preview.appendChild(img);URL.revokeObjectURL(url);};
-    img.src=url;
-  }
-});
-
-$("#reset").addEventListener("click",()=>{files.value="";preview.innerHTML="";info.textContent="";
-  err.textContent="";w.value="";h.value="";counter=1;status.style.display="none";});
-
-async function fileToImage(f){const u=URL.createObjectURL(f);
-  const img=new Image();await new Promise(r=>{img.onload=r;img.src=u;});
-  URL.revokeObjectURL(u);return img;}
-
-async function imageToCanvas(img,W,H){const c=document.createElement("canvas");
-  c.width=W||img.width;c.height=H||img.height;
-  c.getContext("2d").drawImage(img,0,0,c.width,c.height);return c;}
-
-function download(blob,name){const u=URL.createObjectURL(blob);
-  const a=document.createElement("a");a.href=u;a.download=name;a.click();
-  setTimeout(()=>URL.revokeObjectURL(u),4e3);}
-
-async function convert(){
-  err.textContent="";status.style.display="none";
-  const list=Array.from(files.files||[]);if(!list.length){alert("Please choose a file.");return;}
-  const format=fmt.value,u=unit.value,wv=parseFloat(w.value),hv=parseFloat(h.value);
-  const {jsPDF}=window.jspdf;
-  for(const f of list){
-    const base=f.name.replace(/\.[^.]+$/,""),name=`${base}-conv${counter++}`;
-    const isPDF=/pdf$/i.test(f.name),isIMG=/^image\//.test(f.type);
-    if(isIMG && format==="pdf"){
-      const img=await fileToImage(f);
-      const wIn=isFinite(wv)?(u==="in"?wv:u==="cm"?cmToIn(wv):pxToIn(wv)):pxToIn(img.width);
-      const hIn=isFinite(hv)?(u==="in"?hv:u==="cm"?cmToIn(hv):pxToIn(hv)):pxToIn(img.height);
-      const wPt=wIn*72,hPt=hIn*72; // 1 in = 72 pt
-      const drawW=inToPx(wIn),drawH=inToPx(hIn);
-      if(drawW>MAX||drawH>MAX){err.textContent="Size too large. Try smaller values.";preview.insertAdjacentElement("beforebegin",err);return;}
-      const cnv=await imageToCanvas(img,drawW,drawH);
-      const doc=new jsPDF({unit:"pt",format:[wPt,hPt]});
-      doc.addImage(cnv.toDataURL("image/jpeg",0.92),"JPEG",0,0,wPt,hPt);
-      download(doc.output("blob"),`${name}.pdf`);
+    function fmt(n){ return Number(n||0).toLocaleString(undefined,{maximumFractionDigits:2}); }
+    function render(){
+      listEl.innerHTML = "";
+      let inc=0, exp=0;
+      entries.forEach((e,i)=>{
+        if(e.type==="income") inc += Number(e.amount||0);
+        else exp += Number(e.amount||0);
+        const row = document.createElement("div");
+        row.className = "item";
+        row.innerHTML = `
+          <div>${e.title || "(untitled)"} — <strong>${e.type}</strong></div>
+          <div>
+            £${fmt(e.amount)}
+            <button data-i="${i}" class="del" style="margin-left:12px;background:#eee;color:#000;border:1px solid #ddd;border-radius:8px;padding:4px 8px">Delete</button>
+          </div>`;
+        listEl.appendChild(row);
+      });
+      $("#totalIncome").value = `Total income: £${fmt(inc)}`;
+      $("#totalExpense").value = `Total expense: £${fmt(exp)}`;
+      $("#available").value   = `Available: £${fmt(inc - exp)}`;
+      localStorage.setItem(storeKey, JSON.stringify(entries));
+      listEl.querySelectorAll(".del").forEach(b=>{
+        b.onclick = () => { entries.splice(Number(b.dataset.i),1); render(); };
+      });
     }
-    else if(isPDF && format!=="pdf"){
-      const ab=await f.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:ab}).promise;
-      for(let p=1;p<=pdf.numPages;p++){
-        const page=await pdf.getPage(p),vp=page.getViewport({scale:1});
-        const cnv=document.createElement("canvas");cnv.width=vp.width;cnv.height=vp.height;
-        await page.render({canvasContext:cnv.getContext("2d"),viewport:vp}).promise;
-        const blob=await new Promise(r=>cnv.toBlob(r,"image/"+format,0.92));
-        download(blob,`${name}-p${p}.${format}`);
-      }
-    }
-    else if(isIMG && format!=="pdf"){
-      const img=await fileToImage(f);
-      const W=toPxScreen(wv,u)||img.width,H=toPxScreen(hv,u)||img.height;
-      if(W>MAX||H>MAX){err.textContent="Size too large. Try smaller values.";preview.insertAdjacentElement("beforebegin",err);return;}
-      const cnv=await imageToCanvas(img,W,H);
-      const blob=await new Promise(r=>cnv.toBlob(r,"image/"+format,0.92));
-      download(blob,`${name}.${format}`);
-    } else err.textContent="Unsupported conversion.";
-  }
-  status.style.display="block";
-}
+    render();
 
-$("#convert").addEventListener("click",convert);
-if("serviceWorker" in navigator)
-  navigator.serviceWorker.register("service-worker.js");
-})();
-</script>
+    $("#add").onclick = () => {
+      const title = $("#title").value.trim();
+      const amount = Number($("#amount").value);
+      const type = $("#type").value;
+      if(!title || !amount){ err.textContent = "Please enter a title and amount."; return; }
+      err.textContent = "";
+      entries.push({ title, amount, type, ts: Date.now() });
+      $("#title").value = ""; $("#amount").value = "";
+      render();
+    };
+
+    $("#reset").onclick = () => {
+      if(confirm("Clear local entries?")) { entries = []; render(); }
+    };
+
+    // Placeholder auth UI — replace with your saved Firebase logic
+    $("#loginBtn").onclick = () => { statusEl.style.display = "block"; statusEl.textContent = "✅ Signed in (placeholder)"; };
+    $("#logoutBtn").onclick = () => { statusEl.style.display = "none"; };
+
+  </script>
+
+  <!-- Scoped Service Worker just for /Socialcreator-manifest/ -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/Socialcreator-manifest/service-worker.js', { scope: '/Socialcreator-manifest/' })
+        .then(() => console.log('✅ Budget SW registered (scoped)'))
+        .catch(err => console.error('SW registration failed:', err));
+    }
+  </script>
 </body>
 </html>
