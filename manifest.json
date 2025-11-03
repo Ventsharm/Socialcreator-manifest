@@ -1,10 +1,10 @@
 {
-  "id": "https://ventsharm.github.io/Socialcreator-manifest/",
+  "id": "ventsharm-budget-pwa-2025",
   "name": "Ventsharm Budget",
   "short_name": "Budget",
   "description": "Track income, expenses, and available balance with Firebase sync across devices.",
-  "start_url": "/Socialcreator-manifest/",
-  "scope": "/Socialcreator-manifest/",
+  "start_url": "https://ventsharm.github.io/Socialcreator-manifest/",
+  "scope": "https://ventsharm.github.io/Socialcreator-manifest/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
