@@ -166,7 +166,13 @@ dialog{border:0;border-radius:18px;padding:0;width:min(520px,92vw);box-shadow:va
             <option value="subscription">Subscription</option>
           </select>
         </div>
-        <div></div>
+        <div>
+          <label for="exp-month-bucket">Month</label>
+          <select id="exp-month-bucket">
+            <option value="this">This month</option>
+            <option value="next">Next month</option>
+          </select>
+        </div>
       </div>
       <div class="btnrow" style="margin-top:10px">
         <button id="add-exp" class="btn">Add Bill</button>
@@ -223,7 +229,13 @@ dialog{border:0;border-radius:18px;padding:0;width:min(520px,92vw);box-shadow:va
           <option value="subscription">Subscription</option>
         </select>
       </div>
-      <div></div>
+      <div id="edit-month-bucket-wrap">
+        <label for="edit-month-bucket">Month</label>
+        <select id="edit-month-bucket">
+          <option value="this">This month</option>
+          <option value="next">Next month</option>
+        </select>
+      </div>
     </div>
     <div id="edit-include-wrap" class="center-row" style="margin-top:10px">
       <label style="font-weight:800">Include in available income</label>
@@ -277,7 +289,7 @@ const viewIncomes=$("#view-incomes"),viewExpenses=$("#view-expenses"),viewOvervi
 const incName=$("#inc-name"),incAmt=$("#inc-amt"),incDate=$("#inc-date"),incInc=$("#inc-include");
 const addInc=$("#add-inc"),resetInc=$("#reset-inc"),incList=$("#inc-list");
 
-const expName=$("#exp-name"),expAmt=$("#exp-amt"),expDate=$("#exp-date"),expMethod=$("#exp-method"),expCategory=$("#exp-category"),expFilter=$("#exp-filter");
+const expName=$("#exp-name"),expAmt=$("#exp-amt"),expDate=$("#exp-date"),expMethod=$("#exp-method"),expCategory=$("#exp-category"),expMonthBucket=$("#exp-month-bucket"),expFilter=$("#exp-filter");
 const addExp=$("#add-exp"),resetExp=$("#reset-exp"),expList=$("#exp-list");
 
 const ovwTotal=$("#ovw-total"),ovwAvail=$("#ovw-available"),ovwExp=$("#ovw-exp"),ovwRemain=$("#ovw-remaining");
@@ -286,7 +298,7 @@ const btnDeleteAccount=$("#btnDeleteAccount");
 const editModal=$("#editModal"),editTitle=$("#editTitle");
 const editName=$("#edit-name"),editAmount=$("#edit-amt"),editDate=$("#edit-date"),editDateLabel=$("#edit-date-label");
 const editInclude=$("#edit-include"),editIncWrap=$("#edit-include-wrap");
-const editMethodWrap=$("#edit-method-wrap"),editMethod=$("#edit-method");
+const editMethodWrap=$("#edit-method-wrap"),editMethod=$("#edit-method"),editMonthBucket=$("#edit-month-bucket");
 const editCategoryRow=$("#edit-category-row"),editCategory=$("#edit-category");
 const editSave=$("#edit-save"),editCancel=$("#edit-cancel");
 
@@ -539,6 +551,7 @@ function openEdit(type,id){
     editMethod.value=src.method||"manual";
     editCategoryRow.style.display="grid";
     editCategory.value=src.category||"bill";
+    editMonthBucket.value=src.monthBucket||"this";
   }
 
   editModal.showModal();
@@ -560,14 +573,7 @@ editSave.onclick=()=>{
   }else{
     patch.method=editMethod.value||"manual";
     patch.category=editCategory.value||"bill";
-    patch.monthBucket=date?(() => {
-      const x=new Date(date+"T00:00:00");
-      if(isNaN(x))return"this";
-      const now=new Date();
-      const a=now.getFullYear()*12+now.getMonth();
-      const b=x.getFullYear()*12+x.getMonth();
-      return b===a+1?"next":"this";
-    })():"this";
+    patch.monthBucket=editMonthBucket.value||"this";
   }
 
   updateDocFS(editing.type,editing.id,patch);
@@ -598,23 +604,22 @@ addExp.onclick=()=>{
   const date=expDate.value||"";
   if(!title||!isFinite(amount))return alert("Enter a valid name and amount.");
 
-  let monthBucket="this";
-  if(date){
-    const x=new Date(date+"T00:00:00");
-    if(!isNaN(x)){
-      const now=new Date();
-      const a=now.getFullYear()*12+now.getMonth();
-      const b=x.getFullYear()*12+x.getMonth();
-      monthBucket=b===a+1?"next":"this";
-    }
-  }
+  addDocFS("expenses",{
+    title,
+    amount,
+    date,
+    method:expMethod.value||"manual",
+    category:expCategory.value||"bill",
+    monthBucket:expMonthBucket.value||"this",
+    paid:false
+  });
 
-  addDocFS("expenses",{title,amount,date,method:expMethod.value||"manual",category:expCategory.value||"bill",monthBucket,paid:false});
   expName.value="";
   expAmt.value="";
   expDate.value="";
   expMethod.value="manual";
   expCategory.value="bill";
+  expMonthBucket.value="this";
 };
 
 resetExp.onclick=()=>{
@@ -623,6 +628,7 @@ resetExp.onclick=()=>{
   expDate.value="";
   expMethod.value="manual";
   expCategory.value="bill";
+  expMonthBucket.value="this";
 };
 
 if(expFilter)expFilter.addEventListener("change",renderAll);
