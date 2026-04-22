@@ -458,13 +458,13 @@ function sortedExpenses(){
     .filter(doc=>passesExpenseFilter(doc,filter))
     .slice()
     .sort((a,b)=>{
-      const ar=bucketRank(getMonthBucket(a));
-      const br=bucketRank(getMonthBucket(b));
-      if(ar!==br)return ar-br;
-
       const am=methodRank(a.method);
       const bm=methodRank(b.method);
       if(am!==bm)return am-bm;
+
+      const ar=bucketRank(getMonthBucket(a));
+      const br=bucketRank(getMonthBucket(b));
+      if(ar!==br)return ar-br;
 
       const ad=dayNum(a.date);
       const bd=dayNum(b.date);
