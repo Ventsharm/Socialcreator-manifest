@@ -337,7 +337,7 @@ btnDoReg.onclick=async()=>{
     if(!e||!p)return alert("Enter email and password.");
     const cred=await auth.createUserWithEmailAndPassword(e,p);
     await cred.user.sendEmailVerification();
-    alert("✅ Please verify your email before logging in.");
+    return alert("✅ Please verify your email before logging in. If you don’t receive it, please check your spam or junk folder.");
     showAuthView("login");
   }catch(err){alert(err.message);}
 };
@@ -355,7 +355,7 @@ btnDoReset.onclick=async()=>{
     const e=rstEmail.value.trim();
     if(!e)return alert("Enter your email.");
     await auth.sendPasswordResetEmail(e);
-    alert("Password reset email sent.");
+    return alert("Password reset email sent. If you don’t receive it, please check your spam or junk folder.");
   }catch(err){alert(err.message);}
 };
 
@@ -363,7 +363,7 @@ btnResend.onclick=async()=>{
   try{
     if(auth.currentUser){
       await auth.currentUser.sendEmailVerification();
-      alert("Verification email re-sent.");
+      return alert("Verification email re-sent. If you don’t receive it, please check your spam or junk folder.");
     }
   }catch(e){alert(e.message);}
 };
