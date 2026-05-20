@@ -715,6 +715,38 @@ setInterval(async()=>{
     }catch(e){}
   }
 },5000);
+</script><script>
+(function(){
+  const APP_URL="https://play.google.com/store/apps/details?id=io.github.ventsharm.twa";
+  const ratedKey="vsRateRated";
+  const noKey="vsRateNoThanks";
+  const laterKey="vsRateLaterUntil";
+  const launchesKey="vsRateLaunches";
+
+  if(localStorage.getItem(ratedKey)==="yes"||localStorage.getItem(noKey)==="yes") return;
+
+  const now=Date.now();
+  const laterUntil=Number(localStorage.getItem(laterKey)||0);
+
+  if(laterUntil&&now<laterUntil) return;
+
+  const launches=Number(localStorage.getItem(launchesKey)||0)+1;
+  localStorage.setItem(launchesKey,String(launches));
+
+  if(launches<7) return;
+
+  setTimeout(function(){
+    const answer=confirm("Enjoying this app?\n\nWould you like to rate it on Google Play?");
+
+    if(answer){
+      localStorage.setItem(ratedKey,"yes");
+      location.href=APP_URL;
+    }else{
+      localStorage.setItem(laterKey,String(now+45*24*60*60*1000));
+      localStorage.setItem(launchesKey,"0");
+    }
+  },1800);
+})();
 </script>
 </body>
 </html>
