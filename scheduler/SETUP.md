@@ -1,5 +1,16 @@
 # Budget Planner notifications
 
+## Current setup
+
+- New Google Apps Script: [Budget Planner](https://script.google.com/d/1RZ30wCu9pxyWgRbkj_9Lit7j_3mK-1ztL8eZEbfotI7FM-IyeMKVZv5J/edit). The script and UK-time manifest are uploaded.
+- Dedicated Firebase sender identity, keyless GitHub trust, required APIs and token security rules are configured in `budget-app-283de`.
+- The GitHub workflow uses the public provider and service-account names directly; no repository variables are needed.
+- The project-specific public Web Push certificate key is configured; device registration is enabled.
+- [GitHub-to-Firebase dry run passed](https://github.com/Ventsharm/Socialcreator-manifest/actions/runs/39227394665) without writes or sends.
+- Still required: add a new repository-restricted `GITHUB_TOKEN` privately in the new script’s properties, run the automatic test, then enable the daily trigger. Do not reuse Yearly Budget’s token or trigger.
+
+The sections below remain as a setup reference. Do not recreate resources already configured.
+
 The purple option is below the Incomes / Expenses / Overview tabs. After setup,
 enabling registers this device and immediately displays a confirmation. A daily
 check around **09:30 Europe/London** sends:
@@ -43,12 +54,7 @@ gcloud iam workload-identity-pools providers create-oidc github --location=globa
 gcloud iam service-accounts add-iam-policy-binding budget-planner-sender@budget-app-283de.iam.gserviceaccount.com --role="roles/iam.workloadIdentityUser" --member="principalSet://iam.googleapis.com/projects/162369707369/locations/global/workloadIdentityPools/budget-planner-reminders/attribute.repository/Ventsharm/Socialcreator-manifest"
 ```
 
-4. Under [GitHub Actions repository variables](https://github.com/Ventsharm/Socialcreator-manifest/settings/variables/actions), add:
-
-| Name | Value |
-| --- | --- |
-| `BUDGET_WORKLOAD_IDENTITY_PROVIDER` | `projects/162369707369/locations/global/workloadIdentityPools/budget-planner-reminders/providers/github` |
-| `BUDGET_REMINDER_SERVICE_ACCOUNT` | `budget-planner-sender@budget-app-283de.iam.gserviceaccount.com` |
+4. The public provider and sender identity are already configured in `.github/workflows/daily-reminders.yml`. No private service-account JSON key is used.
 
 5. Open [Budget Planner reminders](https://github.com/Ventsharm/Socialcreator-manifest/actions/workflows/daily-reminders.yml).
    Run the workflow on `main` with **dry_run checked**. It queries existing opted-in
@@ -121,5 +127,4 @@ gcloud iam service-accounts add-iam-policy-binding budget-planner-sender@budget-
 `npm test` exercises UK/BST boundaries, grouped sends, account isolation, duplicate
 suppression, dry runs, worker restarts, logout suppression and cache preservation.
 It does not prove delivery to a real phone. Complete both setup sections and the
-automatic live test before calling the feature active. The public configuration
-ships **disabled** and the button says setup is pending until that work is done.
+automatic live test before calling the feature active. Device registration is enabled after the successful Firebase dry run. Scheduled delivery still requires the private Google token, automatic live test and daily trigger described above.

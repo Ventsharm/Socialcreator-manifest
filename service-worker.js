@@ -2,7 +2,7 @@
 importScripts("./push-state.js");
 importScripts("https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/10.13.1/firebase-messaging-compat.js");
-const CACHE_NAME = "socialcreator-budget-cache-v4-notifications";
+const CACHE_NAME = "socialcreator-budget-cache-v5-push-configured";
 const base = self.registration.scope;
 const shell = ["./", "index.html", "manifest.webmanifest", "Icon-192.png", "Icon-512.png",
   "push-client.js", "push-config.js", "push-state.js"].map(p => new URL(p, base).href);
