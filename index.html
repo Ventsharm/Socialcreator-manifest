@@ -43,6 +43,7 @@ h2.section{margin:2px 0 12px;font-size:1.1rem;font-weight:900}
 .item_head{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;cursor:pointer}
 .item_title{font-weight:900}
 .item_title small{display:block;color:#777;font-weight:600}
+.item_title .income-date{display:table;width:fit-content;margin-top:8px;padding:4px 10px;border-radius:999px;background:#f0e7ff;color:#7453d4;font-size:13px;line-height:1.4;font-weight:800}
 .item_amount{font-weight:900}
 .item_actions{display:none;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed #e5e6ee;animation:reveal .18s ease;flex-wrap:wrap}
 .item.show .item_actions{display:flex}
@@ -436,6 +437,15 @@ function ordinal(n){
   return n%10===1&&n!==11?n+"st":n%10===2&&n!==12?n+"nd":n%10===3&&n!==13?n+"rd":n+"th";
 }
 
+function incomeDateLabel(date){
+  const match=/^\d{4}-(\d{2})-(\d{2})$/.exec(date||"");
+  if(!match)return "";
+  const month=Number(match[1]),day=Number(match[2]);
+  const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  if(month<1||month>12||day<1||day>31)return "";
+  return `${ordinal(day)} ${months[month-1]}`;
+}
+
 function displayDateLine(doc){
   const day=ordinal(dayNum(doc.date));
   const bucket=bucketText(getMonthBucket(doc));
@@ -477,7 +487,8 @@ function sortedExpenses(){
 function renderAll(){
   incList.innerHTML="";
   state.incomes.forEach(doc=>{
-    const dateLine=doc.date?`<small>${doc.date}</small>`:"";
+    const incomeDate=incomeDateLabel(doc.date);
+    const dateLine=incomeDate?`<small class="income-date">${incomeDate}</small>`:"";
     const el=document.createElement("div");
     el.className="item";
     el.innerHTML=`<div class="item_head" data-type="incomes" data-id="${doc.id}"><div class="include-pill">${doc.include?"✅":""}</div><div class="item_title">${doc.title}${dateLine}</div><div class="item_amount">${fmt(doc.amount)}</div></div><div class="item_actions"><button class="btn" data-act="edit" data-type="incomes" data-id="${doc.id}">Edit</button><button class="btn" data-act="del" data-type="incomes" data-id="${doc.id}">Delete</button></div>`;
