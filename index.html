@@ -69,6 +69,11 @@ dialog{border:0;border-radius:18px;padding:0;width:min(520px,92vw);box-shadow:va
 .filterbar select{width:auto;min-width:180px}
 .bp-sub-badge-wrap{margin-top:8px}
 .bp-sub-badge{display:inline-flex;align-items:center;justify-content:center;background:#f3efff;color:#6b46c1;border:1px solid #e5ddff;border-radius:999px;padding:4px 10px;font-weight:800;font-size:12px;letter-spacing:.2px}
+.bp-notice{margin:16px 16px 0;padding:12px;border:1px solid #e5ddf1;border-radius:24px;background:linear-gradient(180deg,#faf7ff,#fff)}
+.bp-notify-button{display:block;width:100%;min-height:52px;padding:14px 18px;border:0;border-radius:22px;background:linear-gradient(135deg,#7152e7,#ac91ef);color:#fff;font:800 16px/1.4 system-ui,sans-serif;cursor:pointer;box-shadow:0 10px 24px #7152df26}
+.bp-notify-button:disabled{opacity:.65;cursor:wait}
+.bp-notify-button:focus-visible{outline:3px solid #b8a5ff;outline-offset:3px}
+#bpNotifyStatus{margin:10px 0 0;color:#66518d;font-size:13px;line-height:1.5;font-weight:700}
 </style>
 </head>
 <body>
@@ -123,6 +128,11 @@ dialog{border:0;border-radius:18px;padding:0;width:min(520px,92vw);box-shadow:va
     <button class="tab" id="tab-inc" data-tab="incomes" aria-selected="true">Incomes</button>
     <button class="tab" id="tab-exp" data-tab="expenses">Expenses</button>
     <button class="tab" id="tab-ovw" data-tab="overview">Overview</button>
+  </div>
+
+  <div class="bp-notice">
+    <button class="bp-notify-button" id="bpEnableNotifications" type="button">🔔 Enable notifications</button>
+    <p id="bpNotifyStatus" role="status" aria-live="polite">Get a monthly income-update prompt and one daily alert listing manual payments due.</p>
   </div>
 
   <div class="content">
@@ -257,6 +267,9 @@ dialog{border:0;border-radius:18px;padding:0;width:min(520px,92vw);box-shadow:va
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-messaging-compat.js"></script>
+<script src="push-state.js"></script>
+<script src="push-config.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const fmt=n=>"£"+(Number(n||0)).toFixed(2);
@@ -323,6 +336,9 @@ function showTab(w){
 tabInc.onclick=()=>showTab("incomes");
 tabExp.onclick=()=>showTab("expenses");
 tabOvw.onclick=()=>showTab("overview");
+function showNotificationTab(){if(location.hash==="#expenses")showTab("expenses");}
+showNotificationTab();
+window.addEventListener("hashchange",showNotificationTab);
 
 function showAuthView(which){
   vLogin.classList.remove("active");
@@ -369,7 +385,7 @@ btnResend.onclick=async()=>{
   }catch(e){alert(e.message);}
 };
 
-btnLogout.onclick=async()=>{await auth.signOut();};
+btnLogout.onclick=async()=>{await window.BudgetPush?.detach();await auth.signOut();};
 
 const base=uid=>db.collection("users").doc(uid);
 
@@ -685,6 +701,8 @@ btnDeleteAccount.onclick=async()=>{
     };
     await delCol("incomes");
     await delCol("expenses");
+    await window.BudgetPush?.detach();
+    if(globalThis.BudgetPushConfig?.enabled)await delCol("budgetPushTokens");
     await uref.delete().catch(()=>{});
     await user.delete();
     alert("Account deleted.");
@@ -754,7 +772,9 @@ setInterval(async()=>{
     }catch(e){}
   }
 },5000);
-</script><script>
+</script>
+<script src="push-client.js"></script>
+<script>
 (function(){
   const APP_URL="https://play.google.com/store/apps/details?id=io.github.ventsharm.twa";
   const ratedKey="vsRateRated";

@@ -1,0 +1,48 @@
+name: Budget Planner reminders
+run-name: "Budget Planner — ${{ inputs.trigger_source || github.event_name }}"
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Check Firebase and calculate reminders without writes or sends
+        type: boolean
+        default: true
+      trigger_source:
+        description: Scheduler label
+        type: string
+        default: manual
+permissions:
+  contents: read
+  actions: read
+  id-token: write
+concurrency:
+  group: budget-planner-reminders
+  cancel-in-progress: false
+jobs:
+  send:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Verify Firebase identity configuration
+        env:
+          PROVIDER: ${{ vars.BUDGET_WORKLOAD_IDENTITY_PROVIDER }}
+          ACCOUNT: ${{ vars.BUDGET_REMINDER_SERVICE_ACCOUNT }}
+        run: |
+          test -n "$PROVIDER" && test -n "$ACCOUNT" || { echo 'Complete scheduler/SETUP.md and configure both Budget Planner repository variables.'; exit 1; }
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093
+        with:
+          workload_identity_provider: ${{ vars.BUDGET_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.BUDGET_REMINDER_SERVICE_ACCOUNT }}
+          project_id: budget-app-283de
+      - run: npm run send:reminders
+        env:
+          REMINDERS_DRY_RUN: ${{ inputs.dry_run }}
+          FIREBASE_PROJECT_ID: budget-app-283de
+          GITHUB_TOKEN: ${{ github.token }}
