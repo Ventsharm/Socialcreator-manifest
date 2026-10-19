@@ -30,16 +30,10 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Verify Firebase identity configuration
-        env:
-          PROVIDER: ${{ vars.BUDGET_WORKLOAD_IDENTITY_PROVIDER }}
-          ACCOUNT: ${{ vars.BUDGET_REMINDER_SERVICE_ACCOUNT }}
-        run: |
-          test -n "$PROVIDER" && test -n "$ACCOUNT" || { echo 'Complete scheduler/SETUP.md and configure both Budget Planner repository variables.'; exit 1; }
       - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093
         with:
-          workload_identity_provider: ${{ vars.BUDGET_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.BUDGET_REMINDER_SERVICE_ACCOUNT }}
+          workload_identity_provider: projects/162369707369/locations/global/workloadIdentityPools/budget-planner-reminders/providers/github
+          service_account: budget-planner-sender@budget-app-283de.iam.gserviceaccount.com
           project_id: budget-app-283de
       - run: npm run send:reminders
         env:
