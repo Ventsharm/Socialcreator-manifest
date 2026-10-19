@@ -1,4 +1,4 @@
-const CACHE_NAME = 'socialcreator-budget-cache-v1';
+const CACHE_NAME = 'socialcreator-budget-cache-v2-income-dates';
 const ASSETS = [
   './',
   './index.html',
