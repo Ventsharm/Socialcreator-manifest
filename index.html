@@ -74,6 +74,15 @@ dialog{border:0;border-radius:18px;padding:0;width:min(520px,92vw);box-shadow:va
 .bp-notify-button:disabled{opacity:.65;cursor:wait}
 .bp-notify-button:focus-visible{outline:3px solid #b8a5ff;outline-offset:3px}
 #bpNotifyStatus{margin:10px 0 0;color:#66518d;font-size:13px;line-height:1.5;font-weight:700}
+.bp-info-row{display:flex;justify-content:flex-end;margin-top:8px}
+.bp-info-button{display:grid;place-items:center;width:44px;height:44px;border:1px solid #e2d8f3;border-radius:50%;background:#f0e7ff;color:#7453d4;cursor:pointer}
+.bp-info-button span{display:grid;place-items:center;width:23px;height:23px;border:2px solid currentColor;border-radius:50%;font:700 17px/1 Georgia,serif}
+.bp-info-button:focus-visible{outline:3px solid #b8a5ff;outline-offset:3px}
+.bp-info-dialog{width:min(460px,calc(100% - 32px));max-height:calc(100dvh - 40px);overflow:auto;padding:28px 24px;border:1px solid #eee5f7;border-radius:28px;background:#fff;color:#26222f;box-shadow:0 24px 70px #24143838}
+.bp-info-dialog::backdrop{background:#251c3c80}
+.bp-info-dialog h2{margin:0 0 18px;font-size:23px;line-height:1.3;font-weight:800}
+.bp-info-dialog p{margin:0 0 16px;color:#6d607c;font-size:16px;line-height:1.65}
+.bp-info-dialog form{margin-top:24px}
 </style>
 </head>
 <body>
@@ -133,6 +142,17 @@ dialog{border:0;border-radius:18px;padding:0;width:min(520px,92vw);box-shadow:va
   <div class="bp-notice">
     <button class="bp-notify-button" id="bpEnableNotifications" type="button">🔔 Enable notifications</button>
     <p id="bpNotifyStatus" role="status" aria-live="polite">Get a monthly income-update prompt and one daily alert listing manual payments due.</p>
+    <div class="bp-info-row"><button class="bp-info-button" id="bpReminderInfoButton" type="button" aria-label="About your Budget Planner reminders" aria-haspopup="dialog" aria-controls="bpReminderInfoDialog"><span aria-hidden="true">i</span></button></div>
+    <dialog class="bp-info-dialog" id="bpReminderInfoDialog" aria-labelledby="bpReminderInfoTitle" aria-describedby="bpReminderInfoDescription">
+      <h2 id="bpReminderInfoTitle">About your reminders</h2>
+      <div id="bpReminderInfoDescription">
+        <p>On the 1st of each month, you’ll get a reminder to update when your incomes are due. Income dates display the current UK month, but you’ll need to edit the day if your payment date changes.</p>
+        <p>Unpaid manual payments set to “This month” are checked on their due day. All payments due that day are listed together in one notification. Automatic payments, paid items and “Next month” items are excluded. If the income prompt is due too, it joins the same notification.</p>
+        <p>Checks run daily around 9:30 AM UK time and can run late. Payments added or changed after the check may miss that day’s alert. If a saved day falls beyond the end of a shorter month, its alert uses the last day.</p>
+        <p>Enable notifications on each device you want to receive alerts on. You’ll get a confirmation when enabling them. Background alerts work on supported devices, including while the app is closed.</p>
+      </div>
+      <form method="dialog"><button class="bp-notify-button" type="submit">Got it</button></form>
+    </dialog>
   </div>
 
   <div class="content">
@@ -772,6 +792,18 @@ setInterval(async()=>{
     }catch(e){}
   }
 },5000);
+</script>
+<script>
+(() => {
+  const button=document.getElementById("bpReminderInfoButton"),dialog=document.getElementById("bpReminderInfoDialog");
+  button.addEventListener("click",()=>dialog.showModal());
+  dialog.addEventListener("close",()=>button.focus());
+  dialog.addEventListener("click",event=>{
+    if(event.target!==dialog)return;
+    const box=dialog.getBoundingClientRect();
+    if(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)dialog.close();
+  });
+})();
 </script>
 <script src="push-client.js"></script>
 <script>
