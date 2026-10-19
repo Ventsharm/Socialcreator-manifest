@@ -437,14 +437,42 @@ function ordinal(n){
   return n%10===1&&n!==11?n+"st":n%10===2&&n!==12?n+"nd":n%10===3&&n!==13?n+"rd":n+"th";
 }
 
-function incomeDateLabel(date){
+const incomeMonthFormatter=new Intl.DateTimeFormat("en-GB",{
+  timeZone:"Europe/London",year:"numeric",month:"numeric"
+});
+function currentUKMonth(now=new Date()){
+  const parts=Object.fromEntries(incomeMonthFormatter.formatToParts(now).map(p=>[p.type,p.value]));
+  return {year:Number(parts.year),month:Number(parts.month)};
+}
+
+function incomeDateLabel(date,now=new Date()){
   const match=/^\d{4}-(\d{2})-(\d{2})$/.exec(date||"");
   if(!match)return "";
-  const month=Number(match[1]),day=Number(match[2]);
+  const savedMonth=Number(match[1]),savedDay=Number(match[2]);
+  if(savedMonth<1||savedMonth>12||savedDay<1||savedDay>31)return "";
+  const {year,month}=currentUKMonth(now);
+  const lastDay=new Date(Date.UTC(year,month,0)).getUTCDate();
+  const day=Math.min(savedDay,lastDay);
   const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
-  if(month<1||month>12||day<1||day>31)return "";
   return `${ordinal(day)} ${months[month-1]}`;
 }
+
+// Refresh only displayed labels; monthly rollover never reads or writes Firebase.
+let displayedIncomeMonth="";
+function refreshIncomeMonth(){
+  const now=new Date(),{year,month}=currentUKMonth(now);
+  const key=`${year}-${month}`;
+  if(key===displayedIncomeMonth)return;
+  displayedIncomeMonth=key;
+  document.querySelectorAll(".income-date").forEach(label=>{
+    label.textContent=incomeDateLabel(label.dataset.incomeDate,now);
+  });
+}
+setInterval(refreshIncomeMonth,60000);
+document.addEventListener("visibilitychange",()=>{
+  if(!document.hidden)refreshIncomeMonth();
+});
+window.addEventListener("focus",refreshIncomeMonth);
 
 function displayDateLine(doc){
   const day=ordinal(dayNum(doc.date));
@@ -488,7 +516,7 @@ function renderAll(){
   incList.innerHTML="";
   state.incomes.forEach(doc=>{
     const incomeDate=incomeDateLabel(doc.date);
-    const dateLine=incomeDate?`<small class="income-date">${incomeDate}</small>`:"";
+    const dateLine=incomeDate?`<small class="income-date" data-income-date="${doc.date}">${incomeDate}</small>`:"";
     const el=document.createElement("div");
     el.className="item";
     el.innerHTML=`<div class="item_head" data-type="incomes" data-id="${doc.id}"><div class="include-pill">${doc.include?"✅":""}</div><div class="item_title">${doc.title}${dateLine}</div><div class="item_amount">${fmt(doc.amount)}</div></div><div class="item_actions"><button class="btn" data-act="edit" data-type="incomes" data-id="${doc.id}">Edit</button><button class="btn" data-act="del" data-type="incomes" data-id="${doc.id}">Delete</button></div>`;
