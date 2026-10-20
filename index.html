@@ -83,6 +83,17 @@ dialog{border:0;border-radius:18px;padding:0;width:min(520px,92vw);box-shadow:va
 .bp-info-dialog h2{margin:0 0 18px;font-size:23px;line-height:1.3;font-weight:800}
 .bp-info-dialog p{margin:0 0 16px;color:#6d607c;font-size:16px;line-height:1.65}
 .bp-info-dialog form{margin-top:24px}
+.bp-important-button{display:flex;align-items:center;justify-content:center;gap:10px;width:calc(100% - 32px);margin:16px 16px 0;padding:14px;border:1px solid #dfd2f5;border-radius:18px;background:#f5efff;color:#6747c6;font:700 16px/1.4 system-ui,sans-serif;cursor:pointer}
+.bp-important-icon{display:inline-grid;place-items:center;flex-shrink:0;width:25px;height:25px;border:2px solid currentColor;border-radius:50%;font:700 17px/1 Georgia,serif}
+.bp-important-heading{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.bp-important-heading h2{margin:0}
+.bp-important-heading .bp-important-icon{width:34px;height:34px;color:#7453d4;background:#f5efff;font-size:23px}
+.bp-important-dialog::backdrop{backdrop-filter:blur(3px)}
+.bp-yearly-link,.bp-important-close{display:flex;align-items:center;justify-content:center;width:100%;min-height:51px;padding:13px 15px;border-radius:17px;text-align:center;text-decoration:none;font:700 15px/1.4 system-ui,sans-serif;cursor:pointer}
+.bp-yearly-link{background:linear-gradient(135deg,#7152df,#ac92ef);color:#fff;box-shadow:0 8px 18px #7050da25}
+.bp-important-dialog form{margin-top:12px}
+.bp-important-close{border:1px solid #ded4ed;background:#fff;color:#6b4ac3}
+.bp-important-button:focus-visible,.bp-yearly-link:focus-visible,.bp-important-close:focus-visible{outline:3px solid #b8a5ff;outline-offset:3px}
 </style>
 </head>
 <body>
@@ -151,6 +162,17 @@ dialog{border:0;border-radius:18px;padding:0;width:min(520px,92vw);box-shadow:va
       <form method="dialog"><button class="bp-notify-button" type="submit">Got it</button></form>
     </dialog>
   </div>
+
+  <button class="bp-important-button" id="bpImportantButton" type="button" aria-haspopup="dialog" aria-controls="bpImportantDialog">Important <span class="bp-important-icon" aria-hidden="true">i</span></button>
+  <dialog class="bp-info-dialog bp-important-dialog" id="bpImportantDialog" aria-labelledby="bpImportantTitle" aria-describedby="bpImportantDescription">
+    <div class="bp-important-heading"><span class="bp-important-icon" aria-hidden="true">i</span><h2 id="bpImportantTitle">Important</h2></div>
+    <div id="bpImportantDescription">
+      <p>Budget Planner is designed for managing your monthly income, bills and regular subscriptions.</p>
+      <p>For yearly or occasional payments, top-ups and cancellations, use my <strong>Yearly Budget</strong> app.</p>
+    </div>
+    <a class="bp-yearly-link" href="https://play.google.com/store/apps/details?id=com.ventsharm.yearlybudget" target="_blank" rel="noopener noreferrer">View Yearly Budget on Google Play</a>
+    <form method="dialog"><button class="bp-important-close" type="submit">Got it</button></form>
+  </dialog>
 
   <div class="content">
     <section class="card" id="view-incomes">
@@ -803,6 +825,18 @@ setInterval(async()=>{
 })();
 </script>
 <script src="push-client.js"></script>
+<script>
+(() => {
+  const button=document.getElementById("bpImportantButton"),dialog=document.getElementById("bpImportantDialog");
+  button.addEventListener("click",()=>dialog.showModal());
+  dialog.addEventListener("close",()=>button.focus());
+  dialog.addEventListener("click",event=>{
+    if(event.target!==dialog)return;
+    const box=dialog.getBoundingClientRect();
+    if(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)dialog.close();
+  });
+})();
+</script>
 <script>
 (function(){
   const APP_URL="https://play.google.com/store/apps/details?id=io.github.ventsharm.twa";
