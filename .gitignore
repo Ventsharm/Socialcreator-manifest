@@ -1,4 +1,0 @@
-node_modules/
-gha-creds-*.json
-.env
-*-service-account*.json

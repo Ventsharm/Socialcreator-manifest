@@ -1,10 +1,11 @@
-# Budget Planner
+# Budget Planner — Android download page
 
-Income and expense planner hosted from this repository.
+The website application is retired. This repository now hosts a static Google Play download page for `io.github.ventsharm.twa`, styled after the established Bubblewrap safeguard.
 
-[Budget Planner notification setup](scheduler/SETUP.md) ·
-[New Google Apps Script](scheduler/google-apps-script.gs)
+The old web application, Firebase web configuration, push code, Apps Script scheduler source, reminder/test workflows, Node dependencies and web tests have been removed. Git history preserves prior source. Account and Firestore data remain unchanged and continue to serve the native Android app.
 
-Firebase identity, the public Web Push key and token rules are configured.
-Device notification registration is enabled. The private Google Apps Script
-GitHub token, automatic live test and daily trigger still need activation.
+`service-worker.js` is a small retirement worker kept at the old URL so installed web versions can clear only their own `socialcreator-budget-cache-` caches and unregister. It performs no Firebase reads or notification sends. Other applications' workers and caches are untouched.
+
+The domain-root saved-login association remains in the separate `Ventsharm/ventsharm.github.io` repository at `/.well-known/assetlinks.json`.
+
+Google Play: https://play.google.com/store/apps/details?id=io.github.ventsharm.twa
